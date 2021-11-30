@@ -1,0 +1,122 @@
+syntax = "proto3";
+
+package aea.eightballer.ocean.v0_1_0;
+
+message OceanMessage{
+
+  // Custom Types
+  message ErrorCode{
+    enum ErrorCodeEnum {
+      UNSUPPORTED_PROTOCOL = 0;
+      DECODING_ERROR = 1;
+      INVALID_MESSAGE = 2;
+      UNSUPPORTED_SKILL = 3;
+      INVALID_DIALOGUE = 4;
+    }
+    ErrorCodeEnum error_code = 1;
+  }
+
+
+  // Performatives and contents
+  message Deploy_Data_Download_Performative{
+    string token0_name = 1;
+    string token1_name = 2;
+    string dataset_url = 3;
+    string name = 4;
+    string author = 5;
+    string date_created = 6;
+    string license = 7;
+    int32 amount_to_mint = 8;
+  }
+
+  message Deploy_D2C_Performative{
+    string token0_name = 1;
+    string token1_name = 2;
+    string dataset_url = 3;
+    string name = 4;
+    string author = 5;
+    string date_created = 6;
+    string license = 7;
+    int32 amount_to_mint = 8;
+  }
+
+  message Deploy_Algorithm_Performative{
+    string token0_name = 1;
+    string token1_name = 2;
+    int32 amount_to_mint = 3;
+    string language = 4;
+    string format = 5;
+    string version = 6;
+    string entrypoint = 7;
+    string image = 8;
+    string tag = 9;
+    string files_url = 10;
+    string name = 11;
+    string author = 12;
+    string date_created = 13;
+    string license = 14;
+  }
+
+  message Pool_Deployment_Reciept_Performative{
+    string pool_address = 1;
+  }
+
+  message Deployment_Reciept_Performative{
+    string type = 1;
+    string did = 2;
+    string datatoken_contract_address = 3;
+  }
+
+  message Create_Pool_Performative{
+    string datatoken_address = 1;
+    int32 datatoken_amt = 2;
+    int32 ocean_amt = 3;
+  }
+
+  message Download_Job_Performative{
+    string datatoken_address = 1;
+    int32 datatoken_amt = 2;
+    int32 max_cost_ocean = 3;
+    string asset_did = 4;
+    string pool_address = 5;
+  }
+
+  message Permission_Dataset_Performative{
+    string algo_did = 1;
+    string data_did = 2;
+  }
+
+  message D2C_Job_Performative{
+    string data_did = 1;
+    string algo_did = 2;
+  }
+
+  message Results_Performative{
+    bytes content = 1;
+  }
+
+  message Error_Performative{
+    ErrorCode error_code = 1;
+    string error_msg = 2;
+    map<string, bytes> error_data = 3;
+  }
+
+  message End_Performative{
+  }
+
+
+  oneof performative{
+    Create_Pool_Performative create_pool = 5;
+    D2C_Job_Performative d2c_job = 6;
+    Deploy_Algorithm_Performative deploy_algorithm = 7;
+    Deploy_D2C_Performative deploy_d2c = 8;
+    Deploy_Data_Download_Performative deploy_data_download = 9;
+    Deployment_Reciept_Performative deployment_reciept = 10;
+    Download_Job_Performative download_job = 11;
+    End_Performative end = 12;
+    Error_Performative error = 13;
+    Permission_Dataset_Performative permission_dataset = 14;
+    Pool_Deployment_Reciept_Performative pool_deployment_reciept = 15;
+    Results_Performative results = 16;
+  }
+}

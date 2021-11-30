@@ -1,0 +1,51 @@
+agent_name: generic_buyer
+author: fetchai
+version: 0.29.0
+description: The buyer AEA purchases the services offered by the seller AEA.
+license: Apache-2.0
+aea_version: '>=1.0.0, <2.0.0'
+fingerprint: {}
+fingerprint_ignore_patterns: []
+connections:
+- fetchai/ledger:0.19.0
+- fetchai/p2p_libp2p:0.25.0
+- fetchai/soef:0.26.0
+contracts: []
+protocols:
+- fetchai/acn:1.0.0
+- fetchai/contract_api:1.0.0
+- fetchai/default:1.0.0
+- fetchai/fipa:1.0.0
+- fetchai/ledger_api:1.0.0
+- fetchai/oef_search:1.0.0
+- fetchai/signing:1.0.0
+- fetchai/state_update:1.0.0
+skills:
+- fetchai/generic_buyer:0.1.0
+default_connection: fetchai/p2p_libp2p:0.25.0
+default_ledger: fetchai
+required_ledgers:
+- fetchai
+logging_config:
+  disable_existing_loggers: false
+  version: 1
+private_key_paths:
+  fetchai: fetchai_private_key.txt
+default_routing:
+  fetchai/ledger_api:1.0.0: fetchai/ledger:0.19.0
+  fetchai/oef_search:1.0.0: fetchai/soef:0.26.0
+connection_private_key_paths:
+  fetchai: fetchai_connection_private_key.txt
+dependencies:
+  aea-ledger-fetchai:
+    version: <2.0.0,>=1.0.0
+---
+public_id: fetchai/p2p_libp2p:0.25.0
+type: connection
+config:
+  delegate_uri: 127.0.0.1:11001
+  entry_peers:
+  - /dns4/127.0.0.1/tcp/9000/p2p/16Uiu2HAmRDUGBnKt6hLMRBzeumY9gK39G31HbjchJfRnk3auFwMK
+  local_uri: 127.0.0.1:9001
+  public_uri: 127.0.0.1:9001
+  log_file: libp2p_node.log

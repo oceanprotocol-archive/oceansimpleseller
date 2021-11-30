@@ -1,0 +1,103 @@
+---
+name: ocean
+author: eightballer
+version: 0.1.0
+description: A protocol for interacting with the ocean protocol.
+license: Apache-2.0
+aea_version: '>=1.0.0, <2.0.0'
+protocol_specification_id: eightballer/ocean:0.1.0
+speech_acts:
+  deploy_data_download:
+    token0_name: pt:str
+    token1_name: pt:str
+    dataset_url: pt:str
+    name: pt:str
+    author: pt:str
+    date_created: pt:str
+    license: pt:str
+    amount_to_mint: pt:int
+  deploy_d2c:
+    token0_name: pt:str
+    token1_name: pt:str
+    dataset_url: pt:str
+    name: pt:str
+    author: pt:str
+    date_created: pt:str
+    license: pt:str
+    amount_to_mint: pt:int
+  deploy_algorithm:
+    token0_name: pt:str
+    token1_name: pt:str
+    amount_to_mint: pt:int
+    language: pt:str
+    format: pt:str
+    version: pt:str
+    entrypoint: pt:str
+    image: pt:str
+    tag: pt:str
+    files_url: pt:str
+    name: pt:str
+    author: pt:str
+    date_created: pt:str
+    license: pt:str
+  pool_deployment_reciept:
+    pool_address: pt:str
+  deployment_reciept:
+    type: pt:str
+    did: pt:str
+    datatoken_contract_address: pt:str
+  create_pool:
+    datatoken_address: pt:str
+    datatoken_amt: pt:int
+    ocean_amt: pt:int
+  download_job:
+    datatoken_address: pt:str
+    datatoken_amt: pt:int
+    max_cost_ocean: pt:int
+    asset_did: pt:str
+    pool_address: pt:str
+  permission_dataset:
+    algo_did: pt:str
+    data_did: pt:str
+  d2c_job:
+    data_did: pt:str
+    algo_did: pt:str
+  results:
+    content: pt:bytes
+  error:
+    error_code: ct:ErrorCode
+    error_msg: pt:str
+    error_data: pt:dict[pt:str, pt:bytes]
+  end: {}
+...
+---
+ct:ErrorCode: |
+  enum ErrorCodeEnum {
+      UNSUPPORTED_PROTOCOL = 0;
+      DECODING_ERROR = 1;
+      INVALID_MESSAGE = 2;
+      UNSUPPORTED_SKILL = 3;
+      INVALID_DIALOGUE = 4;
+    }
+  ErrorCodeEnum error_code = 1;
+...
+---
+initiation: [deploy_d2c, deploy_algorithm, d2c_job, download_job]
+reply:
+  deploy_d2c: [deployment_reciept, error, end]
+  deploy_data_download: [deployment_reciept, error, end]
+  deploy_algorithm: [deployment_reciept, error, end]
+  create_pool: [pool_deployment_reciept, error, end]
+  download_job: [results, error, end]
+  d2c_job: [results, error, end]
+  results: [error, end]
+  permission_dataset: [ error, end]
+  deployment_reciept: []
+  pool_deployment_reciept: []
+  error: []
+  end: []
+termination: [deployment_reciept, pool_deployment_reciept, end, error]
+roles: {agent}
+end_states: [successful, failed]
+keep_terminal_state_dialogues: true
+...

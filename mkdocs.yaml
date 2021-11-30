@@ -1,0 +1,19 @@
+site_name: Example Python Repo 
+site_url: ''
+site_description: ''
+site_author: ''
+
+theme:
+  name: material
+#  logo:
+#    icon: code
+#  feature:
+#    tabs: true  
+
+nav:
+  - Index: 'index.md'
+  - Gitlab CI: 'ci.md'
+
+plugins: []
+
+markdown_extensions: []

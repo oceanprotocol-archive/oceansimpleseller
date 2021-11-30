@@ -1,0 +1,69 @@
+# This file is a template, and might need editing before it works on your project.
+# To contribute improvements to CI/CD templates, please follow the Development guide at:
+# https://docs.gitlab.com/ee/development/cicd/templates.html
+# This specific template is located at:
+# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
+
+# This is a sample GitLab CI/CD configuration file that should run without any modifications.
+# It demonstrates a basic 3 stage CI/CD pipeline. Instead of real tests or scripts,
+# it uses echo commands to simulate the pipeline execution.
+#
+# A pipeline is composed of independent jobs that run scripts, grouped into stages.
+# Stages run in sequential order, but jobs within stages run in parallel.
+#
+# For more information, see: https://docs.gitlab.com/ee/ci/yaml/index.html#stages
+
+variables: 
+  OWNER: rebeccajohnson
+  IMAGE: mobix_reward_agent
+  TAG: latest
+
+default:
+  image: python:3.8
+
+stages:          # List of stages for jobs, and their order of execution
+  - build
+  - test
+  - deploy
+
+amd-install-job:       # This job runs in the build stage, which runs first.
+  stage: build
+  script:
+    - pip install pipenv
+    - make new_env
+    - make install_env
+    - echo "Compile complete."
+
+
+unit-test-job:   # This job runs in the test stage.
+  stage: test    # It only starts when the job in the build stage completes successfully.
+  script:
+    - echo "Running unit tests... This will take about 60 seconds."
+    - pip install pipenv
+    - make new_env
+    - make install_env
+    - make tests
+    - echo "tests completed!"
+
+lint-test-job:   # This job also runs in the test stage.
+  stage: test    # It can run at the same time as unit-test-job (in parallel).
+  script:
+    - mkdir app
+    - pip install pipenv
+    - make new_env
+    - make install_env
+    - echo "Linting code... This will take about 10 seconds."
+    - make lint
+    - echo "No lint issues found!"
+
+dockerhub-deploy-job:      # This job runs in the deploy stage.
+  stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
+  image: docker
+  services:
+  - docker:dind
+  script:
+    - docker login -u $OWNER -p $DOCKERHUB_ACCESS_TOKEN
+    - docker build -t $OWNER/$IMAGE:$TAG .
+    - echo "Deploying application..."
+    - docker push $OWNER/$IMAGE:$TAG
+    - echo "Application successfully deployed."

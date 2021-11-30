@@ -1,0 +1,27 @@
+name: storj_file_transfer
+author: eightballer
+version: 0.1.0
+type: connection
+description: The scaffold connection provides a scaffold for a connection to be implemented
+  by the developer.
+license: Apache-2.0
+aea_version: '>=1.0.0, <2.0.0'
+fingerprint:
+  __init__.py: QmZvYZ5ECcWwqiNGh8qNTg735wu51HqaLxTSifUxkQ4KGj
+  connection.py: QmUEg1uCGSZJ6mD5T5NUeMNpi4wFeLwjjbgPiSFfkUScrT
+  readme.md: Qmdt71SaCCwAG1c24VktXDm4pxgUBiPMg4bWfUTiqorypf
+fingerprint_ignore_patterns: []
+connections: []
+protocols: []
+class_name: StorjSyncConnection
+config:
+  storj_creds:
+    aws_access_key_id: null
+    aws_secret_access_key: null
+    endpoint_url: null
+  target_skill_id:  null
+excluded_protocols: []
+restricted_to_protocols: []
+dependencies: {}
+is_abstract: false
+cert_requests: []

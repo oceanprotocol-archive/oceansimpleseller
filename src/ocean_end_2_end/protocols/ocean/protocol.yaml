@@ -1,0 +1,19 @@
+name: ocean
+author: eightballer
+version: 0.1.0
+protocol_specification_id: eightballer/ocean:0.1.0
+type: protocol
+description: A protocol for interacting with the ocean protocol.
+license: Apache-2.0
+aea_version: '>=1.0.0, <2.0.0'
+fingerprint:
+  __init__.py: Qmbo9jNguTqf8H7PaJbm16t58dKhbLSxXtjRY8fB2zpCr5
+  custom_types.py: QmZ1roPfCHpiWdfkpKsHXWZTcRyLUBoB68JtSchqU8irmQ
+  dialogues.py: QmSigSPRVB3ckGZaXEqusuyvD5VWccDSEyWeJSHPx8advD
+  message.py: QmYGvW9nmBmbrUWJWXyR2zh8VEPUcUgSnaGjMXBtZZbngd
+  ocean.proto: QmeYRBeiPh5dkDS3jfnki8iQu6DbF5Eoc8njQ1KQq1bQvb
+  ocean_pb2.py: Qme2okUeW6kHpHsjNLXthHVSCyfJZh5rpcPxwxqVDgDMQs
+  serialization.py: QmP4QGAn3RRqLBtCfVHTTKXHXmjd71uLcMBzQR6zMNsBRG
+fingerprint_ignore_patterns: []
+dependencies:
+  protobuf: {}
