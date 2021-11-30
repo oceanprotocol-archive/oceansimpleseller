@@ -49,7 +49,7 @@ class OceanHandler(Handler):
         :param message: the message
         """
         self.log.debug(f"Received the result from C2D ! {message}")
-        with open("results_output", "wb") as f:
+        with open("./results_output", "wb") as f:
             f.write(message.content)
 
     def teardown(self) -> None:
