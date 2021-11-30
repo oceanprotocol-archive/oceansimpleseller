@@ -1,21 +1,18 @@
-import uuid
 import json
+import uuid
 from typing import Any, Dict, Optional, Tuple
 
 from aea.common import Address
 from aea.crypto.ledger_apis import LedgerApis
 from aea.exceptions import enforce
-from aea.helpers.search.generic import (
-    AGENT_LOCATION_MODEL,
-    AGENT_PERSONALITY_MODEL,
-    AGENT_REMOVE_SERVICE_MODEL,
-    AGENT_SET_SERVICE_MODEL,
-    SIMPLE_SERVICE_MODEL,
-)
+from aea.helpers.search.generic import (AGENT_LOCATION_MODEL,
+                                        AGENT_PERSONALITY_MODEL,
+                                        AGENT_REMOVE_SERVICE_MODEL,
+                                        AGENT_SET_SERVICE_MODEL,
+                                        SIMPLE_SERVICE_MODEL)
 from aea.helpers.search.models import Description, Location, Query
 from aea.helpers.transaction.base import Terms
 from aea.skills.base import Model
-
 
 DEFAULT_IS_LEDGER_TX = True
 
@@ -313,10 +310,14 @@ class GenericStrategy(Model):
     @property
     def data_for_sale(self) -> Dict[str, str]:
         """Get the data for sale."""
-        return {"data": json.dumps({
-            "algo_did": self.algorithm_address.get('did', None),
-            "data_did": self.data_to_compute_address.get('did', None)
-        })}
+        return {
+            "data": json.dumps(
+                {
+                    "algo_did": self.algorithm_address.get("did", None),
+                    "data_did": self.data_to_compute_address.get("did", None),
+                }
+            )
+        }
         if self._has_data_source:
             return self.collect_from_data_source()  # pragma: nocover
         return self._data_for_sale
@@ -338,7 +339,8 @@ class GenericStrategy(Model):
         :return: a description of the agent's location
         """
         description = Description(
-            self._agent_location, data_model=AGENT_LOCATION_MODEL,
+            self._agent_location,
+            data_model=AGENT_LOCATION_MODEL,
         )
         return description
 
@@ -349,7 +351,8 @@ class GenericStrategy(Model):
         :return: a description of the offered services
         """
         description = Description(
-            self._set_service_data, data_model=AGENT_SET_SERVICE_MODEL,
+            self._set_service_data,
+            data_model=AGENT_SET_SERVICE_MODEL,
         )
         return description
 
@@ -360,7 +363,8 @@ class GenericStrategy(Model):
         :return: a description of the personality
         """
         description = Description(
-            self._set_personality_data, data_model=AGENT_PERSONALITY_MODEL,
+            self._set_personality_data,
+            data_model=AGENT_PERSONALITY_MODEL,
         )
         return description
 
@@ -371,7 +375,8 @@ class GenericStrategy(Model):
         :return: a description of the classification
         """
         description = Description(
-            self._set_classification, data_model=AGENT_PERSONALITY_MODEL,
+            self._set_classification,
+            data_model=AGENT_PERSONALITY_MODEL,
         )
         return description
 
@@ -382,7 +387,8 @@ class GenericStrategy(Model):
         :return: a description of the offered services
         """
         description = Description(
-            self._simple_service_data, data_model=SIMPLE_SERVICE_MODEL,
+            self._simple_service_data,
+            data_model=SIMPLE_SERVICE_MODEL,
         )
         return description
 
@@ -393,7 +399,8 @@ class GenericStrategy(Model):
         :return: a description of the to be removed service
         """
         description = Description(
-            self._remove_service_data, data_model=AGENT_REMOVE_SERVICE_MODEL,
+            self._remove_service_data,
+            data_model=AGENT_REMOVE_SERVICE_MODEL,
         )
         return description
 

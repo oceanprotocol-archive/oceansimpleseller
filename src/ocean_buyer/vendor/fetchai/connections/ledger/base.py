@@ -32,7 +32,6 @@ from aea.mail.base import Envelope
 from aea.protocols.base import Message
 from aea.protocols.dialogue.base import Dialogue, Dialogues
 
-
 CONNECTION_ID = PublicId.from_str("fetchai/ledger:0.19.0")
 
 
@@ -131,7 +130,11 @@ class RequestDispatcher(ABC):
 
     @abstractmethod
     def get_error_message(
-        self, e: Exception, api: LedgerApi, message: Message, dialogue: Dialogue,
+        self,
+        e: Exception,
+        api: LedgerApi,
+        message: Message,
+        dialogue: Dialogue,
     ) -> Message:
         """
         Build an error message.

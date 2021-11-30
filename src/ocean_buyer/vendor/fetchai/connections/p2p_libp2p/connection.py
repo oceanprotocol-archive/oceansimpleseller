@@ -27,7 +27,7 @@ from asyncio import AbstractEventLoop, CancelledError, events
 from ipaddress import ip_address
 from pathlib import Path
 from socket import gethostbyname
-from typing import Any, IO, List, Optional, Sequence, cast
+from typing import IO, Any, List, Optional, Sequence, cast
 
 from aea.configurations.base import PublicId
 from aea.configurations.constants import DEFAULT_LEDGER
@@ -39,11 +39,10 @@ from aea.helpers.acn.uri import Uri
 from aea.helpers.multiaddr.base import MultiAddr
 from aea.helpers.pipe import IPCChannel, TCPSocketChannel
 from aea.mail.base import Envelope
-
-from packages.fetchai.connections.p2p_libp2p.consts import LIBP2P_NODE_MODULE_NAME
+from packages.fetchai.connections.p2p_libp2p.consts import \
+    LIBP2P_NODE_MODULE_NAME
 from packages.fetchai.protocols.acn import acn_pb2
 from packages.fetchai.protocols.acn.message import AcnMessage
-
 
 _default_logger = logging.getLogger("aea.packages.fetchai.connections.p2p_libp2p")
 

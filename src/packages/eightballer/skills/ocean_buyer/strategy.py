@@ -3,16 +3,10 @@ from typing import Any, Dict, List, Tuple
 from aea.common import Address
 from aea.exceptions import enforce
 from aea.helpers.search.generic import SIMPLE_SERVICE_MODEL
-from aea.helpers.search.models import (
-    Constraint,
-    ConstraintType,
-    Description,
-    Location,
-    Query,
-)
+from aea.helpers.search.models import (Constraint, ConstraintType, Description,
+                                       Location, Query)
 from aea.helpers.transaction.base import Terms
 from aea.skills.base import Model
-
 
 DEFAULT_IS_LEDGER_TX = True
 
@@ -77,7 +71,7 @@ class GenericStrategy(Model):
         self._currency_id = currency_id
         self._is_searching = False
         self._balance = 0
-        self.purchased_data = None #TODO add as properties....
+        self.purchased_data = None  # TODO add as properties....
         self.is_in_flight = False
         self.is_c2d_active = False
         self.is_processing = False
@@ -140,7 +134,9 @@ class GenericStrategy(Model):
                 self._search_query["search_value"],
             ),
         )
-        query = Query([close_to_my_service, service_key_filter],)
+        query = Query(
+            [close_to_my_service, service_key_filter],
+        )
         return query
 
     def get_service_query(self) -> Query:
@@ -192,7 +188,6 @@ class GenericStrategy(Model):
             and proposal.values["tx_nonce"] != ""
         )
         return result
-
 
     def is_affordable_proposal(self, proposal: Description) -> bool:
         """

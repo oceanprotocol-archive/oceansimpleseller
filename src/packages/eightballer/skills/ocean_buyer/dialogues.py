@@ -7,37 +7,29 @@ from aea.protocols.base import Message
 from aea.protocols.dialogue.base import Dialogue as BaseDialogue
 from aea.protocols.dialogue.base import DialogueLabel as BaseDialogueLabel
 from aea.skills.base import Model
-
-from packages.fetchai.protocols.default.dialogues import (
-    DefaultDialogue as BaseDefaultDialogue,
-)
-from packages.fetchai.protocols.default.dialogues import (
-    DefaultDialogues as BaseDefaultDialogues,
-)
-from packages.fetchai.protocols.fipa.dialogues import FipaDialogue as BaseFipaDialogue
-from packages.fetchai.protocols.fipa.dialogues import FipaDialogues as BaseFipaDialogues
+from packages.fetchai.protocols.default.dialogues import \
+    DefaultDialogue as BaseDefaultDialogue
+from packages.fetchai.protocols.default.dialogues import \
+    DefaultDialogues as BaseDefaultDialogues
+from packages.fetchai.protocols.fipa.dialogues import \
+    FipaDialogue as BaseFipaDialogue
+from packages.fetchai.protocols.fipa.dialogues import \
+    FipaDialogues as BaseFipaDialogues
 from packages.fetchai.protocols.fipa.message import FipaMessage
-from packages.fetchai.protocols.ledger_api.dialogues import (
-    LedgerApiDialogue as BaseLedgerApiDialogue,
-)
-from packages.fetchai.protocols.ledger_api.dialogues import (
-    LedgerApiDialogues as BaseLedgerApiDialogues,
-)
+from packages.fetchai.protocols.ledger_api.dialogues import \
+    LedgerApiDialogue as BaseLedgerApiDialogue
+from packages.fetchai.protocols.ledger_api.dialogues import \
+    LedgerApiDialogues as BaseLedgerApiDialogues
 from packages.fetchai.protocols.ledger_api.message import LedgerApiMessage
-from packages.fetchai.protocols.oef_search.dialogues import (
-    OefSearchDialogue as BaseOefSearchDialogue,
-)
-from packages.fetchai.protocols.oef_search.dialogues import (
-    OefSearchDialogues as BaseOefSearchDialogues,
-)
-from packages.fetchai.protocols.signing.dialogues import (
-    SigningDialogue as BaseSigningDialogue,
-)
-from packages.fetchai.protocols.signing.dialogues import (
-    SigningDialogues as BaseSigningDialogues,
-)
+from packages.fetchai.protocols.oef_search.dialogues import \
+    OefSearchDialogue as BaseOefSearchDialogue
+from packages.fetchai.protocols.oef_search.dialogues import \
+    OefSearchDialogues as BaseOefSearchDialogues
+from packages.fetchai.protocols.signing.dialogues import \
+    SigningDialogue as BaseSigningDialogue
+from packages.fetchai.protocols.signing.dialogues import \
+    SigningDialogues as BaseSigningDialogues
 from packages.fetchai.protocols.signing.message import SigningMessage
-
 
 DefaultDialogue = BaseDefaultDialogue
 

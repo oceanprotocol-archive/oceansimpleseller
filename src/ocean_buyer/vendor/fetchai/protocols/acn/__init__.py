@@ -26,5 +26,4 @@ It was created with protocol buffer compiler version `libprotoc 3.11.4` and aea 
 from packages.fetchai.protocols.acn.message import AcnMessage
 from packages.fetchai.protocols.acn.serialization import AcnSerializer
 
-
 AcnMessage.serializer = AcnSerializer

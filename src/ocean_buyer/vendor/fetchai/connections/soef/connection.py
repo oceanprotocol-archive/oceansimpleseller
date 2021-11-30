@@ -33,36 +33,24 @@ from typing import Any, Callable, Dict, List, Optional, Union, cast
 from urllib import parse
 from uuid import uuid4
 
-from defusedxml import ElementTree  # pylint: disable=wrong-import-order
-
 from aea.common import Address, JSONLike
 from aea.configurations.base import PublicId
 from aea.connections.base import Connection, ConnectionStates
 from aea.exceptions import enforce
 from aea.helpers import http_requests as requests
-from aea.helpers.search.models import (
-    Constraint,
-    ConstraintTypes,
-    Description,
-    Location,
-    Query,
-)
+from aea.helpers.search.models import (Constraint, ConstraintTypes,
+                                       Description, Location, Query)
 from aea.mail.base import Envelope
 from aea.protocols.base import Message
 from aea.protocols.dialogue.base import Dialogue as BaseDialogue
-
+from defusedxml import ElementTree  # pylint: disable=wrong-import-order
 from packages.fetchai.protocols.oef_search.custom_types import (
-    AgentsInfo,
-    OefErrorOperation,
-)
-from packages.fetchai.protocols.oef_search.dialogues import (
-    OefSearchDialogue as BaseOefSearchDialogue,
-)
-from packages.fetchai.protocols.oef_search.dialogues import (
-    OefSearchDialogues as BaseOefSearchDialogues,
-)
+    AgentsInfo, OefErrorOperation)
+from packages.fetchai.protocols.oef_search.dialogues import \
+    OefSearchDialogue as BaseOefSearchDialogue
+from packages.fetchai.protocols.oef_search.dialogues import \
+    OefSearchDialogues as BaseOefSearchDialogues
 from packages.fetchai.protocols.oef_search.message import OefSearchMessage
-
 
 _default_logger = logging.getLogger("aea.packages.fetchai.connections.soef")
 
@@ -388,7 +376,8 @@ class SOEFChannel:
         return True
 
     def _construct_personality_filter_params(
-        self, equality_constraints: List[Constraint],
+        self,
+        equality_constraints: List[Constraint],
     ) -> Dict[str, List[str]]:
         """
         Construct a dictionary of personality filters.
@@ -864,7 +853,8 @@ class SOEFChannel:
         if disclosure_accuracy:
             params = {"accuracy": disclosure_accuracy}
             await self._generic_oef_command(
-                "set_find_position_disclosure_accuracy", params,
+                "set_find_position_disclosure_accuracy",
+                params,
             )
 
         self.agent_location = agent_location
@@ -981,7 +971,11 @@ class SOEFChannel:
             target_message=oef_search_message,
             oef_error_operation=oef_error_operation,
         )
-        envelope = Envelope(to=message.to, sender=message.sender, message=message,)
+        envelope = Envelope(
+            to=message.to,
+            sender=message.sender,
+            message=message,
+        )
         await self.in_queue.put(envelope)
 
     async def unregister_service(
@@ -1244,7 +1238,11 @@ class SOEFChannel:
             agents=tuple(agents.keys()),
             agents_info=AgentsInfo(agents),
         )
-        envelope = Envelope(to=message.to, sender=message.sender, message=message,)
+        envelope = Envelope(
+            to=message.to,
+            sender=message.sender,
+            message=message,
+        )
         await self.in_queue.put(envelope)
 
 

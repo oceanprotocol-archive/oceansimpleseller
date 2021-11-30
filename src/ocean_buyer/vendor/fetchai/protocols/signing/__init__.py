@@ -26,5 +26,4 @@ It was created with protocol buffer compiler version `libprotoc 3.11.4` and aea 
 from packages.fetchai.protocols.signing.message import SigningMessage
 from packages.fetchai.protocols.signing.serialization import SigningSerializer
 
-
 SigningMessage.serializer = SigningSerializer

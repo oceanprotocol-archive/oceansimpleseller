@@ -25,17 +25,10 @@ from typing import Any, Dict, cast
 from aea.mail.base_pb2 import DialogueMessage
 from aea.mail.base_pb2 import Message as ProtobufMessage
 from aea.protocols.base import Message, Serializer
-
 from packages.fetchai.protocols.ledger_api import ledger_api_pb2
 from packages.fetchai.protocols.ledger_api.custom_types import (
-    Kwargs,
-    RawTransaction,
-    SignedTransaction,
-    State,
-    Terms,
-    TransactionDigest,
-    TransactionReceipt,
-)
+    Kwargs, RawTransaction, SignedTransaction, State, Terms, TransactionDigest,
+    TransactionReceipt)
 from packages.fetchai.protocols.ledger_api.message import LedgerApiMessage
 
 

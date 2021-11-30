@@ -311,7 +311,9 @@ _ACNMESSAGE_STATUSBODY = _descriptor.Descriptor(
     ],
     extensions=[],
     nested_types=[],
-    enum_types=[_ACNMESSAGE_STATUSBODY_STATUSCODEENUM,],
+    enum_types=[
+        _ACNMESSAGE_STATUSBODY_STATUSCODEENUM,
+    ],
     serialized_options=None,
     is_extendable=False,
     syntax="proto3",

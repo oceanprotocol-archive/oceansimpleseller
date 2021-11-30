@@ -1,32 +1,18 @@
 from typing import Any, List, Optional, Set, cast
 
 from aea.protocols.dialogue.base import DialogueLabel
-from aea.skills.behaviours import TickerBehaviour, Behaviour
-
-
-from typing import cast
-
 from aea.skills.base import Envelope
+from aea.skills.behaviours import Behaviour, TickerBehaviour
+from packages.fetchai.connections.ledger.base import \
+    CONNECTION_ID as LEDGER_CONNECTION_PUBLIC_ID
+from packages.fetchai.protocols.ledger_api.message import LedgerApiMessage
+from packages.fetchai.protocols.oef_search.message import OefSearchMessage
 
 from packages.eightballer.protocols.ocean.message import OceanMessage
 from packages.eightballer.skills.ocean_buyer import PUBLIC_ID as SENDER_ID
-
-
-
-
-from packages.fetchai.connections.ledger.base import (
-    CONNECTION_ID as LEDGER_CONNECTION_PUBLIC_ID,
-)
-from packages.fetchai.protocols.ledger_api.message import LedgerApiMessage
-from packages.fetchai.protocols.oef_search.message import OefSearchMessage
 from packages.eightballer.skills.ocean_buyer.dialogues import (
-    FipaDialogue,
-    LedgerApiDialogue,
-    LedgerApiDialogues,
-    OefSearchDialogues,
-)
+    FipaDialogue, LedgerApiDialogue, LedgerApiDialogues, OefSearchDialogues)
 from packages.eightballer.skills.ocean_buyer.strategy import GenericStrategy
-
 
 DEFAULT_MAX_PROCESSING = 120
 DEFAULT_TX_INTERVAL = 2.0
@@ -199,10 +185,7 @@ class OceanC2DBehaviour(Behaviour):
         if strategy.is_in_flight or not strategy.is_c2d_active:
             return
 
-        if (
-            strategy.purchased_data is not None
-            and not strategy.has_completed_d2c_job
-        ):
+        if strategy.purchased_data is not None and not strategy.has_completed_d2c_job:
             self.log.info(f"submitting the compute 2 data job!")
             self.__create_envelope(
                 OceanMessage.Performative.D2C_JOB, **strategy.purchased_data
@@ -213,7 +196,7 @@ class OceanC2DBehaviour(Behaviour):
                 f"Completed the c2d demonstration... Setting strategy to download behaviour"
             )
             strategy.is_c2d_active = False
-            strategy.is_processing  = False
+            strategy.is_processing = False
 
     def __create_envelope(
         self, performative: OceanMessage.Performative, **kwargs

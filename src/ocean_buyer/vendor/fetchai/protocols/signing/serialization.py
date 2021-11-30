@@ -25,16 +25,13 @@ from typing import Any, Dict, cast
 from aea.mail.base_pb2 import DialogueMessage
 from aea.mail.base_pb2 import Message as ProtobufMessage
 from aea.protocols.base import Message, Serializer
-
 from packages.fetchai.protocols.signing import signing_pb2
-from packages.fetchai.protocols.signing.custom_types import (
-    ErrorCode,
-    RawMessage,
-    RawTransaction,
-    SignedMessage,
-    SignedTransaction,
-    Terms,
-)
+from packages.fetchai.protocols.signing.custom_types import (ErrorCode,
+                                                             RawMessage,
+                                                             RawTransaction,
+                                                             SignedMessage,
+                                                             SignedTransaction,
+                                                             Terms)
 from packages.fetchai.protocols.signing.message import SigningMessage
 
 

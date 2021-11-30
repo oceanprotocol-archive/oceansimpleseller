@@ -1,29 +1,22 @@
-from packages.eightballer.skills.ocean_seller import \
-    PUBLIC_ID as SENDER_ID
-from packages.eightballer.protocols.file_storage.message import \
-    FileStorageMessage
-from typing import cast
-from packages.eightballer.skills.ocean_seller import PUBLIC_ID as SENDER_ID
-from packages.eightballer.protocols.ocean.message import OceanMessage
-from packages.eightballer.protocols.ocean.dialogues import (OceanDialogue,
-                                                            OceanDialogues)
-from aea.skills.base import Behaviour, Envelope
 from typing import Any, Optional, cast
 
 from aea.helpers.search.models import Description
+from aea.skills.base import Behaviour, Envelope
 from aea.skills.behaviours import TickerBehaviour
-
-from packages.fetchai.connections.ledger.base import (
-    CONNECTION_ID as LEDGER_CONNECTION_PUBLIC_ID,
-)
+from packages.fetchai.connections.ledger.base import \
+    CONNECTION_ID as LEDGER_CONNECTION_PUBLIC_ID
 from packages.fetchai.protocols.ledger_api.message import LedgerApiMessage
 from packages.fetchai.protocols.oef_search.message import OefSearchMessage
-from packages.eightballer.skills.ocean_seller.dialogues import (
-    LedgerApiDialogues,
-    OefSearchDialogues,
-)
-from packages.eightballer.skills.ocean_seller.strategy import GenericStrategy
 
+from packages.eightballer.protocols.file_storage.message import \
+    FileStorageMessage
+from packages.eightballer.protocols.ocean.dialogues import (OceanDialogue,
+                                                            OceanDialogues)
+from packages.eightballer.protocols.ocean.message import OceanMessage
+from packages.eightballer.skills.ocean_seller import PUBLIC_ID as SENDER_ID
+from packages.eightballer.skills.ocean_seller.dialogues import (
+    LedgerApiDialogues, OefSearchDialogues)
+from packages.eightballer.skills.ocean_seller.strategy import GenericStrategy
 
 DEFAULT_SERVICES_INTERVAL = 60.0
 DEFAULT_MAX_SOEF_REGISTRATION_RETRIES = 5
@@ -57,8 +50,7 @@ class GenericServiceRegistrationBehaviour(TickerBehaviour):
                 counterparty=LEDGER_API_ADDRESS,
                 performative=LedgerApiMessage.Performative.GET_BALANCE,
                 ledger_id=strategy.ledger_id,
-                address=cast(str, self.context.agent_addresses.get(
-                    strategy.ledger_id)),
+                address=cast(str, self.context.agent_addresses.get(strategy.ledger_id)),
             )
             self.context.outbox.put_message(message=ledger_api_msg)
         self._registered = False
@@ -233,9 +225,7 @@ class OceanC2DBehaviour(OceanBehaviourBase):
             and strategy.is_algorithm_deployed
             and strategy.is_data_to_compute_deployed
         ):
-            self.log.info(
-                f"Completed the c2d deployment."
-            )
+            self.log.info(f"Completed the c2d deployment.")
             strategy.is_d2c_active = False
             strategy.is_processing = False
             strategy.has_completed_d2c_job = True
@@ -255,7 +245,6 @@ class OceanC2DBehaviour(OceanBehaviourBase):
         strategy.is_in_flight = True
 
 
-
 class OceanSellerBehaviour(Behaviour):
     def act(self):
         strategy = cast(GenericStrategy, self.context.strategy)
@@ -273,22 +262,22 @@ class OceanSellerBehaviour(Behaviour):
         #     strategy.is_processing = True
         #     strategy.is_d2c_active = True
         #     return
-        
+
         # else:
         self.context.logger.info(f"Seller behaviour to active")
         strategy.is_processing = True
         strategy.is_seller_active = True
-            
-        
 
     def teardown(self):
         pass
 
     def setup(self):
         self.log = self.context.logger
-        return 
+        return
 
-    def __upload_data(self, ) -> None:
+    def __upload_data(
+        self,
+    ) -> None:
         with open("../EXAMPLE_DATA.csv", "rb") as f:
             bytes = f.read()
             filename = "EXAMPLE_FILE"

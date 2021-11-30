@@ -32,14 +32,13 @@ from aea.helpers.transaction.base import RawMessage, RawTransaction, State
 from aea.protocols.base import Address, Message
 from aea.protocols.dialogue.base import Dialogue as BaseDialogue
 from aea.protocols.dialogue.base import Dialogues as BaseDialogues
-
-from packages.fetchai.connections.ledger.base import CONNECTION_ID, RequestDispatcher
+from packages.fetchai.connections.ledger.base import (CONNECTION_ID,
+                                                      RequestDispatcher)
 from packages.fetchai.protocols.contract_api import ContractApiMessage
-from packages.fetchai.protocols.contract_api.dialogues import ContractApiDialogue
-from packages.fetchai.protocols.contract_api.dialogues import (
-    ContractApiDialogues as BaseContractApiDialogues,
-)
-
+from packages.fetchai.protocols.contract_api.dialogues import \
+    ContractApiDialogue
+from packages.fetchai.protocols.contract_api.dialogues import \
+    ContractApiDialogues as BaseContractApiDialogues
 
 _default_logger = logging.getLogger(
     "aea.packages.fetchai.connections.ledger.contract_dispatcher"
@@ -105,7 +104,11 @@ class ContractApiRequestDispatcher(RequestDispatcher):
         return message.ledger_id
 
     def get_error_message(
-        self, e: Exception, api: LedgerApi, message: Message, dialogue: BaseDialogue,
+        self,
+        e: Exception,
+        api: LedgerApi,
+        message: Message,
+        dialogue: BaseDialogue,
     ) -> ContractApiMessage:
         """
         Build an error message.
@@ -289,7 +292,10 @@ class ContractApiRequestDispatcher(RequestDispatcher):
         return self.dispatch_request(ledger_api, message, dialogue, build_response)
 
     def _get_data(
-        self, api: LedgerApi, message: ContractApiMessage, contract: Contract,
+        self,
+        api: LedgerApi,
+        message: ContractApiMessage,
+        contract: Contract,
     ) -> Union[bytes, JSONLike]:
         """Get the data from the contract method, either from the stub or from the callable specified by the message."""
         # first, check if the custom handler for this type of request has been implemented.

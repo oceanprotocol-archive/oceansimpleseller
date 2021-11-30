@@ -25,6 +25,7 @@ from typing import Any, Dict, cast
 from aea.mail.base_pb2 import DialogueMessage
 from aea.mail.base_pb2 import Message as ProtobufMessage
 from aea.protocols.base import Message, Serializer
+
 from packages.eightballer.protocols.file_storage import file_storage_pb2
 from packages.eightballer.protocols.file_storage.custom_types import ErrorCode
 from packages.eightballer.protocols.file_storage.message import \

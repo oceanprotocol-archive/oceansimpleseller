@@ -25,7 +25,6 @@ from typing import Any, Dict, cast
 from aea.mail.base_pb2 import DialogueMessage
 from aea.mail.base_pb2 import Message as ProtobufMessage
 from aea.protocols.base import Message, Serializer
-
 from packages.fetchai.protocols.state_update import state_update_pb2
 from packages.fetchai.protocols.state_update.message import StateUpdateMessage
 

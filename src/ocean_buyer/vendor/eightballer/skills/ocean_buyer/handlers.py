@@ -1,37 +1,30 @@
+import json
 import pprint
 from typing import Optional, cast
-import json
 
 from aea.configurations.base import PublicId
 from aea.crypto.ledger_apis import LedgerApis
 from aea.protocols.base import Message
 from aea.skills.base import Handler
-
-from packages.fetchai.connections.ledger.base import (
-    CONNECTION_ID as LEDGER_CONNECTION_PUBLIC_ID,
-)
+from packages.fetchai.connections.ledger.base import \
+    CONNECTION_ID as LEDGER_CONNECTION_PUBLIC_ID
 from packages.fetchai.protocols.default.message import DefaultMessage
 from packages.fetchai.protocols.fipa.message import FipaMessage
 from packages.fetchai.protocols.ledger_api.message import LedgerApiMessage
 from packages.fetchai.protocols.oef_search.message import OefSearchMessage
 from packages.fetchai.protocols.signing.message import SigningMessage
-from packages.eightballer.skills.ocean_buyer.behaviours import GenericTransactionBehaviour
-from packages.eightballer.skills.ocean_buyer.dialogues import (
-    DefaultDialogues,
-    FipaDialogue,
-    FipaDialogues,
-    LedgerApiDialogue,
-    LedgerApiDialogues,
-    OefSearchDialogue,
-    OefSearchDialogues,
-    SigningDialogue,
-    SigningDialogues,
-)
-from packages.eightballer.skills.ocean_buyer.strategy import GenericStrategy
-from packages.eightballer.protocols.ocean.message import OceanMessage
 
+from packages.eightballer.protocols.ocean.message import OceanMessage
+from packages.eightballer.skills.ocean_buyer.behaviours import \
+    GenericTransactionBehaviour
+from packages.eightballer.skills.ocean_buyer.dialogues import (
+    DefaultDialogues, FipaDialogue, FipaDialogues, LedgerApiDialogue,
+    LedgerApiDialogues, OefSearchDialogue, OefSearchDialogues, SigningDialogue,
+    SigningDialogues)
+from packages.eightballer.skills.ocean_buyer.strategy import GenericStrategy
 
 LEDGER_API_ADDRESS = str(LEDGER_CONNECTION_PUBLIC_ID)
+
 
 class OceanHandler(Handler):
     """This class scaffolds a handler."""
@@ -95,7 +88,6 @@ class GenericFipaHandler(Handler):
     def teardown(self) -> None:
         """Implement the handler teardown."""
 
-        
     def _handle_unidentified_dialogue(self, fipa_msg: FipaMessage) -> None:
         """
         Handle an unidentified dialogue.
@@ -115,7 +107,6 @@ class GenericFipaHandler(Handler):
         )
         self.context.outbox.put_message(message=default_msg)
 
-
     def _handle_propose(
         self, fipa_msg: FipaMessage, fipa_dialogue: FipaDialogue
     ) -> None:
@@ -127,7 +118,8 @@ class GenericFipaHandler(Handler):
         """
         self.context.logger.info(
             "received proposal={} from sender={}".format(
-                fipa_msg.proposal.values, fipa_msg.sender[-5:],
+                fipa_msg.proposal.values,
+                fipa_msg.sender[-5:],
             )
         )
         strategy = cast(GenericStrategy, self.context.strategy)
@@ -140,7 +132,8 @@ class GenericFipaHandler(Handler):
             terms = strategy.terms_from_proposal(fipa_msg.proposal, fipa_msg.sender)
             fipa_dialogue.terms = terms
             accept_msg = fipa_dialogue.reply(
-                performative=FipaMessage.Performative.ACCEPT, target_message=fipa_msg,
+                performative=FipaMessage.Performative.ACCEPT,
+                target_message=fipa_msg,
             )
             self.context.outbox.put_message(message=accept_msg)
         else:
@@ -148,10 +141,10 @@ class GenericFipaHandler(Handler):
                 "declining the proposal from sender={}".format(fipa_msg.sender[-5:])
             )
             decline_msg = fipa_dialogue.reply(
-                performative=FipaMessage.Performative.DECLINE, target_message=fipa_msg,
+                performative=FipaMessage.Performative.DECLINE,
+                target_message=fipa_msg,
             )
             self.context.outbox.put_message(message=decline_msg)
-
 
     def _handle_decline(
         self,
@@ -184,7 +177,6 @@ class GenericFipaHandler(Handler):
             fipa_dialogues.dialogue_stats.add_dialogue_endstate(
                 FipaDialogue.EndState.DECLINED_ACCEPT, fipa_dialogue.is_self_initiated
             )
-
 
     def _handle_match_accept(
         self, fipa_msg: FipaMessage, fipa_dialogue: FipaDialogue
@@ -248,7 +240,7 @@ class GenericFipaHandler(Handler):
             )
             strategy = cast(GenericStrategy, self.context.strategy)
             strategy.successful_trade_with_counterparty(fipa_msg.sender, data)
-            strategy.purchased_data = json.loads(data['data'])
+            strategy.purchased_data = json.loads(data["data"])
             strategy.is_c2d_active = True
         else:
             self.context.logger.info(
@@ -389,9 +381,11 @@ class GenericOefSearchHandler(Handler):
         """
         self.context.logger.warning(
             "cannot handle oef_search message of performative={} in dialogue={}.".format(
-                oef_search_msg.performative, oef_search_dialogue,
+                oef_search_msg.performative,
+                oef_search_dialogue,
             )
         )
+
 
 class GenericSigningHandler(Handler):
     """Implement the signing handler."""
@@ -581,7 +575,8 @@ class GenericLedgerApiHandler(Handler):
         if ledger_api_msg.balance > 0:
             self.context.logger.info(
                 "starting balance on {} ledger={}.".format(
-                    strategy.ledger_id, ledger_api_msg.balance,
+                    strategy.ledger_id,
+                    ledger_api_msg.balance,
                 )
             )
             strategy.balance = ledger_api_msg.balance
@@ -723,6 +718,7 @@ class GenericLedgerApiHandler(Handler):
         """
         self.context.logger.warning(
             "cannot handle ledger_api message of performative={} in dialogue={}.".format(
-                ledger_api_msg.performative, ledger_api_dialogue,
+                ledger_api_msg.performative,
+                ledger_api_dialogue,
             )
         )

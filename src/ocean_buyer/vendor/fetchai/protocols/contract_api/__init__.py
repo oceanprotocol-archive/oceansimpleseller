@@ -24,7 +24,7 @@ It was created with protocol buffer compiler version `libprotoc 3.11.4` and aea 
 """
 
 from packages.fetchai.protocols.contract_api.message import ContractApiMessage
-from packages.fetchai.protocols.contract_api.serialization import ContractApiSerializer
-
+from packages.fetchai.protocols.contract_api.serialization import \
+    ContractApiSerializer
 
 ContractApiMessage.serializer = ContractApiSerializer

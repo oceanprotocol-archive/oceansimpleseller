@@ -26,5 +26,4 @@ It was created with protocol buffer compiler version `libprotoc 3.11.4` and aea 
 from packages.fetchai.protocols.fipa.message import FipaMessage
 from packages.fetchai.protocols.fipa.serialization import FipaSerializer
 
-
 FipaMessage.serializer = FipaSerializer

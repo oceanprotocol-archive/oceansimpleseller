@@ -26,18 +26,14 @@ from typing import Any, Set, Tuple, cast
 from aea.configurations.base import PublicId
 from aea.exceptions import AEAEnforceError, enforce
 from aea.protocols.base import Message
-
-from packages.fetchai.protocols.oef_search.custom_types import (
-    AgentsInfo as CustomAgentsInfo,
-)
-from packages.fetchai.protocols.oef_search.custom_types import (
-    Description as CustomDescription,
-)
-from packages.fetchai.protocols.oef_search.custom_types import (
-    OefErrorOperation as CustomOefErrorOperation,
-)
-from packages.fetchai.protocols.oef_search.custom_types import Query as CustomQuery
-
+from packages.fetchai.protocols.oef_search.custom_types import \
+    AgentsInfo as CustomAgentsInfo
+from packages.fetchai.protocols.oef_search.custom_types import \
+    Description as CustomDescription
+from packages.fetchai.protocols.oef_search.custom_types import \
+    OefErrorOperation as CustomOefErrorOperation
+from packages.fetchai.protocols.oef_search.custom_types import \
+    Query as CustomQuery
 
 _default_logger = logging.getLogger("aea.packages.fetchai.protocols.oef_search.message")
 

@@ -26,23 +26,20 @@ from typing import Any, Optional, Set, Tuple, cast
 from aea.configurations.base import PublicId
 from aea.exceptions import AEAEnforceError, enforce
 from aea.protocols.base import Message
-
-from packages.fetchai.protocols.ledger_api.custom_types import Kwargs as CustomKwargs
-from packages.fetchai.protocols.ledger_api.custom_types import (
-    RawTransaction as CustomRawTransaction,
-)
-from packages.fetchai.protocols.ledger_api.custom_types import (
-    SignedTransaction as CustomSignedTransaction,
-)
-from packages.fetchai.protocols.ledger_api.custom_types import State as CustomState
-from packages.fetchai.protocols.ledger_api.custom_types import Terms as CustomTerms
-from packages.fetchai.protocols.ledger_api.custom_types import (
-    TransactionDigest as CustomTransactionDigest,
-)
-from packages.fetchai.protocols.ledger_api.custom_types import (
-    TransactionReceipt as CustomTransactionReceipt,
-)
-
+from packages.fetchai.protocols.ledger_api.custom_types import \
+    Kwargs as CustomKwargs
+from packages.fetchai.protocols.ledger_api.custom_types import \
+    RawTransaction as CustomRawTransaction
+from packages.fetchai.protocols.ledger_api.custom_types import \
+    SignedTransaction as CustomSignedTransaction
+from packages.fetchai.protocols.ledger_api.custom_types import \
+    State as CustomState
+from packages.fetchai.protocols.ledger_api.custom_types import \
+    Terms as CustomTerms
+from packages.fetchai.protocols.ledger_api.custom_types import \
+    TransactionDigest as CustomTransactionDigest
+from packages.fetchai.protocols.ledger_api.custom_types import \
+    TransactionReceipt as CustomTransactionReceipt
 
 _default_logger = logging.getLogger("aea.packages.fetchai.protocols.ledger_api.message")
 

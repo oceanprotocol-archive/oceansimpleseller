@@ -24,7 +24,7 @@ It was created with protocol buffer compiler version `libprotoc 3.11.4` and aea 
 """
 
 from packages.fetchai.protocols.oef_search.message import OefSearchMessage
-from packages.fetchai.protocols.oef_search.serialization import OefSearchSerializer
-
+from packages.fetchai.protocols.oef_search.serialization import \
+    OefSearchSerializer
 
 OefSearchMessage.serializer = OefSearchSerializer

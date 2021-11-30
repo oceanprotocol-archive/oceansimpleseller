@@ -33,15 +33,11 @@ from typing import Iterable, List, Optional, Pattern, Tuple
 
 from aea.helpers.base import ensure_dir
 
-
 try:
     # flake8: noqa
     # pylint: disable=unused-import,ungrouped-imports
-    from .consts import (  # type: ignore
-        LIBP2P_NODE_DEPS_DOWNLOAD_TIMEOUT,
-        LIBP2P_NODE_MODULE,
-        LIBP2P_NODE_MODULE_NAME,
-    )
+    from .consts import (LIBP2P_NODE_DEPS_DOWNLOAD_TIMEOUT,  # type: ignore
+                         LIBP2P_NODE_MODULE, LIBP2P_NODE_MODULE_NAME)
 except ImportError:  # pragma: nocover
     # flake8: noqa
     # pylint: disable=unused-import,ungrouped-imports
@@ -52,7 +48,6 @@ except ImportError:  # pragma: nocover
     )
 
 from aea.exceptions import AEAException
-
 
 ERROR_MESSAGE_TEMPLATE_BINARY_NOT_FOUND = "'{command}' is required by the libp2p connection, but it is not installed, or it is not accessible from the system path."
 ERROR_MESSAGE_TEMPLATE_VERSION_TOO_LOW = "The installed version of '{command}' is too low: expected at least {lower_bound}; found {actual_version}."
@@ -188,7 +183,8 @@ def main() -> None:  # pragma: nocover
 
 
 def _golang_module_build(
-    path: str, timeout: float = LIBP2P_NODE_DEPS_DOWNLOAD_TIMEOUT,
+    path: str,
+    timeout: float = LIBP2P_NODE_DEPS_DOWNLOAD_TIMEOUT,
 ) -> Optional[str]:
     """
     Builds go module located at `path`, downloads necessary dependencies

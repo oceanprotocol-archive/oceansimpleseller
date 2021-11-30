@@ -26,16 +26,14 @@ from typing import Any, Optional, Set, Tuple, cast
 from aea.configurations.base import PublicId
 from aea.exceptions import AEAEnforceError, enforce
 from aea.protocols.base import Message
-
-from packages.fetchai.protocols.contract_api.custom_types import Kwargs as CustomKwargs
-from packages.fetchai.protocols.contract_api.custom_types import (
-    RawMessage as CustomRawMessage,
-)
-from packages.fetchai.protocols.contract_api.custom_types import (
-    RawTransaction as CustomRawTransaction,
-)
-from packages.fetchai.protocols.contract_api.custom_types import State as CustomState
-
+from packages.fetchai.protocols.contract_api.custom_types import \
+    Kwargs as CustomKwargs
+from packages.fetchai.protocols.contract_api.custom_types import \
+    RawMessage as CustomRawMessage
+from packages.fetchai.protocols.contract_api.custom_types import \
+    RawTransaction as CustomRawTransaction
+from packages.fetchai.protocols.contract_api.custom_types import \
+    State as CustomState
 
 _default_logger = logging.getLogger(
     "aea.packages.fetchai.protocols.contract_api.message"

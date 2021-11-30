@@ -24,7 +24,7 @@ It was created with protocol buffer compiler version `libprotoc 3.11.4` and aea 
 """
 
 from packages.fetchai.protocols.ledger_api.message import LedgerApiMessage
-from packages.fetchai.protocols.ledger_api.serialization import LedgerApiSerializer
-
+from packages.fetchai.protocols.ledger_api.serialization import \
+    LedgerApiSerializer
 
 LedgerApiMessage.serializer = LedgerApiSerializer

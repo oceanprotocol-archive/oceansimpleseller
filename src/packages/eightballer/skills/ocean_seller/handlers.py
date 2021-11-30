@@ -5,28 +5,19 @@ from aea.crypto.ledger_apis import LedgerApis
 from aea.helpers.transaction.base import TransactionDigest
 from aea.protocols.base import Message
 from aea.skills.base import Handler
-
-from packages.fetchai.connections.ledger.base import (
-    CONNECTION_ID as LEDGER_CONNECTION_PUBLIC_ID,
-)
+from packages.fetchai.connections.ledger.base import \
+    CONNECTION_ID as LEDGER_CONNECTION_PUBLIC_ID
 from packages.fetchai.protocols.default.message import DefaultMessage
 from packages.fetchai.protocols.fipa.message import FipaMessage
 from packages.fetchai.protocols.ledger_api.message import LedgerApiMessage
 from packages.fetchai.protocols.oef_search.message import OefSearchMessage
-from packages.eightballer.skills.ocean_seller.behaviours import (
-    GenericServiceRegistrationBehaviour,
-)
-from packages.eightballer.skills.ocean_seller.dialogues import (
-    DefaultDialogues,
-    FipaDialogue,
-    FipaDialogues,
-    LedgerApiDialogue,
-    LedgerApiDialogues,
-    OefSearchDialogue,
-    OefSearchDialogues,
-)
-from packages.eightballer.skills.ocean_seller.strategy import GenericStrategy
 
+from packages.eightballer.skills.ocean_seller.behaviours import \
+    GenericServiceRegistrationBehaviour
+from packages.eightballer.skills.ocean_seller.dialogues import (
+    DefaultDialogues, FipaDialogue, FipaDialogues, LedgerApiDialogue,
+    LedgerApiDialogues, OefSearchDialogue, OefSearchDialogues)
+from packages.eightballer.skills.ocean_seller.strategy import GenericStrategy
 
 LEDGER_API_ADDRESS = str(LEDGER_CONNECTION_PUBLIC_ID)
 
@@ -35,16 +26,11 @@ from typing import Optional, cast
 from aea.configurations.base import PublicId
 from aea.protocols.base import Message
 from aea.skills.base import Handler
-from packages.eightballer.protocols.ocean.message import OceanMessage
-from packages.eightballer.skills.ocean_seller.strategy import GenericStrategy
 
-from typing import Optional, cast
-
-from aea.configurations.base import PublicId
-from aea.protocols.base import Message
-from aea.skills.base import Handler
 from packages.eightballer.protocols.file_storage.message import \
     FileStorageMessage
+from packages.eightballer.protocols.ocean.message import OceanMessage
+from packages.eightballer.skills.ocean_seller.strategy import GenericStrategy
 
 
 class StorjHandler(Handler):
@@ -244,7 +230,8 @@ class GenericFipaHandler(Handler):
                 "declined the CFP from sender={}".format(fipa_msg.sender[-5:])
             )
             decline_msg = fipa_dialogue.reply(
-                performative=FipaMessage.Performative.DECLINE, target_message=fipa_msg,
+                performative=FipaMessage.Performative.DECLINE,
+                target_message=fipa_msg,
             )
             self.context.outbox.put_message(message=decline_msg)
 
@@ -292,7 +279,8 @@ class GenericFipaHandler(Handler):
         )
         self.context.logger.info(
             "sending MATCH_ACCEPT_W_INFORM to sender={} with info={}".format(
-                fipa_msg.sender[-5:], info,
+                fipa_msg.sender[-5:],
+                info,
             )
         )
         self.context.outbox.put_message(message=match_accept_msg)
@@ -352,7 +340,8 @@ class GenericFipaHandler(Handler):
             )
             self.context.logger.info(
                 "transaction confirmed, sending data={} to buyer={}.".format(
-                    fipa_dialogue.data_for_sale, fipa_msg.sender[-5:],
+                    fipa_dialogue.data_for_sale,
+                    fipa_msg.sender[-5:],
                 )
             )
         else:
@@ -441,7 +430,8 @@ class GenericLedgerApiHandler(Handler):
         """
         self.context.logger.info(
             "starting balance on {} ledger={}.".format(
-                ledger_api_msg.ledger_id, ledger_api_msg.balance,
+                ledger_api_msg.ledger_id,
+                ledger_api_msg.balance,
             )
         )
 
@@ -484,7 +474,8 @@ class GenericLedgerApiHandler(Handler):
             )
             self.context.logger.info(
                 "transaction confirmed, sending data={} to buyer={}.".format(
-                    fipa_dialogue.data_for_sale, last_message.sender[-5:],
+                    fipa_dialogue.data_for_sale,
+                    last_message.sender[-5:],
                 )
             )
         else:
@@ -520,7 +511,8 @@ class GenericLedgerApiHandler(Handler):
         """
         self.context.logger.warning(
             "cannot handle ledger_api message of performative={} in dialogue={}.".format(
-                ledger_api_msg.performative, ledger_api_dialogue,
+                ledger_api_msg.performative,
+                ledger_api_dialogue,
             )
         )
 
@@ -667,6 +659,7 @@ class GenericOefSearchHandler(Handler):
         """
         self.context.logger.warning(
             "cannot handle oef_search message of performative={} in dialogue={}.".format(
-                oef_search_msg.performative, oef_search_dialogue,
+                oef_search_msg.performative,
+                oef_search_dialogue,
             )
         )

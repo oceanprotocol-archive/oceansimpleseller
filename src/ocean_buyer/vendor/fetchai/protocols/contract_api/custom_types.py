@@ -28,7 +28,6 @@ from aea.helpers.transaction.base import RawMessage as BaseRawMessage
 from aea.helpers.transaction.base import RawTransaction as BaseRawTransaction
 from aea.helpers.transaction.base import State as BaseState
 
-
 RawMessage = BaseRawMessage
 RawTransaction = BaseRawTransaction
 State = BaseState
@@ -40,7 +39,8 @@ class Kwargs:
     __slots__ = ("_body",)
 
     def __init__(
-        self, body: JSONLike,
+        self,
+        body: JSONLike,
     ):
         """Initialise an instance of RawTransaction."""
         self._body = body
