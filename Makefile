@@ -40,10 +40,9 @@ clean-test:
 
 .PHONY: lint
 lint:
-	pipenv run black src/
-	pipenv run isort src/
-	pipenv run flake8 src/
-	pipenv run vulture src/
+	pipenv run black src/packages/eightballer
+	pipenv run isort src/packages/eightballer
+#	pipenv run vulture src/
 
 .PHONY: security
 security:

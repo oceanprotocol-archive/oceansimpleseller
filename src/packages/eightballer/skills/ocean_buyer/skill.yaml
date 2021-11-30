@@ -6,11 +6,11 @@ description: The weather client skill implements the skill to purchase weather d
 license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
-  __init__.py: Qmakma8c1dBHUYHh9AdaYFuAiSza7atyk7vNdFRBKbj4Pm
-  behaviours.py: QmVfNiGtqBLQ1fYWRBMhnHizCeAq6oEf4um5PwYCEQqYQ6
-  dialogues.py: QmaiesCHLiBQeqWSe6nP9g7hTMWtyz9apVRTM7LkAW2Kbu
-  handlers.py: Qmd1bro2xupx2WZVdLuaWL4Pkp6qetc4EsXN2bxzA9SJAW
-  strategy.py: QmUHBZNRX3PrJoHCT4XgoHUNofGcmMAQzwRLAFS6aPAvwT
+  __init__.py: QmXdYL7HzJQNfXe22szymE6yUvZbPo2ZoWAj5UGg46iySD
+  behaviours.py: QmRBYneKRACPwrhWCDuqGBmdw1ap9szurfDcXGRHKE6VDe
+  dialogues.py: QmRqVaMFU9cPMG5NocZqpu8vsWCMUr7gCUpH8XUJjmTmN4
+  handlers.py: Qme9sSetgqmXpSJzPpdRjRdgyeZY7fwKFTaCNnDQEP4ZqE
+  strategy.py: QmefDvBLkRFYgwu2MGsoVKhp7wL2wu9VeSGdKd18KBAk18
 fingerprint_ignore_patterns: []
 connections:
 - fetchai/ledger:0.19.0

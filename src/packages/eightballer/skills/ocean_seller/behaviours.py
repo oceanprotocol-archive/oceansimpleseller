@@ -257,13 +257,12 @@ class OceanSellerBehaviour(Behaviour):
             strategy.is_processing = True
             self.__upload_data()
 
-        # if not strategy.has_completed_d2c_job:
-        #     self.context.logger.info(f"Setting D2C Behaviour to active")
-        #     strategy.is_processing = True
-        #     strategy.is_d2c_active = True
-        #     return
+        if not strategy.has_completed_d2c_job:
+            self.context.logger.info(f"Setting D2C Behaviour to active")
+            strategy.is_processing = True
+            strategy.is_d2c_active = True
+            return
 
-        # else:
         self.context.logger.info(f"Seller behaviour to active")
         strategy.is_processing = True
         strategy.is_seller_active = True
