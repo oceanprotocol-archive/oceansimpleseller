@@ -188,7 +188,7 @@ class OceanC2DBehaviour(OceanBehaviourBase):
         """Implement the act."""
         strategy = cast(GenericStrategy, self.context.strategy)
 
-        if strategy.is_in_flight or not strategy.is_d2c_active:
+        if strategy.is_in_flight or not strategy.is_c2d_active:
             return
 
         if (
@@ -197,7 +197,7 @@ class OceanC2DBehaviour(OceanBehaviourBase):
         ):
             self.log.info(f"Initialising deploying the data_to_compute!!")
             self.__create_envelope(
-                OceanMessage.Performative.DEPLOY_D2C, **strategy.data_to_compute_params
+                OceanMessage.Performative.DEPLOY_C2D, **strategy.data_to_compute_params
             )
             return
 
@@ -226,9 +226,9 @@ class OceanC2DBehaviour(OceanBehaviourBase):
             and strategy.is_data_to_compute_deployed
         ):
             self.log.info(f"Completed the c2d deployment.")
-            strategy.is_d2c_active = False
+            strategy.is_c2d_active = False
             strategy.is_processing = False
-            strategy.has_completed_d2c_job = True
+            strategy.has_completed_c2d_job = True
 
     def __create_envelope(
         self, performative: OceanMessage.Performative, **kwargs
@@ -257,10 +257,10 @@ class OceanSellerBehaviour(Behaviour):
             strategy.is_processing = True
             self.__upload_data()
 
-        if not strategy.has_completed_d2c_job:
-            self.context.logger.info(f"Setting D2C Behaviour to active")
+        if not strategy.has_completed_c2d_job:
+            self.context.logger.info(f"Setting C2D Behaviour to active")
             strategy.is_processing = True
-            strategy.is_d2c_active = True
+            strategy.is_c2d_active = True
             return
 
         self.context.logger.info(f"Seller behaviour to active")

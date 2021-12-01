@@ -52,7 +52,7 @@ class GenericStrategy(Model):
     _is_data_permissioned = False
 
     _is_in_flight = False
-    _has_completed_d2c_job = False
+    _has_completed_c2d_job = False
     _has_completed_download_job = False
 
     _data_to_compute_params = {}
@@ -60,16 +60,16 @@ class GenericStrategy(Model):
     _download_params = {}
     _datapool_params = {}
 
-    _is_d2c_active = False
+    _is_c2d_active = False
     _is_download_active = False
 
     @property
-    def is_d2c_active(self):
-        return self._is_d2c_active
+    def is_c2d_active(self):
+        return self._is_c2d_active
 
-    @is_d2c_active.setter
-    def is_d2c_active(self, value):
-        self._is_d2c_active = value
+    @is_c2d_active.setter
+    def is_c2d_active(self, value):
+        self._is_c2d_active = value
 
     @property
     def is_seller_active(self):
@@ -96,12 +96,12 @@ class GenericStrategy(Model):
         self._has_completed_download_job = value
 
     @property
-    def has_completed_d2c_job(self):
-        return self._has_completed_d2c_job
+    def has_completed_c2d_job(self):
+        return self._has_completed_c2d_job
 
-    @has_completed_d2c_job.setter
-    def has_completed_d2c_job(self, value):
-        self._has_completed_d2c_job = value
+    @has_completed_c2d_job.setter
+    def has_completed_c2d_job(self, value):
+        self._has_completed_c2d_job = value
 
     @property
     def is_data_permissioned(self):
@@ -303,7 +303,7 @@ class GenericStrategy(Model):
         if self.algorithm_address != {}:
             self.is_algorithm_deployed = True
 
-        self.is_d2c_active = False
+        self.is_c2d_active = False
         self.is_download_active = False
         self.is_processing = False
 

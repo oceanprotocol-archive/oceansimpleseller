@@ -73,8 +73,8 @@ class OceanSerializer(Serializer):
             amount_to_mint = msg.amount_to_mint
             performative.amount_to_mint = amount_to_mint
             ocean_msg.deploy_data_download.CopyFrom(performative)
-        elif performative_id == OceanMessage.Performative.DEPLOY_D2C:
-            performative = ocean_pb2.OceanMessage.Deploy_D2C_Performative()  # type: ignore
+        elif performative_id == OceanMessage.Performative.DEPLOY_C2D:
+            performative = ocean_pb2.OceanMessage.Deploy_C2D_Performative()  # type: ignore
             token0_name = msg.token0_name
             performative.token0_name = token0_name
             token1_name = msg.token1_name
@@ -91,7 +91,7 @@ class OceanSerializer(Serializer):
             performative.license = license
             amount_to_mint = msg.amount_to_mint
             performative.amount_to_mint = amount_to_mint
-            ocean_msg.deploy_d2c.CopyFrom(performative)
+            ocean_msg.deploy_c2d.CopyFrom(performative)
         elif performative_id == OceanMessage.Performative.DEPLOY_ALGORITHM:
             performative = ocean_pb2.OceanMessage.Deploy_Algorithm_Performative()  # type: ignore
             token0_name = msg.token0_name
@@ -166,13 +166,13 @@ class OceanSerializer(Serializer):
             data_did = msg.data_did
             performative.data_did = data_did
             ocean_msg.permission_dataset.CopyFrom(performative)
-        elif performative_id == OceanMessage.Performative.D2C_JOB:
-            performative = ocean_pb2.OceanMessage.D2C_Job_Performative()  # type: ignore
+        elif performative_id == OceanMessage.Performative.C2D_JOB:
+            performative = ocean_pb2.OceanMessage.C2D_Job_Performative()  # type: ignore
             data_did = msg.data_did
             performative.data_did = data_did
             algo_did = msg.algo_did
             performative.algo_did = algo_did
-            ocean_msg.d2c_job.CopyFrom(performative)
+            ocean_msg.c2d_job.CopyFrom(performative)
         elif performative_id == OceanMessage.Performative.RESULTS:
             performative = ocean_pb2.OceanMessage.Results_Performative()  # type: ignore
             content = msg.content
@@ -238,22 +238,22 @@ class OceanSerializer(Serializer):
             performative_content["license"] = license
             amount_to_mint = ocean_pb.deploy_data_download.amount_to_mint
             performative_content["amount_to_mint"] = amount_to_mint
-        elif performative_id == OceanMessage.Performative.DEPLOY_D2C:
-            token0_name = ocean_pb.deploy_d2c.token0_name
+        elif performative_id == OceanMessage.Performative.DEPLOY_C2D:
+            token0_name = ocean_pb.deploy_c2d.token0_name
             performative_content["token0_name"] = token0_name
-            token1_name = ocean_pb.deploy_d2c.token1_name
+            token1_name = ocean_pb.deploy_c2d.token1_name
             performative_content["token1_name"] = token1_name
-            dataset_url = ocean_pb.deploy_d2c.dataset_url
+            dataset_url = ocean_pb.deploy_c2d.dataset_url
             performative_content["dataset_url"] = dataset_url
-            name = ocean_pb.deploy_d2c.name
+            name = ocean_pb.deploy_c2d.name
             performative_content["name"] = name
-            author = ocean_pb.deploy_d2c.author
+            author = ocean_pb.deploy_c2d.author
             performative_content["author"] = author
-            date_created = ocean_pb.deploy_d2c.date_created
+            date_created = ocean_pb.deploy_c2d.date_created
             performative_content["date_created"] = date_created
-            license = ocean_pb.deploy_d2c.license
+            license = ocean_pb.deploy_c2d.license
             performative_content["license"] = license
-            amount_to_mint = ocean_pb.deploy_d2c.amount_to_mint
+            amount_to_mint = ocean_pb.deploy_c2d.amount_to_mint
             performative_content["amount_to_mint"] = amount_to_mint
         elif performative_id == OceanMessage.Performative.DEPLOY_ALGORITHM:
             token0_name = ocean_pb.deploy_algorithm.token0_name
@@ -321,10 +321,10 @@ class OceanSerializer(Serializer):
             performative_content["algo_did"] = algo_did
             data_did = ocean_pb.permission_dataset.data_did
             performative_content["data_did"] = data_did
-        elif performative_id == OceanMessage.Performative.D2C_JOB:
-            data_did = ocean_pb.d2c_job.data_did
+        elif performative_id == OceanMessage.Performative.C2D_JOB:
+            data_did = ocean_pb.c2d_job.data_did
             performative_content["data_did"] = data_did
-            algo_did = ocean_pb.d2c_job.algo_did
+            algo_did = ocean_pb.c2d_job.algo_did
             performative_content["algo_did"] = algo_did
         elif performative_id == OceanMessage.Performative.RESULTS:
             content = ocean_pb.results.content

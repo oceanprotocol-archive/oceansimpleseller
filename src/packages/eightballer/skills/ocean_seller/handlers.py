@@ -79,7 +79,7 @@ class OceanHandler(Handler):
         self.log.debug(f"Handling message {message}")
         strategy = cast(GenericStrategy, self.context.strategy)
         if message.performative == OceanMessage.Performative.DEPLOYMENT_RECIEPT:
-            if message.type == "d2c":
+            if message.type == "c2d":
                 self.log.info(f"Recieved deployment reciept for data token!")
                 strategy.data_to_compute_address = {
                     "did": message.did,
@@ -115,9 +115,9 @@ class OceanHandler(Handler):
 
         elif message.performative == OceanMessage.Performative.RESULTS:
             self.log.info(f"{message.content}")
-            if strategy.is_d2c_active:
-                self.log.info(f"results for d2c job!")
-                strategy.has_completed_d2c_job = True
+            if strategy.is_c2d_active:
+                self.log.info(f"results for c2d job!")
+                strategy.has_completed_c2d_job = True
 
             if strategy.is_download_active:
                 self.log.info(f"Recieved results down job!")

@@ -1,17 +1,41 @@
 # Ocean Simple seller
 
-to setup the project
+To setup the project run the following
 
-```
+```bash
 git clone git@gitlab.com:datarella/MOBIX-GROUP/oceansimpleseller.git
+cd oceansimpleseller || exit
 make new_env
 make install_env
 ```
 
-to run the project
+To run the project you will need two terminals open simultaneously.
 
+Export the following on vars on both of them:
+
+```bash
+export SELLER_AEA_KEY_ETHEREUM="0x4a7b2cc2d0a9574f9e207fcfb6b13f6daf4e90b9e0f50e389a68f507f9767880"
+export SELLER_AEA_KEY_FETCHAI="1437aebfadbb766b810894a7859db3574088e6909f229e484e2e14e00b7c0875"
+
+export BUYER_AEA_KEY_ETHEREUM="0xb6ad18f951812195b31f57f1ec2a79862885d3f5d3c84a1a0cc3c4d940a4cf9b"
+export BUYER_AEA_KEY_FETCHAI="670c081eb3f674ae55e28ab714e7393abc74346a6fc738b1bf245140a038a3bb"
+
+export STORJ_ENDPOINT="https://gateway.eu1.storjshare.io"
+export STORJ_ACCESS_KEY="j2wulv3drlgrt5apjr2csc5lmkzyqpqakgzuoc63fn6wedxmnu2ng"
+export STORJ_ACCESS_KEY_ID="jx7bgg74ceog3eznrovaiqcy23sa"
+export TARGET_SKILL="eightballer/storj_file_transfer:0.1.0"
 ```
-make run_app
+
+After the export on the first terminal run:
+```bash
+cd src || exit 
+./run_ocean_seller.sh
+```
+
+On the second terminal run:
+```bash
+cd src || exit 
+./run_buyer_seller.sh
 ```
 
 
@@ -52,26 +76,7 @@ make run_app
  pipenv shell # if you haven't already
  mkdocs serve
 ```
-Visit http://127.0.0.1:8000/  
-
-
-# Install environment
-1. install pip
-```
-pip install pipenv
-```
-
-2. create new environment
-```
-make new_env
-```
-3. install new env
-```
-make install_env
-```
-
-
-
+Visit http://127.0.0.1:8000/
 
 # dev tools
 setup pre-commit hooks
