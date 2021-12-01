@@ -1,4 +1,4 @@
-site_name: Example Python Repo 
+site_name: Ocean Simple Seller 
 site_url: ''
 site_description: ''
 site_author: ''
@@ -12,6 +12,8 @@ theme:
 
 nav:
   - Index: 'index.md'
+  - Architecture: 'architecture.md'
+  - Prerequisites: 'prerequisites.md'
   - Gitlab CI: 'ci.md'
 
 plugins: []
