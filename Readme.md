@@ -1,9 +1,9 @@
-# AEA Storj File Uploader
+# Ocean Simple seller
 
 to setup the project
 
 ```
-git clone git@gitlab.com:datarella/MOBIX-GROUP/storj-aea.git
+git clone git@gitlab.com:datarella/MOBIX-GROUP/oceansimpleseller.git
 make new_env
 make install_env
 ```
@@ -47,10 +47,12 @@ make run_app
 2. setup a new environment
    - make new_env
    - make 
-3. run application
+3. in project directory:
 ```bash
- RUN_CMD="echo hello" pipenv run app
+ pipenv shell # if you haven't already
+ mkdocs serve
 ```
+Visit http://127.0.0.1:8000/  
 
 
 # Install environment
