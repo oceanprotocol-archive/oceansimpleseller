@@ -185,13 +185,13 @@ class OceanC2DBehaviour(Behaviour):
         if strategy.is_in_flight or not strategy.is_c2d_active:
             return
 
-        if strategy.purchased_data is not None and not strategy.has_completed_c2d_job:
+        if strategy.purchased_data is not None and not strategy.has_completed_d2c_job:
             self.log.info(f"submitting the compute 2 data job!")
             self.__create_envelope(
-                OceanMessage.Performative.C2D_JOB, **strategy.purchased_data
+                OceanMessage.Performative.D2C_JOB, **strategy.purchased_data
             )
 
-        if strategy.has_completed_c2d_job:
+        if strategy.has_completed_d2c_job:
             self.log.info(
                 f"Completed the c2d demonstration... Setting strategy to download behaviour"
             )
