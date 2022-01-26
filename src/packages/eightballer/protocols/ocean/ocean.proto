@@ -29,7 +29,7 @@ message OceanMessage{
     int32 amount_to_mint = 8;
   }
 
-  message Deploy_C2D_Performative{
+  message Deploy_D2C_Performative{
     string token0_name = 1;
     string token1_name = 2;
     string dataset_url = 3;
@@ -86,7 +86,7 @@ message OceanMessage{
     string data_did = 2;
   }
 
-  message C2D_Job_Performative{
+  message D2C_Job_Performative{
     string data_did = 1;
     string algo_did = 2;
   }
@@ -107,9 +107,9 @@ message OceanMessage{
 
   oneof performative{
     Create_Pool_Performative create_pool = 5;
-    C2D_Job_Performative c2d_job = 6;
+    D2C_Job_Performative d2c_job = 6;
     Deploy_Algorithm_Performative deploy_algorithm = 7;
-    Deploy_C2D_Performative deploy_c2d = 8;
+    Deploy_D2C_Performative deploy_d2c = 8;
     Deploy_Data_Download_Performative deploy_data_download = 9;
     Deployment_Reciept_Performative deployment_reciept = 10;
     Download_Job_Performative download_job = 11;

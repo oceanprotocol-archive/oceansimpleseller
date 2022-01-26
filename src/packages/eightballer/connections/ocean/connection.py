@@ -58,7 +58,7 @@ Account.enable_unaudited_hdwallet_features()
 
 from string import Template
 
-C2D_TEMPLATE = Template(
+D2C_TEMPLATE = Template(
     """{
     "main": {
         "type": "dataset",
@@ -196,8 +196,8 @@ class OceanConnection(BaseSyncConnection):
         """
         self.logger.debug(f"Receieved {envelope} in connection")
 
-        if envelope.message.performative == OceanMessage.Performative.DEPLOY_C2D:
-            self._deploy_data_for_c2d(envelope)
+        if envelope.message.performative == OceanMessage.Performative.DEPLOY_D2C:
+            self._deploy_data_for_d2c(envelope)
         if envelope.message.performative == OceanMessage.Performative.DEPLOY_ALGORITHM:
             self._deploy_algorithm(envelope)
         if (
@@ -205,8 +205,8 @@ class OceanConnection(BaseSyncConnection):
             == OceanMessage.Performative.PERMISSION_DATASET
         ):
             self._permission_dataset(envelope)
-        if envelope.message.performative == OceanMessage.Performative.C2D_JOB:
-            self._create_c2d_job(envelope)
+        if envelope.message.performative == OceanMessage.Performative.D2C_JOB:
+            self._create_d2c_job(envelope)
         if (
             envelope.message.performative
             == OceanMessage.Performative.DEPLOY_DATA_DOWNLOAD
@@ -297,7 +297,7 @@ class OceanConnection(BaseSyncConnection):
         self.put_envelope(envelope)
         self.logger.info(f"Data pool created! Sending result to handler!")
 
-    def _create_c2d_job(self, envelope):
+    def _create_d2c_job(self, envelope):
         DATA_did = envelope.message.data_did  # for convenience
         ALG_did = envelope.message.algo_did
         DATA_DDO = self.ocean.assets.resolve(
@@ -376,7 +376,7 @@ class OceanConnection(BaseSyncConnection):
         msg.to = envelope.sender
         envelope = Envelope(to=msg.to, sender=msg.sender, message=msg)
         self.put_envelope(envelope)
-        self.logger.info(f"completed C2D! Sending result to handler!")
+        self.logger.info(f"completed D2C! Sending result to handler!")
 
     def _permission_dataset(self, envelope: Envelope):
         data_ddo = self.ocean.assets.resolve(envelope.message.data_did)
@@ -428,7 +428,7 @@ class OceanConnection(BaseSyncConnection):
         )
 
         data_metadata = json.loads(
-            C2D_TEMPLATE.substitute(
+            D2C_TEMPLATE.substitute(
                 url=envelope.message.dataset_url,
                 name=envelope.message.name,
                 author=envelope.message.author,
@@ -464,7 +464,7 @@ class OceanConnection(BaseSyncConnection):
         deployment_envelope = Envelope(to=msg.to, sender=msg.sender, message=msg)
         self.put_envelope(deployment_envelope)
 
-    def _deploy_data_for_c2d(self, envelope: Envelope):
+    def _deploy_data_for_d2c(self, envelope: Envelope):
         datatoken = self._deploy_datatoken(envelope)
 
         provider_url = DataServiceProvider.get_url(self.ocean.config)
@@ -484,7 +484,7 @@ class OceanConnection(BaseSyncConnection):
         )
 
         data_metadata = json.loads(
-            C2D_TEMPLATE.substitute(
+            D2C_TEMPLATE.substitute(
                 url=envelope.message.dataset_url,
                 name=envelope.message.name,
                 author=envelope.message.author,
@@ -512,7 +512,7 @@ class OceanConnection(BaseSyncConnection):
 
         msg = OceanMessage(
             performative=OceanMessage.Performative.DEPLOYMENT_RECIEPT,
-            type="c2d",
+            type="d2c",
             did=DATA_ddo.did,
             datatoken_contract_address=datatoken.address,
         )

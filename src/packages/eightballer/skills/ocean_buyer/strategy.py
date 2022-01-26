@@ -75,7 +75,7 @@ class GenericStrategy(Model):
         self.is_in_flight = False
         self.is_c2d_active = False
         self.is_processing = False
-        self.has_completed_c2d_job = False
+        self.has_completed_d2c_job = False
 
     @property
     def ledger_id(self) -> str:
