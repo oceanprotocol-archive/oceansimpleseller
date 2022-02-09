@@ -185,8 +185,32 @@ class OceanC2DBehaviour(Behaviour):
         if strategy.is_in_flight or not strategy.is_c2d_active:
             return
 
+        if strategy.purchased_data is not None and not strategy.has_purchased_datatoken:
+            self.log.info("purchasing data from the datapool")
+
+            self.__create_envelope(
+                OceanMessage.Performative.DOWNLOAD_JOB, **{
+                    "pool_address": strategy.purchased_data["datapool_address"],
+                }
+            )
+
+            return
+
+        if strategy.purchased_data is not None and strategy.has_purchased_datatoken and not strategy.has_purchased_algtoken:
+            self.log.info("purchasing data from the datapool")
+
+            self.__create_envelope(
+                OceanMessage.Performative.DOWNLOAD_JOB, **{
+                    "pool_address": strategy.purchased_data["algpool_address"],
+                }
+            )
+
+            return
+
         if strategy.purchased_data is not None and not strategy.has_completed_d2c_job:
             self.log.info(f"submitting the compute 2 data job!")
+            strategy.purchased_data.pop("algpool_address")
+            strategy.purchased_data.pop("datapool_address")
             self.__create_envelope(
                 OceanMessage.Performative.D2C_JOB, **strategy.purchased_data
             )
@@ -199,7 +223,7 @@ class OceanC2DBehaviour(Behaviour):
             strategy.is_processing = False
 
     def __create_envelope(
-        self, performative: OceanMessage.Performative, **kwargs
+            self, performative: OceanMessage.Performative, **kwargs
     ) -> None:
         strategy = cast(GenericStrategy, self.context.strategy)
         receiver_id = "eightballer/ocean:0.1.0"
