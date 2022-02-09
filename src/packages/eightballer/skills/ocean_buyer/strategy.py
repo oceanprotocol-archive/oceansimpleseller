@@ -76,6 +76,9 @@ class GenericStrategy(Model):
         self.is_c2d_active = False
         self.is_processing = False
         self.has_completed_d2c_job = False
+        self.is_data_downloaded = False
+        self.has_purchased_datatoken = False
+        self.has_purchased_algtoken = False
 
     @property
     def ledger_id(self) -> str:
