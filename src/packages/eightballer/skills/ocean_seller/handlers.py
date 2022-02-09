@@ -128,7 +128,11 @@ class OceanHandler(Handler):
             self.log.info(f"Sucecssfully deployed pool for asset!")
             strategy.is_in_flight = False
             strategy.is_pool_deployed = True
-            strategy.download_params["pool_address"] = message.pool_address
+
+            if not strategy.download_params.get("datapool_address", None):
+                strategy.download_params["datapool_address"] = message.pool_address
+            else:
+                strategy.download_params["algpool_address"] = message.pool_address
 
         else:
             raise ValueError("Unhandled Message!!!")
@@ -236,10 +240,10 @@ class GenericFipaHandler(Handler):
             self.context.outbox.put_message(message=decline_msg)
 
     def _handle_decline(
-        self,
-        fipa_msg: FipaMessage,
-        fipa_dialogue: FipaDialogue,
-        fipa_dialogues: FipaDialogues,
+            self,
+            fipa_msg: FipaMessage,
+            fipa_dialogue: FipaDialogue,
+            fipa_dialogues: FipaDialogues,
     ) -> None:
         """
         Handle the DECLINE.
@@ -258,7 +262,7 @@ class GenericFipaHandler(Handler):
         )
 
     def _handle_accept(
-        self, fipa_msg: FipaMessage, fipa_dialogue: FipaDialogue
+            self, fipa_msg: FipaMessage, fipa_dialogue: FipaDialogue
     ) -> None:
         """
         Handle the ACCEPT.
@@ -286,7 +290,7 @@ class GenericFipaHandler(Handler):
         self.context.outbox.put_message(message=match_accept_msg)
 
     def _handle_inform(
-        self, fipa_msg: FipaMessage, fipa_dialogue: FipaDialogue
+            self, fipa_msg: FipaMessage, fipa_dialogue: FipaDialogue
     ) -> None:
         """
         Handle the INFORM.
@@ -352,7 +356,7 @@ class GenericFipaHandler(Handler):
             )
 
     def _handle_invalid(
-        self, fipa_msg: FipaMessage, fipa_dialogue: FipaDialogue
+            self, fipa_msg: FipaMessage, fipa_dialogue: FipaDialogue
     ) -> None:
         """
         Handle a fipa message of invalid performative.
@@ -398,8 +402,8 @@ class GenericLedgerApiHandler(Handler):
         if ledger_api_msg.performative is LedgerApiMessage.Performative.BALANCE:
             self._handle_balance(ledger_api_msg)
         elif (
-            ledger_api_msg.performative
-            is LedgerApiMessage.Performative.TRANSACTION_RECEIPT
+                ledger_api_msg.performative
+                is LedgerApiMessage.Performative.TRANSACTION_RECEIPT
         ):
             self._handle_transaction_receipt(ledger_api_msg, ledger_api_dialogue)
         elif ledger_api_msg.performative == LedgerApiMessage.Performative.ERROR:
@@ -436,7 +440,7 @@ class GenericLedgerApiHandler(Handler):
         )
 
     def _handle_transaction_receipt(
-        self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue
+            self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue
     ) -> None:
         """
         Handle a message of balance performative.
@@ -472,6 +476,11 @@ class GenericLedgerApiHandler(Handler):
             fipa_dialogues.dialogue_stats.add_dialogue_endstate(
                 FipaDialogue.EndState.SUCCESSFUL, fipa_dialogue.is_self_initiated
             )
+
+            strategy = cast(GenericStrategy, self.context.strategy)
+            fipa_dialogue.data_for_sale["datapool_address"] = strategy.download_params["datapool_address"]
+            fipa_dialogue.data_for_sale["algpool_address"] = strategy.download_params["algpool_address"]
+
             self.context.logger.info(
                 "transaction confirmed, sending data={} to buyer={}.".format(
                     fipa_dialogue.data_for_sale,
@@ -486,7 +495,7 @@ class GenericLedgerApiHandler(Handler):
             )
 
     def _handle_error(
-        self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue
+            self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue
     ) -> None:
         """
         Handle a message of error performative.
@@ -501,7 +510,7 @@ class GenericLedgerApiHandler(Handler):
         )
 
     def _handle_invalid(
-        self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue
+            self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue
     ) -> None:
         """
         Handle a message of invalid performative.
@@ -568,9 +577,9 @@ class GenericOefSearchHandler(Handler):
         )
 
     def _handle_success(
-        self,
-        oef_search_success_msg: OefSearchMessage,
-        oef_search_dialogue: OefSearchDialogue,
+            self,
+            oef_search_success_msg: OefSearchMessage,
+            oef_search_dialogue: OefSearchDialogue,
     ) -> None:
         """
         Handle an oef search message.
@@ -588,8 +597,8 @@ class GenericOefSearchHandler(Handler):
             oef_search_dialogue.get_message_by_id(oef_search_success_msg.target),
         )
         if (
-            target_message.performative
-            == OefSearchMessage.Performative.REGISTER_SERVICE
+                target_message.performative
+                == OefSearchMessage.Performative.REGISTER_SERVICE
         ):
             description = target_message.service_description
             data_model_name = description.data_model.name
@@ -602,13 +611,13 @@ class GenericOefSearchHandler(Handler):
             elif "set_service_key" in data_model_name:
                 registration_behaviour.register_genus()
             elif (
-                "personality_agent" in data_model_name
-                and description.values["piece"] == "genus"
+                    "personality_agent" in data_model_name
+                    and description.values["piece"] == "genus"
             ):
                 registration_behaviour.register_classification()
             elif (
-                "personality_agent" in data_model_name
-                and description.values["piece"] == "classification"
+                    "personality_agent" in data_model_name
+                    and description.values["piece"] == "classification"
             ):
                 self.context.logger.info(
                     "the agent, with its genus and classification, and its service are successfully registered on the SOEF."
@@ -619,9 +628,9 @@ class GenericOefSearchHandler(Handler):
                 )
 
     def _handle_error(
-        self,
-        oef_search_error_msg: OefSearchMessage,
-        oef_search_dialogue: OefSearchDialogue,
+            self,
+            oef_search_error_msg: OefSearchMessage,
+            oef_search_dialogue: OefSearchDialogue,
     ) -> None:
         """
         Handle an oef search message.
@@ -639,8 +648,8 @@ class GenericOefSearchHandler(Handler):
             oef_search_dialogue.get_message_by_id(oef_search_error_msg.target),
         )
         if (
-            target_message.performative
-            == OefSearchMessage.Performative.REGISTER_SERVICE
+                target_message.performative
+                == OefSearchMessage.Performative.REGISTER_SERVICE
         ):
             registration_behaviour = cast(
                 GenericServiceRegistrationBehaviour,
@@ -649,7 +658,7 @@ class GenericOefSearchHandler(Handler):
             registration_behaviour.failed_registration_msg = target_message
 
     def _handle_invalid(
-        self, oef_search_msg: OefSearchMessage, oef_search_dialogue: OefSearchDialogue
+            self, oef_search_msg: OefSearchMessage, oef_search_dialogue: OefSearchDialogue
     ) -> None:
         """
         Handle an oef search message.
