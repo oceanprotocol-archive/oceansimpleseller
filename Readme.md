@@ -3,7 +3,7 @@
 To setup the project run the following
 
 ```bash
-git clone git@gitlab.com:datarella/MOBIX-GROUP/oceansimpleseller.git
+git clone git@github.com:oceanprotocol/oceansimpleseller.git
 cd oceansimpleseller || exit
 make new_env
 make install_env
