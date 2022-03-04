@@ -28,13 +28,13 @@ export TARGET_SKILL="eightballer/storj_file_transfer:0.1.0"
 
 After the export on the first terminal run:
 ```bash
-cd src || exit 
+cd src || exit
 ./run_ocean_seller.sh
 ```
 
 On the second terminal run:
 ```bash
-cd src || exit 
+cd src || exit
 ./run_ocean_buyer.sh
 ```
 
@@ -43,7 +43,7 @@ cd src || exit
 
 - gitlab ci
     - The ci contains the basic configuration required to launch a launch a gitlab ci
-  
+
 - Dockerfile
   - Basic Dockerfile which installs deps and launchs the app
 
@@ -70,7 +70,7 @@ cd src || exit
 1. clone repo
 2. setup a new environment
    - make new_env
-   - make 
+   - make
 3. in project directory:
 ```bash
  pipenv shell # if you haven't already
