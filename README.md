@@ -27,12 +27,14 @@ export TARGET_SKILL="eightballer/storj_file_transfer:0.1.0"
 ```
 
 After the export on the first terminal run:
+
 ```bash
 cd src || exit
 ./run_ocean_seller.sh
 ```
 
 On the second terminal run:
+
 ```bash
 cd src || exit
 ./run_ocean_buyer.sh
@@ -79,19 +81,22 @@ cd src || exit
 Visit http://127.0.0.1:8000/
 
 # dev tools
+
 setup pre-commit hooks
-```
+
+```console
 make install_hooks
 ```
 
 lint, format, and sense check code
-```
+
+```console
 make lint
 ```
 
 run tests
 
-```
+```console
 make tests
 ```
 
