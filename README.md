@@ -9,6 +9,9 @@ make new_env
 make install_env
 ```
 
+go is required by the libp2p connection. Install go using the official
+installation docs: https://go.dev/doc/install
+
 If running the project with a local eth network with [Barge](https://github.com/oceanprotocol/barge/branches) use the barge branch `v3` and run barge with:
 ```
 ./start_ocean.sh --with-provider2
