@@ -12,6 +12,9 @@ echo -n $SELLER_AEA_KEY_FETCHAI > fetchai_private_key.txt
 aea add-key fetchai
 aea add-key fetchai fetchai_private_key.txt --connection
 
+# fetchd config chain-id capricorn-1
+# fetchd config node https://rpc-capricorn.fetch.ai:443
+
 # setup fetch libraries
 # generic protocols
 aea add protocol fetchai/acn:1.0.0
@@ -56,8 +59,8 @@ aea add skill eightballer/ocean_seller:0.1.0
 
 
 # setup connections
-aea config set vendor.eightballer.connections.ocean.config.ocean_network_url  https://rpc.polygon.oceanprotocol.com
-aea config set vendor.fetchai.connections.ledger.config.ledger_apis.ethereum.address https://rpc.polygon.oceanprotocol.com
+aea config set vendor.eightballer.connections.ocean.config.ocean_network_url $RPC_URL
+aea config set vendor.fetchai.connections.ledger.config.ledger_apis.ethereum.address $RPC_URL
 aea config set vendor.eightballer.connections.ocean.config.key_path ethereum_private_key.txt
 aea config set --type dict vendor.eightballer.connections.storj_file_transfer.config.storj_creds \
 '{
