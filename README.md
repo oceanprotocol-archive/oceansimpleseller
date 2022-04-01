@@ -24,6 +24,10 @@ export STORJ_ENDPOINT="https://gateway.eu1.storjshare.io"
 export STORJ_ACCESS_KEY="j2wulv3drlgrt5apjr2csc5lmkzyqpqakgzuoc63fn6wedxmnu2ng"
 export STORJ_ACCESS_KEY_ID="jx7bgg74ceog3eznrovaiqcy23sa"
 export TARGET_SKILL="eightballer/storj_file_transfer:0.1.0"
+export RPC_URL=""
+# export RPC_URL="https://matic-mumbai.chainstacklabs.com"
+# export ENV_GAS_PRICE="50000000000000"
+# export RPC_URL="https://rpc.polygon.oceanprotocol.com"
 ```
 
 After the export on the first terminal run:
