@@ -41,6 +41,16 @@ class OceanHandler(Handler):
 
         :param message: the message
         """
+        strategy = cast(GenericStrategy, self.context.strategy)
+
+        if message.performative == OceanMessage.Performative.DOWNLOAD_JOB:
+            strategy.is_in_flight = False
+            if not strategy.has_purchased_datatoken:
+                strategy.has_purchased_datatoken = True
+
+            elif not strategy.has_purchased_algtoken:
+                strategy.has_purchased_algtoken = True
+
         self.log.info(f"Received the result from C2D ! {message}")
 
     def teardown(self) -> None:
@@ -106,7 +116,7 @@ class GenericFipaHandler(Handler):
         self.context.outbox.put_message(message=default_msg)
 
     def _handle_propose(
-        self, fipa_msg: FipaMessage, fipa_dialogue: FipaDialogue
+            self, fipa_msg: FipaMessage, fipa_dialogue: FipaDialogue
     ) -> None:
         """
         Handle the propose.
@@ -145,10 +155,10 @@ class GenericFipaHandler(Handler):
             self.context.outbox.put_message(message=decline_msg)
 
     def _handle_decline(
-        self,
-        fipa_msg: FipaMessage,
-        fipa_dialogue: FipaDialogue,
-        fipa_dialogues: FipaDialogues,
+            self,
+            fipa_msg: FipaMessage,
+            fipa_dialogue: FipaDialogue,
+            fipa_dialogues: FipaDialogues,
     ) -> None:
         """
         Handle the decline.
@@ -177,7 +187,7 @@ class GenericFipaHandler(Handler):
             )
 
     def _handle_match_accept(
-        self, fipa_msg: FipaMessage, fipa_dialogue: FipaDialogue
+            self, fipa_msg: FipaMessage, fipa_dialogue: FipaDialogue
     ) -> None:
         """
         Handle the match accept.
@@ -214,10 +224,10 @@ class GenericFipaHandler(Handler):
             )
 
     def _handle_inform(
-        self,
-        fipa_msg: FipaMessage,
-        fipa_dialogue: FipaDialogue,
-        fipa_dialogues: FipaDialogues,
+            self,
+            fipa_msg: FipaMessage,
+            fipa_dialogue: FipaDialogue,
+            fipa_dialogues: FipaDialogues,
     ) -> None:
         """
         Handle the match inform.
@@ -239,6 +249,8 @@ class GenericFipaHandler(Handler):
             strategy = cast(GenericStrategy, self.context.strategy)
             strategy.successful_trade_with_counterparty(fipa_msg.sender, data)
             strategy.purchased_data = json.loads(data["data"])
+            strategy.purchased_data["datapool_address"] = data["datapool_address"]
+            strategy.purchased_data["algpool_address"] = data["algpool_address"]
             strategy.is_c2d_active = True
         else:
             self.context.logger.info(
@@ -246,7 +258,7 @@ class GenericFipaHandler(Handler):
             )
 
     def _handle_invalid(
-        self, fipa_msg: FipaMessage, fipa_dialogue: FipaDialogue
+            self, fipa_msg: FipaMessage, fipa_dialogue: FipaDialogue
     ) -> None:
         """
         Handle a fipa message of invalid performative.
@@ -312,7 +324,7 @@ class GenericOefSearchHandler(Handler):
         )
 
     def _handle_error(
-        self, oef_search_msg: OefSearchMessage, oef_search_dialogue: OefSearchDialogue
+            self, oef_search_msg: OefSearchMessage, oef_search_dialogue: OefSearchDialogue
     ) -> None:
         """
         Handle an oef search message.
@@ -327,7 +339,7 @@ class GenericOefSearchHandler(Handler):
         )
 
     def _handle_search(
-        self, oef_search_msg: OefSearchMessage, oef_search_dialogue: OefSearchDialogue
+            self, oef_search_msg: OefSearchMessage, oef_search_dialogue: OefSearchDialogue
     ) -> None:
         """
         Handle the search response.
@@ -369,7 +381,7 @@ class GenericOefSearchHandler(Handler):
             )
 
     def _handle_invalid(
-        self, oef_search_msg: OefSearchMessage, oef_search_dialogue: OefSearchDialogue
+            self, oef_search_msg: OefSearchMessage, oef_search_dialogue: OefSearchDialogue
     ) -> None:
         """
         Handle an oef search message.
@@ -434,7 +446,7 @@ class GenericSigningHandler(Handler):
         )
 
     def _handle_signed_transaction(
-        self, signing_msg: SigningMessage, signing_dialogue: SigningDialogue
+            self, signing_msg: SigningMessage, signing_dialogue: SigningDialogue
     ) -> None:
         """
         Handle an oef search message.
@@ -456,7 +468,7 @@ class GenericSigningHandler(Handler):
         self.context.logger.info("sending transaction to ledger.")
 
     def _handle_error(
-        self, signing_msg: SigningMessage, signing_dialogue: SigningDialogue
+            self, signing_msg: SigningMessage, signing_dialogue: SigningDialogue
     ) -> None:
         """
         Handle an oef search message.
@@ -473,9 +485,9 @@ class GenericSigningHandler(Handler):
             Optional[SigningMessage], signing_dialogue.last_outgoing_message
         )
         if (
-            signing_msg_ is not None
-            and signing_msg_.performative
-            == SigningMessage.Performative.SIGN_TRANSACTION
+                signing_msg_ is not None
+                and signing_msg_.performative
+                == SigningMessage.Performative.SIGN_TRANSACTION
         ):
             tx_behaviour = cast(
                 GenericTransactionBehaviour, self.context.behaviours.transaction
@@ -484,7 +496,7 @@ class GenericSigningHandler(Handler):
             tx_behaviour.failed_processing(ledger_api_dialogue)
 
     def _handle_invalid(
-        self, signing_msg: SigningMessage, signing_dialogue: SigningDialogue
+            self, signing_msg: SigningMessage, signing_dialogue: SigningDialogue
     ) -> None:
         """
         Handle an oef search message.
@@ -530,17 +542,17 @@ class GenericLedgerApiHandler(Handler):
         if ledger_api_msg.performative is LedgerApiMessage.Performative.BALANCE:
             self._handle_balance(ledger_api_msg)
         elif (
-            ledger_api_msg.performative is LedgerApiMessage.Performative.RAW_TRANSACTION
+                ledger_api_msg.performative is LedgerApiMessage.Performative.RAW_TRANSACTION
         ):
             self._handle_raw_transaction(ledger_api_msg, ledger_api_dialogue)
         elif (
-            ledger_api_msg.performative
-            == LedgerApiMessage.Performative.TRANSACTION_DIGEST
+                ledger_api_msg.performative
+                == LedgerApiMessage.Performative.TRANSACTION_DIGEST
         ):
             self._handle_transaction_digest(ledger_api_msg, ledger_api_dialogue)
         elif (
-            ledger_api_msg.performative
-            == LedgerApiMessage.Performative.TRANSACTION_RECEIPT
+                ledger_api_msg.performative
+                == LedgerApiMessage.Performative.TRANSACTION_RECEIPT
         ):
             self._handle_transaction_receipt(ledger_api_msg, ledger_api_dialogue)
         elif ledger_api_msg.performative == LedgerApiMessage.Performative.ERROR:
@@ -586,7 +598,7 @@ class GenericLedgerApiHandler(Handler):
             self.context.is_active = False
 
     def _handle_raw_transaction(
-        self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue
+            self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue
     ) -> None:
         """
         Handle a message of raw_transaction performative.
@@ -610,7 +622,7 @@ class GenericLedgerApiHandler(Handler):
         )
 
     def _handle_transaction_digest(
-        self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue
+            self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue
     ) -> None:
         """
         Handle a message of transaction_digest performative.
@@ -632,7 +644,7 @@ class GenericLedgerApiHandler(Handler):
         self.context.outbox.put_message(message=ledger_api_msg_)
 
     def _handle_transaction_receipt(
-        self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue
+            self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue
     ) -> None:
         """
         Handle a message of balance performative.
@@ -679,7 +691,7 @@ class GenericLedgerApiHandler(Handler):
             )
 
     def _handle_error(
-        self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue
+            self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue
     ) -> None:
         """
         Handle a message of error performative.
@@ -696,9 +708,9 @@ class GenericLedgerApiHandler(Handler):
             Optional[LedgerApiMessage], ledger_api_dialogue.last_outgoing_message
         )
         if (
-            ledger_api_msg_ is not None
-            and ledger_api_msg_.performative
-            != LedgerApiMessage.Performative.GET_BALANCE
+                ledger_api_msg_ is not None
+                and ledger_api_msg_.performative
+                != LedgerApiMessage.Performative.GET_BALANCE
         ):
             tx_behaviour = cast(
                 GenericTransactionBehaviour, self.context.behaviours.transaction
@@ -706,7 +718,7 @@ class GenericLedgerApiHandler(Handler):
             tx_behaviour.failed_processing(ledger_api_dialogue)
 
     def _handle_invalid(
-        self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue
+            self, ledger_api_msg: LedgerApiMessage, ledger_api_dialogue: LedgerApiDialogue
     ) -> None:
         """
         Handle a message of invalid performative.

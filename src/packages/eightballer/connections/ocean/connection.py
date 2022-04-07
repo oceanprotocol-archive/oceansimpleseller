@@ -215,7 +215,28 @@ class OceanConnection(BaseSyncConnection):
         if envelope.message.performative == OceanMessage.Performative.CREATE_POOL:
             self._create_pool(envelope)
         if envelope.message.performative == OceanMessage.Performative.DOWNLOAD_JOB:
-            self._download_asset(envelope)
+            self._purchase_datatoken(envelope)
+
+    def _purchase_datatoken(self, envelope: Envelope):
+        try:
+            self.ocean.pool.buy_data_tokens(
+                envelope.message.pool_address,
+                amount=to_wei(2),
+                max_OCEAN_amount=to_wei(1),
+                from_wallet=self.wallet
+            )
+
+            msg = OceanMessage(performative=OceanMessage.Performative.DOWNLOAD_JOB)
+            msg.sender = envelope.to
+            msg.to = envelope.sender
+
+            envelope = Envelope(to=msg.to, sender=msg.sender, message=msg)
+            self.put_envelope(envelope)
+            self.logger.info(f"Purchased 1 datatoken")
+
+        except Exception as e:
+            self.logger.error("Couldn't purchase datatokens")
+            self.logger.error(e)
 
     def _download_asset(self, envelope: Envelope):
         did = envelope.message.asset_did
