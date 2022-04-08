@@ -1,5 +1,6 @@
 import json
 import uuid
+from decimal import Decimal
 from typing import Any, Dict, Optional, Tuple
 
 from aea.common import Address
@@ -86,6 +87,14 @@ class GenericStrategy(Model):
     @is_download_active.setter
     def is_download_active(self, value):
         self._is_download_active = value
+
+    @property
+    def is_pool_deployed(self):
+        return self._is_download_active
+
+    @is_pool_deployed.setter
+    def is_pool_deployed(self, value):
+        self._is_pool_deployed = value
 
     @property
     def has_completed_download_job(self):
@@ -473,3 +482,19 @@ class GenericStrategy(Model):
                 "Agent does not have data did! make sure it has been deployed."
             )
         return {"algo_did": algo_did, "data_did": data_did}
+
+    def get_create_pool_request(self, is_data=True):
+        if is_data:
+            data_did = self.data_to_compute_address.get("datatoken_contract_address", None)
+        else:
+            data_did = self.algorithm_address.get("datatoken_contract_address", None)
+
+        if data_did is None:
+            raise ValueError(
+                "Agent does not have data did! make sure it has been deployed."
+            )
+        return {
+            "datatoken_address": data_did,
+            "datatoken_amt": 50,
+            "ocean_amt": 1
+        }
