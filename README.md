@@ -14,6 +14,10 @@ To run the project you will need two terminals open simultaneously.
 Export the following on vars on both of them:
 
 ```bash
+export FETCH_URL=https://rest-capricorn.fetch.ai:443
+export FETCH_DENOM=atestfet
+export FETCH_CHAIN_ID=capricorn-1
+
 export SELLER_AEA_KEY_ETHEREUM="0x4a7b2cc2d0a9574f9e207fcfb6b13f6daf4e90b9e0f50e389a68f507f9767880"
 export SELLER_AEA_KEY_FETCHAI="1437aebfadbb766b810894a7859db3574088e6909f229e484e2e14e00b7c0875"
 
