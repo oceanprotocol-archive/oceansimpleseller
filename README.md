@@ -42,6 +42,7 @@ export TARGET_SKILL="eightballer/storj_file_transfer:0.1.0"
 export RPC_URL="http://127.0.0.1:8545" # Use a local ETH network i.e. ganache / barge
 # export RPC_URL="https://rinkeby.infura.io/v3/{infura_key}" # Use a local ETH network i.e. ganache / barge
 
+# Make sure to copy the Ocean v3 address.json from https://github.com/oceanprotocol/contracts/blob/main/artifacts/address.json
 export ADDRESS_FILE=~/.ocean/ocean-contracts/artifacts/address.json
 export OCEAN_NETWORK_URL=http://127.0.0.1:8545
 ```
