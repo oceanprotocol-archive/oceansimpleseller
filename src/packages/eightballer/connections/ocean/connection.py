@@ -43,7 +43,6 @@ import os
 
 import ocean_lib
 import web3
-from web3._utils.threads import Timeout
 from eth_account import Account
 from ocean_lib.common.agreements.service_types import ServiceTypes
 from ocean_lib.data_provider.data_service_provider import DataServiceProvider
@@ -54,6 +53,7 @@ from ocean_lib.services.service import Service
 from ocean_lib.web3_internal.constants import ZERO_ADDRESS
 from ocean_lib.web3_internal.currency import to_wei
 from ocean_lib.web3_internal.wallet import Wallet
+from web3._utils.threads import Timeout
 
 Account.enable_unaudited_hdwallet_features()
 
@@ -603,8 +603,9 @@ class OceanConnection(BaseSyncConnection):
         deployment_envelope = Envelope(to=msg.to, sender=msg.sender, message=msg)
         self.put_envelope(deployment_envelope)
 
-
-    def _ensure_asset_cached_in_aquarius(self, did: str, timeout: float = 600, poll_latency: float = 1):
+    def _ensure_asset_cached_in_aquarius(
+        self, did: str, timeout: float = 600, poll_latency: float = 1
+    ):
         """Ensure asset is cached in Aquarius
         Default timeout = 10 mins
         Default poll_latency = 1 second
@@ -615,7 +616,6 @@ class OceanConnection(BaseSyncConnection):
                 if asset is not None:
                     break
                 _timeout.sleep(poll_latency)
-
 
     def _deploy_datatoken(self, envelope: Envelope):
         self.logger.info(f"interacting with ocean to deploy data token ...")
@@ -745,4 +745,3 @@ class OceanConnection(BaseSyncConnection):
 
         Connection status set automatically.
         """
-
