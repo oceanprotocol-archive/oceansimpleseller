@@ -7,6 +7,7 @@ from aea.protocols.base import Message
 from aea.protocols.dialogue.base import Dialogue as BaseDialogue
 from aea.protocols.dialogue.base import DialogueLabel as BaseDialogueLabel
 from aea.skills.base import Model
+
 from packages.fetchai.protocols.default.dialogues import \
     DefaultDialogue as BaseDefaultDialogue
 from packages.fetchai.protocols.default.dialogues import \
