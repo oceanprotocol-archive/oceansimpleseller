@@ -43,6 +43,7 @@ import os
 
 import ocean_lib
 import web3
+from web3._utils.threads import Timeout
 from eth_account import Account
 from ocean_lib.common.agreements.service_types import ServiceTypes
 from ocean_lib.data_provider.data_service_provider import DataServiceProvider
@@ -130,7 +131,7 @@ ALGO_SERVICE_TEMPLATE = Template(
             "creator": "$address",
             "timeout": 3600,
             "datePublished": "$date_published",
-            "cost": 1.0 
+            "cost": 1.0
         }
     }"""
 )
@@ -474,6 +475,9 @@ class OceanConnection(BaseSyncConnection):
                 self.logger.error(f"Trying to resolve pre-existing did..")
                 DATA_ddo = self.ocean.assets.resolve(msg.split(" ")[2])
 
+        self.logger.info(f"Ensure asset is cached in aquarius")
+        self._ensure_asset_cached_in_aquarius(DATA_ddo.did)
+
         msg = OceanMessage(
             performative=OceanMessage.Performative.DEPLOYMENT_RECIEPT,
             type="data_download",
@@ -531,6 +535,9 @@ class OceanConnection(BaseSyncConnection):
                 self.logger.error(f"Trying to resolve pre-existing did..")
                 DATA_ddo = self.ocean.assets.resolve(msg.split(" ")[2])
 
+        self.logger.info(f"Ensure asset is cached in aquarius")
+        self._ensure_asset_cached_in_aquarius(DATA_ddo.did)
+
         msg = OceanMessage(
             performative=OceanMessage.Performative.DEPLOYMENT_RECIEPT,
             type="d2c",
@@ -582,6 +589,9 @@ class OceanConnection(BaseSyncConnection):
         )
         self.logger.info(f"ALG did = '{ALG_ddo.did}'")
 
+        self.logger.info(f"Ensure asset is cached in aquarius")
+        self._ensure_asset_cached_in_aquarius(ALG_ddo.did)
+
         msg = OceanMessage(
             performative=OceanMessage.Performative.DEPLOYMENT_RECIEPT,
             type="algorithm",
@@ -592,6 +602,20 @@ class OceanConnection(BaseSyncConnection):
         msg.to = envelope.sender
         deployment_envelope = Envelope(to=msg.to, sender=msg.sender, message=msg)
         self.put_envelope(deployment_envelope)
+
+
+    def _ensure_asset_cached_in_aquarius(self, did: str, timeout: float = 600, poll_latency: float = 1):
+        """Ensure asset is cached in Aquarius
+        Default timeout = 10 mins
+        Default poll_latency = 1 second
+        """
+        with Timeout(timeout) as _timeout:
+            while True:
+                asset = self.ocean.assets.resolve(did)
+                if asset is not None:
+                    break
+                _timeout.sleep(poll_latency)
+
 
     def _deploy_datatoken(self, envelope: Envelope):
         self.logger.info(f"interacting with ocean to deploy data token ...")
@@ -721,3 +745,4 @@ class OceanConnection(BaseSyncConnection):
 
         Connection status set automatically.
         """
+
