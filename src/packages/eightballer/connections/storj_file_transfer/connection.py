@@ -115,10 +115,7 @@ class StorjSyncConnection(BaseSyncConnection):
         )
         url = self.s3.generate_presigned_url(
             ClientMethod="get_object",
-            Params={
-                "Bucket": self.bucket_name,
-                "Key": envelope.message.key,
-            },
+            Params={"Bucket": self.bucket_name, "Key": envelope.message.key,},
             ExpiresIn=604800,
         )
         msg = FileStorageMessage(

@@ -223,7 +223,7 @@ class OceanConnection(BaseSyncConnection):
                 envelope.message.pool_address,
                 amount=to_wei(2),
                 max_OCEAN_amount=to_wei(1),
-                from_wallet=self.wallet
+                from_wallet=self.wallet,
             )
 
             msg = OceanMessage(performative=OceanMessage.Performative.DOWNLOAD_JOB)
