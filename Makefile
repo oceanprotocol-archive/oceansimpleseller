@@ -97,3 +97,7 @@ tests:
 run_app:
 	pipenv run app
 
+.PHONY: shell
+shell:
+	pipenv shell
+
