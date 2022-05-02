@@ -396,9 +396,7 @@ class OceanConnection(BaseSyncConnection):
                     break
             time.sleep(2)
 
-        result_file = self.ocean.compute.result_file(
-            DATA_did, job_id, 0, self.wallet
-        )
+        result_file = self.ocean.compute.result_file(DATA_did, job_id, 0, self.wallet)
 
         msg = OceanMessage(
             performative=OceanMessage.Performative.RESULTS, content=result_file
