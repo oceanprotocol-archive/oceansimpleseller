@@ -395,13 +395,13 @@ class OceanConnection(BaseSyncConnection):
                 elif code == 70:
                     break
             time.sleep(2)
-        result_urls = self.ocean.compute.result(DATA_did, job_id, self.wallet)
-        result_url = result_urls["urls"][0]
 
-        result_file = requests.get(result_url)
+        result_file = self.ocean.compute.result_file(
+            DATA_did, job_id, 0, self.wallet
+        )
 
         msg = OceanMessage(
-            performative=OceanMessage.Performative.RESULTS, content=result_file.content
+            performative=OceanMessage.Performative.RESULTS, content=result_file
         )
         msg.sender = envelope.to
         msg.to = envelope.sender
