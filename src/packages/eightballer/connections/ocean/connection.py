@@ -221,9 +221,9 @@ class OceanConnection(BaseSyncConnection):
     def _purchase_datatoken(self, envelope: Envelope):
         try:
             self.ocean.pool.buy_data_tokens(
-                envelope.message.pool_address,
-                amount=to_wei(2),
-                max_OCEAN_amount=to_wei(1),
+                pool_address=envelope.message.pool_address,
+                amount=to_wei(envelope.message.datatoken_amt),
+                max_OCEAN_amount=to_wei(envelope.message.max_cost_ocean),
                 from_wallet=self.wallet,
             )
 
