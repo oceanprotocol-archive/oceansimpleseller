@@ -46,7 +46,7 @@ export RPC_URL="http://127.0.0.1:8545" # Use a local ETH network i.e. ganache / 
 export ADDRESS_FILE=~/.ocean/ocean-contracts/artifacts/address.json
 export OCEAN_NETWORK_URL=http://127.0.0.1:8545
 
-#needed to mint OCEAN for testing with ganache
+#needed to mint OCEAN for testing with barge and ganache
 export FACTORY_DEPLOYER_PRIVATE_KEY=0xc594c6e5def4bab63ac29eed19a134c130388f74f019bc74b8f4389df2837a58
 ```
 
