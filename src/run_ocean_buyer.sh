@@ -2,6 +2,11 @@
 
 NAME="ocean_buyer"
 
+# distribute_ocean_tokens if using barge and ganache
+if [ $OCEAN_NETWORK_URL == http://127.0.0.1:8545 ]; then
+  python distribute_ocean_tokens.py
+fi
+
 aea create $NAME
 cd $NAME
 
@@ -47,10 +52,10 @@ aea config set --type dict vendor.fetchai.connections.p2p_libp2p.config \
 
 
 # custom connections
-aea add connection eightballer/ocean:0.1.0 
+aea add connection eightballer/ocean:0.1.0
 
 # custom protocols
-aea add protocol eightballer/ocean:0.1.0 
+aea add protocol eightballer/ocean:0.1.0
 
 # custom skills
 aea add skill eightballer/ocean_buyer:0.1.0
