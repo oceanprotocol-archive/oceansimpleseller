@@ -227,7 +227,16 @@ class OceanConnection(BaseSyncConnection):
                 from_wallet=self.wallet,
             )
 
-            msg = OceanMessage(performative=OceanMessage.Performative.DOWNLOAD_JOB)
+            msg = OceanMessage(
+                performative=OceanMessage.Performative.DOWNLOAD_JOB,
+                **{
+                    "datatoken_address": "unused",
+                    "datatoken_amt": -1,
+                    "max_cost_ocean": -1,
+                    "asset_did": "unused",
+                    "pool_address": "unused",
+                },
+            )
             msg.sender = envelope.to
             msg.to = envelope.sender
 
