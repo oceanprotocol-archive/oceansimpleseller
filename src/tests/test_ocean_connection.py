@@ -6,19 +6,46 @@
 
 # import pytest
 
+import os
 from aea.mail.base import Envelope
 from aea.configurations.base import ComponentType, ConnectionConfig, PublicId
 
 from packages.eightballer.connections.ocean.connection import OceanConnection
 from packages.eightballer.protocols.ocean.message import OceanMessage
 
+
 def test_datatoken_creation():
     """Tests that a compute job with a raw algorithm starts properly."""
 
-    # ocean = OceanConnection(ConnectionConfig("test","test", "1.0.0"), "None")
+    ocean = OceanConnection(
+        ConnectionConfig(
+            "ocean",
+            "eightballer",
+            "0.1.0",
+            ocean_network_url=os.environ["OCEAN_NETWORK_URL"],
+            key_path="src/ocean_seller/ethereum_private_key.txt",
+        ),
+        "None",
+    )
 
-    # ocean_message = OceanMessage()
+    ocean.on_connect()
 
-    # envelope = Envelope(to="test", sender="msg.sender", message="msg")
-    
-    # OceanMessage._deploy_datatoken(envelope)
+    ocean_message = OceanMessage(
+        OceanMessage.Performative.D2C_JOB,
+        _body={
+            "token0_name": "DATA1",
+            "token1_name": "DATA1",
+            "amount_to_mint": 100,
+            "dataset_url": "https://raw.githubusercontent.com/trentmc/branin/main/branin.arff",
+            "name": "example",
+            "author": "Trent",
+            "license": "CCO",
+            "date_created": "2019-12-28T10:55:11Z",
+        },
+    )
+
+    envelope = Envelope(to="test", sender="msg.sender", message=ocean_message)
+
+    datatoken = ocean._deploy_datatoken(envelope)
+
+    assert datatoken.name == "DataTokenTemplate"

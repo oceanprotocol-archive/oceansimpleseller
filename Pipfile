@@ -72,6 +72,7 @@ ocean-lib = "==0.8.5"
 boto3 = "*"
 
 [dev-packages]
+black = "*"
 
 [requires]
 python_version = "3.8"
@@ -80,3 +81,6 @@ python_version = "3.8"
 docs = "bash ./scripts/launch_docs.sh"
 app = "bash ./scripts/launch_app.sh"
 container_app = "python app.py"
+
+[pipenv]
+allow_prereleases = true
