@@ -53,6 +53,7 @@ from ocean_lib.services.service import Service
 from ocean_lib.web3_internal.constants import ZERO_ADDRESS
 from ocean_lib.web3_internal.currency import to_wei
 from ocean_lib.web3_internal.wallet import Wallet
+from web3._utils.threads import Timeout
 
 Account.enable_unaudited_hdwallet_features()
 
@@ -130,7 +131,7 @@ ALGO_SERVICE_TEMPLATE = Template(
             "creator": "$address",
             "timeout": 3600,
             "datePublished": "$date_published",
-            "cost": 1.0 
+            "cost": 1.0
         }
     }"""
 )
@@ -220,13 +221,22 @@ class OceanConnection(BaseSyncConnection):
     def _purchase_datatoken(self, envelope: Envelope):
         try:
             self.ocean.pool.buy_data_tokens(
-                envelope.message.pool_address,
-                amount=to_wei(2),
-                max_OCEAN_amount=to_wei(1),
-                from_wallet=self.wallet
+                pool_address=envelope.message.pool_address,
+                amount=to_wei(envelope.message.datatoken_amt),
+                max_OCEAN_amount=to_wei(envelope.message.max_cost_ocean),
+                from_wallet=self.wallet,
             )
 
-            msg = OceanMessage(performative=OceanMessage.Performative.DOWNLOAD_JOB)
+            msg = OceanMessage(
+                performative=OceanMessage.Performative.DOWNLOAD_JOB,
+                **{
+                    "datatoken_address": "unused",
+                    "datatoken_amt": -1,
+                    "max_cost_ocean": -1,
+                    "asset_did": "unused",
+                    "pool_address": "unused",
+                },
+            )
             msg.sender = envelope.to
             msg.to = envelope.sender
 
@@ -385,13 +395,11 @@ class OceanConnection(BaseSyncConnection):
                 elif code == 70:
                     break
             time.sleep(2)
-        result_urls = self.ocean.compute.result(DATA_did, job_id, self.wallet)
-        result_url = result_urls["urls"][0]
 
-        result_file = requests.get(result_url)
+        result_file = self.ocean.compute.result_file(DATA_did, job_id, 0, self.wallet)
 
         msg = OceanMessage(
-            performative=OceanMessage.Performative.RESULTS, content=result_file.content
+            performative=OceanMessage.Performative.RESULTS, content=result_file
         )
         msg.sender = envelope.to
         msg.to = envelope.sender
@@ -474,6 +482,9 @@ class OceanConnection(BaseSyncConnection):
                 self.logger.error(f"Trying to resolve pre-existing did..")
                 DATA_ddo = self.ocean.assets.resolve(msg.split(" ")[2])
 
+        self.logger.info(f"Ensure asset is cached in aquarius")
+        self._ensure_asset_cached_in_aquarius(DATA_ddo.did)
+
         msg = OceanMessage(
             performative=OceanMessage.Performative.DEPLOYMENT_RECIEPT,
             type="data_download",
@@ -531,6 +542,9 @@ class OceanConnection(BaseSyncConnection):
                 self.logger.error(f"Trying to resolve pre-existing did..")
                 DATA_ddo = self.ocean.assets.resolve(msg.split(" ")[2])
 
+        self.logger.info(f"Ensure asset is cached in aquarius")
+        self._ensure_asset_cached_in_aquarius(DATA_ddo.did)
+
         msg = OceanMessage(
             performative=OceanMessage.Performative.DEPLOYMENT_RECIEPT,
             type="d2c",
@@ -582,6 +596,9 @@ class OceanConnection(BaseSyncConnection):
         )
         self.logger.info(f"ALG did = '{ALG_ddo.did}'")
 
+        self.logger.info(f"Ensure asset is cached in aquarius")
+        self._ensure_asset_cached_in_aquarius(ALG_ddo.did)
+
         msg = OceanMessage(
             performative=OceanMessage.Performative.DEPLOYMENT_RECIEPT,
             type="algorithm",
@@ -592,6 +609,20 @@ class OceanConnection(BaseSyncConnection):
         msg.to = envelope.sender
         deployment_envelope = Envelope(to=msg.to, sender=msg.sender, message=msg)
         self.put_envelope(deployment_envelope)
+
+    def _ensure_asset_cached_in_aquarius(
+        self, did: str, timeout: float = 600, poll_latency: float = 1
+    ):
+        """Ensure asset is cached in Aquarius
+        Default timeout = 10 mins
+        Default poll_latency = 1 second
+        """
+        with Timeout(timeout) as _timeout:
+            while True:
+                asset = self.ocean.assets.resolve(did)
+                if asset is not None:
+                    break
+                _timeout.sleep(poll_latency)
 
     def _deploy_datatoken(self, envelope: Envelope):
         self.logger.info(f"interacting with ocean to deploy data token ...")

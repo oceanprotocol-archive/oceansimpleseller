@@ -2,6 +2,11 @@
 
 NAME="ocean_seller"
 
+# distribute_ocean_tokens if using barge and ganache
+if [ $OCEAN_NETWORK_URL == http://127.0.0.1:8545 ]; then
+  python distribute_ocean_tokens.py
+fi
+
 aea create $NAME
 cd $NAME
 
@@ -11,6 +16,9 @@ echo -n $SELLER_AEA_KEY_FETCHAI > fetchai_private_key.txt
 
 aea add-key fetchai
 aea add-key fetchai fetchai_private_key.txt --connection
+
+# fetchd config chain-id capricorn-1
+# fetchd config node https://rpc-capricorn.fetch.ai:443
 
 # setup fetch libraries
 # generic protocols
@@ -44,20 +52,22 @@ aea config set --type dict vendor.fetchai.connections.p2p_libp2p.config \
 
 
 # custom connections
-aea add connection eightballer/ocean:0.1.0 
-aea add connection eightballer/storj_file_transfer:0.1.0 
+aea add connection eightballer/ocean:0.1.0
+aea add connection eightballer/storj_file_transfer:0.1.0
 
 # custom protocols
-aea add protocol eightballer/file_storage:0.1.0 
-aea add protocol eightballer/ocean:0.1.0 
+aea add protocol eightballer/file_storage:0.1.0
+aea add protocol eightballer/ocean:0.1.0
 
 # custom skills
 aea add skill eightballer/ocean_seller:0.1.0
 
-
 # setup connections
-aea config set vendor.eightballer.connections.ocean.config.ocean_network_url  https://rpc.polygon.oceanprotocol.com
-aea config set vendor.fetchai.connections.ledger.config.ledger_apis.ethereum.address https://rpc.polygon.oceanprotocol.com
+aea config set vendor.fetchai.connections.ledger.config.ledger_apis.fetchai.address $FETCH_URL
+aea config set vendor.fetchai.connections.ledger.config.ledger_apis.fetchai.denom $FETCH_DENOM
+aea config set vendor.fetchai.connections.ledger.config.ledger_apis.fetchai.chain_id $FETCH_CHAIN_ID
+aea config set vendor.eightballer.connections.ocean.config.ocean_network_url $RPC_URL
+aea config set vendor.fetchai.connections.ledger.config.ledger_apis.ethereum.address $RPC_URL
 aea config set vendor.eightballer.connections.ocean.config.key_path ethereum_private_key.txt
 aea config set --type dict vendor.eightballer.connections.storj_file_transfer.config.storj_creds \
 '{
@@ -74,7 +84,7 @@ aea config set --type dict vendor.eightballer.skills.ocean_seller.strategy.args 
         "data_download": {},
         "algorithm": {}
         },
-    "algorithm_params": { 
+    "algorithm_params": {
         "token0_name": "DATA1",
         "token1_name": "DATA1",
         "amount_to_mint": 100,

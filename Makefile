@@ -91,9 +91,13 @@ setup_repo:
 
 .PHONY: tests
 tests:
-	pipenv run python -m unittest discover tests/
+	pipenv run python -m pytest
 
 .PHONY: run_app
 run_app:
 	pipenv run app
+
+.PHONY: shell
+shell:
+	pipenv shell
 
