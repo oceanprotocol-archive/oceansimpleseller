@@ -23,7 +23,7 @@ def test_datatoken_creation():
             "eightballer",
             "0.1.0",
             ocean_network_url=os.environ["OCEAN_NETWORK_URL"],
-            key_path="src/ocean_seller/ethereum_private_key.txt",
+            key_path="./ethereum_private_key.txt",
         ),
         "None",
     )
