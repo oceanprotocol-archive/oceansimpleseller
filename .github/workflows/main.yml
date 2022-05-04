@@ -10,7 +10,6 @@ on:
 
 jobs:
   build:
-    environment: CC_REPORTER_ID
     runs-on: ubuntu-latest
     steps:
       - name: Setup Oceansimpleseller
