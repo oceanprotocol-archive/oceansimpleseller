@@ -51,5 +51,20 @@ jobs:
           pipenv run pip install pytest pytest-env
       - name: Run tests
         working-directory: ${{ github.workspace }}
+        env:
+          FETCH_URL: https://rest-capricorn.fetch.ai:443
+          FETCH_DENOM: atestfet
+          FETCH_CHAIN_ID: capricorn-1
+          SELLER_AEA_KEY_ETHEREUM: "0x8467415bb2ba7c91084d932276214b11a3dd9bdb2930fefa194b666dd8020b99"
+          SELLER_AEA_KEY_FETCHAI: "1437aebfadbb766b810894a7859db3574088e6909f229e484e2e14e00b7c0875"
+          BUYER_AEA_KEY_ETHEREUM: "0xef4b441145c1d0f3b4bc6d61d29f5c6e502359481152f869247c7a4244d45209"
+          BUYER_AEA_KEY_FETCHAI: "670c081eb3f674ae55e28ab714e7393abc74346a6fc738b1bf245140a038a3bb"
+          STORJ_ENDPOINT: https://gateway.eu1.storjshare.io
+          STORJ_ACCESS_KEY: j2wulv3drlgrt5apjr2csc5lmkzyqpqakgzuoc63fn6wedxmnu2ng
+          STORJ_ACCESS_KEY_ID: jx7bgg74ceog3eznrovaiqcy23sa
+          TARGET_SKILL: eightballer/storj_file_transfer:0.1.0
+          RPC_URL: http://127.0.0.1:8545
+          ADDRESS_FILE: ~/.ocean/ocean-contracts/artifacts/address.json
+          OCEAN_NETWORK_URL: http://127.0.0.1:8545
         run: |
           pipenv run python -m pytest
