@@ -64,7 +64,7 @@ jobs:
           STORJ_ACCESS_KEY_ID: jx7bgg74ceog3eznrovaiqcy23sa
           TARGET_SKILL: eightballer/storj_file_transfer:0.1.0
           RPC_URL: http://127.0.0.1:8545
-          ADDRESS_FILE: /.ocean/ocean-contracts/artifacts/address.json
+          ADDRESS_FILE: ~/.ocean/ocean-contracts/artifacts/address.json
           OCEAN_NETWORK_URL: http://127.0.0.1:8545
         run: |
           echo -n $SELLER_AEA_KEY_ETHEREUM > "ethereum_private_key.txt"
