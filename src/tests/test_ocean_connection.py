@@ -15,7 +15,7 @@ from packages.eightballer.protocols.ocean.message import OceanMessage
 
 
 def test_datatoken_creation():
-    """Tests that a compute job with a raw algorithm starts properly."""
+    """Tests that _deploy_datatoken function works as expected."""
 
     ocean = OceanConnection(
         ConnectionConfig(
