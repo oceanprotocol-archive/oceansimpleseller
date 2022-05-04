@@ -142,3 +142,5 @@ cython_debug/
 
 ocean_buyer
 ocean_seller
+
+ethereum_private_key.txt

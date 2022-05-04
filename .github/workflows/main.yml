@@ -51,9 +51,5 @@ jobs:
           pipenv run pip install pytest pytest-env
       - name: Run tests
         working-directory: ${{ github.workspace }}
-        env:
-          SELLER_AEA_KEY_ETHEREUM: "0x8467415bb2ba7c91084d932276214b11a3dd9bdb2930fefa194b666dd8020b99"
-          SELLER_AEA_KEY_ETHEREUM_PATH: "ethereum_private_key.txt"
         run: |
-          echo -n $SELLER_AEA_KEY_ETHEREUM > "ethereum_private_key.txt"
           pipenv run python -m pytest
