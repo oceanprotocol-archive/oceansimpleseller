@@ -48,6 +48,7 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: |
           pipenv install --dev --skip-lock
+          pipenv run pip install pytest pytest-env
       - name: Run tests
         working-directory: ${{ github.workspace }}
         run: |
