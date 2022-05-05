@@ -48,4 +48,4 @@ def test_datatoken_creation():
 
     datatoken = ocean._deploy_datatoken(envelope)
 
-    assert datatoken.name == "DataTokenTemplate"
+    assert datatoken.name == "ERC20Template"

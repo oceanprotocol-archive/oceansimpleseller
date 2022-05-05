@@ -44,7 +44,7 @@ import os
 import ocean_lib
 import web3
 from eth_account import Account
-from ocean_lib.common.agreements.service_types import ServiceTypes
+from ocean_lib.agreements.service_types import ServiceTypes
 from ocean_lib.data_provider.data_service_provider import DataServiceProvider
 from ocean_lib.example_config import ExampleConfig
 from ocean_lib.models.compute_input import ComputeInput
@@ -626,18 +626,35 @@ class OceanConnection(BaseSyncConnection):
 
     def _deploy_datatoken(self, envelope: Envelope):
         self.logger.info(f"interacting with ocean to deploy data token ...")
-        datatoken = self.ocean.create_data_token(
-            envelope.message.token0_name,
-            envelope.message.token1_name,
-            self.wallet,
-            blob=self.ocean.config.metadata_cache_uri,
+
+        print("Create ERC721 data NFT: begin.")
+        
+        erc721_nft = self.ocean.create_erc721_nft(
+            envelope.message.token0_name, envelope.message.token0_name, self.wallet
         )
-        self.logger.info(f"created the data token. Minting tokens to address....")
-        datatoken.mint(
-            self.wallet.address, to_wei(envelope.message.amount_to_mint), self.wallet
+
+        cap = self.ocean.to_wei(100)
+
+        # nft_factory = self.ocean.get_nft_factory()
+        
+        erc20_token = erc721_nft.create_datatoken(
+            template_index=1, # default value
+            name="ERC20DT1",  # name for ERC20 token
+            symbol="ERC20DT1Symbol",  # symbol for ERC20 token
+            minter=self.wallet.address,  # minter address
+            fee_manager=self.wallet.address,  # fee manager for this ERC20 token
+            publish_market_order_fee_address=self.wallet.address,  # publishing Market Address
+            publish_market_order_fee_token=ZERO_ADDRESS,  # publishing Market Fee Token
+            cap=cap,
+            publish_market_order_fee_amount=0,
+            bytess=[b""],
+            from_wallet=self.wallet
         )
-        self.logger.info(f"DATA_datatoken.address = '{datatoken.address}'\n publishing")
-        return datatoken
+
+        self.logger.info(f"created the data token.")
+
+        self.logger.info(f"DATA_datatoken.address = '{erc20_token.address}'\n publishing")
+        return erc20_token
 
     def add_publisher_trusted_algorithm(
         self, asset_or_did: str, algo_did: str, metadata_cache_uri: str
