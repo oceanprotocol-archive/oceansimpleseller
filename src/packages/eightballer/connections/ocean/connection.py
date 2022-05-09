@@ -27,7 +27,7 @@ import requests
 from aea.configurations.base import PublicId
 from aea.connections.base import BaseSyncConnection, Connection
 from aea.mail.base import Envelope
-
+from ocean_lib.structures.file_objects import UrlFile
 from packages.eightballer.protocols.ocean.message import OceanMessage
 
 """
@@ -497,59 +497,60 @@ class OceanConnection(BaseSyncConnection):
         self.put_envelope(deployment_envelope)
 
     def _deploy_data_for_d2c(self, envelope: Envelope):
-        datatoken = self._deploy_datatoken(envelope)
+        erc721_nft, erc20_token = self._deploy_datatoken(envelope)
 
-        provider_url = DataServiceProvider.get_url(self.ocean.config)
+        DATA_metadata = {
+            "created": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "updated": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "description": "envelope.message.description",  # TODO replace description field
+            "name": envelope.message.name,
+            "type": "dataset",
+            "author": envelope.message.author,
+            "license": envelope.message.license,
+        }
 
-        # Calc DATA service compute descriptor
-        service_attributes = json.loads(
-            DATA_SERVICES_TEMPLATE.substitute(
-                creator_address=self.wallet.address,
-                date_published=datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
-            )
-        )
+        DATA_url_file = UrlFile(url=envelope.message.dataset_url)
+
+        # Encrypt file(s) using provider
+        DATA_encrypted_files = self.ocean.assets.encrypt_files([DATA_url_file])
+
+        # Set the compute values for compute service
+        DATA_compute_values = {
+            "allowRawAlgorithm": False,
+            "allowNetworkAccess": True,
+            "publisherTrustedAlgorithms": [],
+            "publisherTrustedAlgorithmPublishers": [],
+        }
+
+        # Create the Service
+        from ocean_lib.services.service import Service
 
         DATA_compute_service = Service(
-            service_endpoint=provider_url,
-            service_type=ServiceTypes.CLOUD_COMPUTE,
-            attributes=service_attributes,
+            service_id="2",
+            service_type="compute",
+            service_endpoint=self.ocean.config.provider_url,
+            datatoken=erc20_token.address,
+            files=DATA_encrypted_files,
+            timeout=3600,
+            compute_values=DATA_compute_values,
         )
 
-        data_metadata = json.loads(
-            D2C_TEMPLATE.substitute(
-                url=envelope.message.dataset_url,
-                name=envelope.message.name,
-                author=envelope.message.author,
-                license=envelope.message.license,
-                date_created=envelope.message.date_created,
-            )
+        # Publish asset with compute service on-chain.
+        DATA_asset = self.ocean.assets.create(
+            metadata=DATA_metadata,
+            publisher_wallet=self.wallet,
+            encrypted_files=DATA_encrypted_files,
+            services=[DATA_compute_service],
+            erc721_address=erc721_nft.address,
+            deployed_erc20_tokens=[erc20_token],
         )
-
-        # Publish metadata and service info on-chain
-        try:
-            DATA_ddo = self.ocean.assets.create(
-                metadata=data_metadata,
-                publisher_wallet=self.wallet,
-                services=[DATA_compute_service],
-                data_token_address=datatoken.address,
-                encrypt=True,
-            )
-            self.logger.info(f"DATA did = '{DATA_ddo.did}'")
-        except ocean_lib.exceptions.AquariusError as error:  # and how exactly is the did generated???
-            self.logger.error(f"Error with creating asset. {error}")
-            msg = error.args[0]
-            if "is already registered to another asset." in msg:
-                self.logger.error(f"Trying to resolve pre-existing did..")
-                DATA_ddo = self.ocean.assets.resolve(msg.split(" ")[2])
-
-        self.logger.info(f"Ensure asset is cached in aquarius")
-        self._ensure_asset_cached_in_aquarius(DATA_ddo.did)
+        self.logger.info(f"DATA did = '{DATA_asset.did}'")
 
         msg = OceanMessage(
             performative=OceanMessage.Performative.DEPLOYMENT_RECIEPT,
             type="d2c",
-            did=DATA_ddo.did,
-            datatoken_contract_address=datatoken.address,
+            did=DATA_asset.did,
+            datatoken_contract_address=erc20_token.address,
         )
         msg.sender = envelope.to
         msg.to = envelope.sender
@@ -628,7 +629,7 @@ class OceanConnection(BaseSyncConnection):
         self.logger.info(f"interacting with ocean to deploy data token ...")
 
         print("Create ERC721 data NFT: begin.")
-        
+
         erc721_nft = self.ocean.create_erc721_nft(
             envelope.message.token0_name, envelope.message.token0_name, self.wallet
         )
@@ -636,9 +637,9 @@ class OceanConnection(BaseSyncConnection):
         cap = self.ocean.to_wei(100)
 
         # nft_factory = self.ocean.get_nft_factory()
-        
+
         erc20_token = erc721_nft.create_datatoken(
-            template_index=1, # default value
+            template_index=1,  # default value
             name="ERC20DT1",  # name for ERC20 token
             symbol="ERC20DT1Symbol",  # symbol for ERC20 token
             minter=self.wallet.address,  # minter address
@@ -648,13 +649,15 @@ class OceanConnection(BaseSyncConnection):
             cap=cap,
             publish_market_order_fee_amount=0,
             bytess=[b""],
-            from_wallet=self.wallet
+            from_wallet=self.wallet,
         )
 
         self.logger.info(f"created the data token.")
 
-        self.logger.info(f"DATA_datatoken.address = '{erc20_token.address}'\n publishing")
-        return erc20_token
+        self.logger.info(
+            f"DATA_datatoken.address = '{erc20_token.address}'\n publishing"
+        )
+        return erc721_nft, erc20_token
 
     def add_publisher_trusted_algorithm(
         self, asset_or_did: str, algo_did: str, metadata_cache_uri: str

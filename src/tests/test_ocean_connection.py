@@ -2,10 +2,7 @@
 # Copyright 2021 Ocean Protocol Foundation
 # SPDX-License-Identifier: Apache-2.0
 #
-# import time
-
-# import pytest
-
+import asyncio
 import os
 from aea.mail.base import Envelope
 from aea.configurations.base import ComponentType, ConnectionConfig, PublicId
@@ -28,24 +25,22 @@ def test_datatoken_creation():
         "None",
     )
 
-    ocean.on_connect()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(ocean.connect())
 
     ocean_message = OceanMessage(
-        OceanMessage.Performative.D2C_JOB,
+        OceanMessage.Performative.DEPLOY_D2C,
         _body={
             "token0_name": "DATA1",
             "token1_name": "DATA1",
             "amount_to_mint": 100,
             "dataset_url": "https://raw.githubusercontent.com/trentmc/branin/main/branin.arff",
-            "name": "example",
+            "name": "example", # TODO add description field
             "author": "Trent",
             "license": "CCO",
-            "date_created": "2019-12-28T10:55:11Z",
         },
     )
 
     envelope = Envelope(to="test", sender="msg.sender", message=ocean_message)
 
-    datatoken = ocean._deploy_datatoken(envelope)
-
-    assert datatoken.name == "ERC20Template"
+    ocean.on_send(envelope)
