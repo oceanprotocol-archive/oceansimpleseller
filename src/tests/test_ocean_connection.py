@@ -9,10 +9,16 @@ from aea.configurations.base import ComponentType, ConnectionConfig, PublicId
 
 from packages.eightballer.connections.ocean.connection import OceanConnection
 from packages.eightballer.protocols.ocean.message import OceanMessage
+from mock import patch, Mock
 
-
-def test_datatoken_creation():
+@patch.object(OceanConnection, 'put_envelope')
+def test_datatoken_creation(put_envelope):
     """Tests that _deploy_datatoken function works as expected."""
+
+    def side_effect(envelope):
+        assert envelope.message.performative == OceanMessage.Performative.DEPLOYMENT_RECIEPT
+
+    put_envelope.side_effect = side_effect
 
     ocean = OceanConnection(
         ConnectionConfig(
