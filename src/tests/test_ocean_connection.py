@@ -85,7 +85,7 @@ def test_deploy_algorithm(put_envelope):
 
     ocean_message = OceanMessage(
         OceanMessage.Performative.DEPLOY_ALGORITHM,
-        _body={  # TODO check consistency with run_ocean_seller.sh params in aea config set --type dict vendor.eightballer.skills.ocean_seller.strategy.args
+        _body={
             "token0_name": "DATA1",
             "token1_name": "DATA1",
             "amount_to_mint": 100,
