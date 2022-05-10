@@ -106,6 +106,7 @@ class OceanMessage(Message):
             "max_cost_ocean",
             "message_id",
             "name",
+            "description",
             "ocean_amt",
             "performative",
             "pool_address",
@@ -115,6 +116,7 @@ class OceanMessage(Message):
             "token1_name",
             "type",
             "version",
+            "checksum"
         )
 
     def __init__(
@@ -254,6 +256,12 @@ class OceanMessage(Message):
         return cast(str, self.get("entrypoint"))
 
     @property
+    def checksum(self) -> str:
+        """Get the 'checksum' content from the message."""
+        enforce(self.is_set("checksum"), "'checksum' content is not set.")
+        return cast(str, self.get("checksum"))
+
+    @property
     def error_code(self) -> CustomErrorCode:
         """Get the 'error_code' content from the message."""
         enforce(self.is_set("error_code"), "'error_code' content is not set.")
@@ -312,6 +320,12 @@ class OceanMessage(Message):
         """Get the 'name' content from the message."""
         enforce(self.is_set("name"), "'name' content is not set.")
         return cast(str, self.get("name"))
+
+    @property
+    def description(self) -> str:
+        """Get the 'description' content from the message."""
+        enforce(self.is_set("description"), "'description' content is not set.")
+        return cast(str, self.get("description"))
 
     @property
     def ocean_amt(self) -> int:
@@ -546,6 +560,12 @@ class OceanMessage(Message):
                     ),
                 )
                 enforce(
+                    isinstance(self.checksum, str),
+                    "Invalid type for content 'checksum'. Expected 'str'. Found '{}'.".format(
+                        type(self.checksum)
+                    ),
+                )
+                enforce(
                     isinstance(self.image, str),
                     "Invalid type for content 'image'. Expected 'str'. Found '{}'.".format(
                         type(self.image)
@@ -567,6 +587,12 @@ class OceanMessage(Message):
                     isinstance(self.name, str),
                     "Invalid type for content 'name'. Expected 'str'. Found '{}'.".format(
                         type(self.name)
+                    ),
+                )
+                enforce(
+                    isinstance(self.description, str),
+                    "Invalid type for content 'description'. Expected 'str'. Found '{}'.".format(
+                        type(self.description)
                     ),
                 )
                 enforce(

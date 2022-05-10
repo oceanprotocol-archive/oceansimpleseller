@@ -559,52 +559,56 @@ class OceanConnection(BaseSyncConnection):
 
     def _deploy_algorithm(self, envelope: Envelope):
         """ """
-        datatoken = self._deploy_datatoken(envelope)
-        provider_url = DataServiceProvider.get_url(self.ocean.config)
-        service_attributes = json.loads(
-            ALGO_SERVICE_TEMPLATE.substitute(
-                address=self.wallet.address,
-                date_published=datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
-            )
-        )
-        ALG_access_service = Service(
-            service_endpoint=provider_url,
-            service_type=ServiceTypes.CLOUD_COMPUTE,
-            attributes=service_attributes,
-        )
-        metadata = json.loads(
-            ALGO_TEMPLATE.substitute(
-                files_url=envelope.message.files_url,
-                name=envelope.message.name,
-                author=envelope.message.author,
-                license=envelope.message.license,
-                date_created=envelope.message.date_created,
-                language=envelope.message.language,
-                format=envelope.message.format,
-                version=envelope.message.version,
-                entrypoint=envelope.message.entrypoint,
-                image=envelope.message.image,
-                tag=envelope.message.tag,
-            )
+        ALGO_nft_token, ALGO_datatoken = self._deploy_datatoken(envelope)
+
+        ALGO_date_created = envelope.message.date_created
+        ALGO_metadata = {
+            "created": ALGO_date_created,
+            "updated": ALGO_date_created,
+            "description": "gpr",
+            "name": "gpr",
+            "type": "algorithm",
+            "author": envelope.message.author,
+            "license": envelope.message.license,
+            "algorithm": {
+                "language": envelope.message.language,
+                "format": envelope.message.format,
+                "version": envelope.message.version,
+                "container": {
+                    "entrypoint": envelope.message.entrypoint,
+                    "image": envelope.message.image,
+                    "tag": envelope.message.tag,
+                    "checksum": envelope.message.checksum,
+                },
+            },
+        }
+
+        from ocean_lib.structures.file_objects import UrlFile
+
+        ALGO_url_file = UrlFile(
+            url=envelope.message.files_url
         )
 
-        # Publish metadata and service info on-chain
-        ALG_ddo = self.ocean.assets.create(
-            metadata=metadata,  # {"main" : {"type" : "algorithm", ..}, ..}
+        # Encrypt file(s) using provider
+        ALGO_encrypted_files = self.ocean.assets.encrypt_files([ALGO_url_file])
+
+        # Publish asset with compute service on-chain.
+        # The download (access service) is automatically created, but you can explore other options as well
+        ALGO_asset = self.ocean.assets.create(
+            metadata=ALGO_metadata,
             publisher_wallet=self.wallet,
-            services=[ALG_access_service],
-            data_token_address=datatoken.address,
+            encrypted_files=ALGO_encrypted_files,
+            erc721_address=ALGO_nft_token.address,
+            deployed_erc20_tokens=[ALGO_datatoken],
         )
-        self.logger.info(f"ALG did = '{ALG_ddo.did}'")
 
-        self.logger.info(f"Ensure asset is cached in aquarius")
-        self._ensure_asset_cached_in_aquarius(ALG_ddo.did)
+        self.logger.info(f"ALG did = '{ALGO_asset.did}'")
 
         msg = OceanMessage(
             performative=OceanMessage.Performative.DEPLOYMENT_RECIEPT,
             type="algorithm",
-            did=ALG_ddo.did,
-            datatoken_contract_address=datatoken.address,
+            did=ALGO_asset.did,
+            datatoken_contract_address=ALGO_datatoken.address,
         )
         msg.sender = envelope.to
         msg.to = envelope.sender

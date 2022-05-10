@@ -93,6 +93,7 @@ aea config set --type dict vendor.eightballer.skills.ocean_seller.strategy.args 
         "version": "0.1",
         "entrypoint": "python $ALGO",
         "image": "oceanprotocol/algo_dockers",
+        "checksum": "44e10daa6637893f4276bb8d7301eb35306ece50f61ca34dcab550",
         "tag": "python-branin",
         "files_url": "https://raw.githubusercontent.com/trentmc/branin/main/gpr.py",
         "name": "gdr",
@@ -106,6 +107,7 @@ aea config set --type dict vendor.eightballer.skills.ocean_seller.strategy.args 
         "amount_to_mint": 100,
         "dataset_url": "https://raw.githubusercontent.com/trentmc/branin/main/branin.arff",
         "name": "example",
+        "description": "example",
         "author": "Trent",
         "license": "CCO",
         "date_created": "2019-12-28T10:55:11Z"
