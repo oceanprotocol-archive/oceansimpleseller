@@ -583,11 +583,7 @@ class OceanConnection(BaseSyncConnection):
             },
         }
 
-        from ocean_lib.structures.file_objects import UrlFile
-
-        ALGO_url_file = UrlFile(
-            url=envelope.message.files_url
-        )
+        ALGO_url_file = UrlFile(url=envelope.message.files_url)
 
         # Encrypt file(s) using provider
         ALGO_encrypted_files = self.ocean.assets.encrypt_files([ALGO_url_file])
