@@ -41,8 +41,8 @@ def test_datatoken_creation(put_envelope):
     ocean_message = OceanMessage(
         OceanMessage.Performative.DEPLOY_D2C,
         _body={
-            "token0_name": "DATA1",
-            "token1_name": "DATA1",
+            "data_nft_name": "data_nft_c2d",
+            "datatoken_name": "datatoken_c2d",
             "amount_to_mint": 100,
             "dataset_url": "https://raw.githubusercontent.com/trentmc/branin/main/branin.arff",
             "name": "example",
@@ -86,8 +86,8 @@ def test_deploy_algorithm(put_envelope):
     ocean_message = OceanMessage(
         OceanMessage.Performative.DEPLOY_ALGORITHM,
         _body={
-            "token0_name": "DATA1",
-            "token1_name": "DATA1",
+            "data_nft_name": "algo_nft_c2d",
+            "datatoken_name": "algo_token",
             "amount_to_mint": 100,
             "language": "python",
             "format": "docker-image",
@@ -97,7 +97,8 @@ def test_deploy_algorithm(put_envelope):
             "checksum": "44e10daa6637893f4276bb8d7301eb35306ece50f61ca34dcab550",
             "tag": "python-branin",
             "files_url": "https://raw.githubusercontent.com/trentmc/branin/main/gpr.py",
-            "name": "gdr",
+            "name": "gpr",
+            "description": "gpr",
             "author": "Trent",
             "license": "CCO",
             "date_created": "2019-12-28T10:55:11Z",

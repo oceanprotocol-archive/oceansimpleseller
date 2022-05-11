@@ -116,7 +116,9 @@ class OceanMessage(Message):
             "token1_name",
             "type",
             "version",
-            "checksum"
+            "checksum",
+            "data_nft_name",
+            "datatoken_name"
         )
 
     def __init__(
@@ -358,6 +360,18 @@ class OceanMessage(Message):
         return cast(str, self.get("token1_name"))
 
     @property
+    def data_nft_name(self) -> str:
+        """Get the 'data_nft_name' content from the message."""
+        enforce(self.is_set("data_nft_name"), "'data_nft_name' content is not set.")
+        return cast(str, self.get("data_nft_name"))
+
+    @property
+    def datatoken_name(self) -> str:
+        """Get the 'datatoken_name' content from the message."""
+        enforce(self.is_set("datatoken_name"), "'datatoken_name' content is not set.")
+        return cast(str, self.get("datatoken_name"))
+
+    @property
     def type(self) -> str:
         """Get the 'type' content from the message."""
         enforce(self.is_set("type"), "'type' content is not set.")
@@ -518,15 +532,15 @@ class OceanMessage(Message):
             elif self.performative == OceanMessage.Performative.DEPLOY_ALGORITHM:
                 expected_nb_of_contents = 14
                 enforce(
-                    isinstance(self.token0_name, str),
-                    "Invalid type for content 'token0_name'. Expected 'str'. Found '{}'.".format(
-                        type(self.token0_name)
+                    isinstance(self.data_nft_name, str),
+                    "Invalid type for content 'data_nft_name'. Expected 'str'. Found '{}'.".format(
+                        type(self.data_nft_name)
                     ),
                 )
                 enforce(
-                    isinstance(self.token1_name, str),
-                    "Invalid type for content 'token1_name'. Expected 'str'. Found '{}'.".format(
-                        type(self.token1_name)
+                    isinstance(self.datatoken_name, str),
+                    "Invalid type for content 'datatoken_name'. Expected 'str'. Found '{}'.".format(
+                        type(self.datatoken_name)
                     ),
                 )
                 enforce(

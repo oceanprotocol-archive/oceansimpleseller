@@ -565,8 +565,8 @@ class OceanConnection(BaseSyncConnection):
         ALGO_metadata = {
             "created": ALGO_date_created,
             "updated": ALGO_date_created,
-            "description": "gpr",
-            "name": "gpr",
+            "description": envelope.message.description,
+            "name": envelope.message.author,
             "type": "algorithm",
             "author": envelope.message.author,
             "license": envelope.message.license,
@@ -635,7 +635,7 @@ class OceanConnection(BaseSyncConnection):
         print("Create ERC721 data NFT: begin.")
 
         erc721_nft = self.ocean.create_erc721_nft(
-            envelope.message.token0_name, envelope.message.token0_name, self.wallet
+            envelope.message.data_nft_name, envelope.message.datatoken_name, self.wallet
         )
 
         cap = self.ocean.to_wei(100)
@@ -644,8 +644,8 @@ class OceanConnection(BaseSyncConnection):
 
         erc20_token = erc721_nft.create_datatoken(
             template_index=1,  # default value
-            name="ERC20DT1",  # name for ERC20 token
-            symbol="ERC20DT1Symbol",  # symbol for ERC20 token
+            name=envelope.message.datatoken_name,  # name for ERC20 token
+            symbol=envelope.message.datatoken_name,  # symbol for ERC20 token
             minter=self.wallet.address,  # minter address
             fee_manager=self.wallet.address,  # fee manager for this ERC20 token
             publish_market_order_fee_address=self.wallet.address,  # publishing Market Address
