@@ -415,16 +415,12 @@ class OceanConnection(BaseSyncConnection):
             raise ValueError(
                 f"Unable to loaded the assets from their dids. Please confirm correct deployemnt on ocean!"
             )
-        trusted_algos = self.add_publisher_trusted_algorithm(
-            data_ddo.did, algo_ddo.did, self.ocean_config.metadata_cache_uri
-        )
-        data_ddo.update_compute_privacy(
-            trusted_algorithms=trusted_algos,
-            trusted_algo_publishers=[],
-            allow_all=True,
-            allow_raw_algorithm=True,
-        )
-        self.ocean.assets.update(data_ddo, publisher_wallet=self.wallet)
+
+        compute_service = data_ddo.services[0]
+        compute_service.add_publisher_trusted_algorithm(algo_ddo)
+
+        data_ddo = self.ocean.assets.update(data_ddo, self.wallet)
+
         msg = OceanMessage(
             performative=OceanMessage.Performative.DEPLOYMENT_RECIEPT,
             type="permissions",
