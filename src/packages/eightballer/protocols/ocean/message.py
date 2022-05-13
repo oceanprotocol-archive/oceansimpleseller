@@ -118,7 +118,8 @@ class OceanMessage(Message):
             "version",
             "checksum",
             "data_nft_name",
-            "datatoken_name"
+            "datatoken_name",
+            "rate"
         )
 
     def __init__(
@@ -371,6 +372,12 @@ class OceanMessage(Message):
         enforce(self.is_set("datatoken_name"), "'datatoken_name' content is not set.")
         return cast(str, self.get("datatoken_name"))
 
+    @property
+    def rate(self) -> str:
+        """Get the 'rate' content from the message."""
+        enforce(self.is_set("rate"), "'rate' content is not set.")
+        return cast(str, self.get("rate"))
+    
     @property
     def type(self) -> str:
         """Get the 'type' content from the message."""
@@ -664,15 +671,15 @@ class OceanMessage(Message):
                     ),
                 )
                 enforce(
-                    type(self.datatoken_amt) is int,
-                    "Invalid type for content 'datatoken_amt'. Expected 'int'. Found '{}'.".format(
-                        type(self.datatoken_amt)
-                    ),
-                )
-                enforce(
                     type(self.ocean_amt) is int,
                     "Invalid type for content 'ocean_amt'. Expected 'int'. Found '{}'.".format(
                         type(self.ocean_amt)
+                    ),
+                )
+                enforce(
+                    type(self.rate) is int,
+                    "Invalid type for content 'rate'. Expected 'int'. Found '{}'.".format(
+                        type(self.rate)
                     ),
                 )
             elif self.performative == OceanMessage.Performative.DOWNLOAD_JOB:

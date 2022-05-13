@@ -28,6 +28,7 @@ from aea.configurations.base import PublicId
 from aea.connections.base import BaseSyncConnection, Connection
 from aea.mail.base import Envelope
 from ocean_lib.structures.file_objects import UrlFile
+from ocean_lib.models.erc20_token import ERC20Token
 from packages.eightballer.protocols.ocean.message import OceanMessage
 
 """
@@ -306,13 +307,22 @@ class OceanConnection(BaseSyncConnection):
         if retries == 0:
             raise ValueError("Failed to deploy pool...")
         try:
-            pool = self.ocean.pool.create(
-                envelope.message.datatoken_address,
-                data_token_amount=to_wei(envelope.message.datatoken_amt),
-                OCEAN_amount=to_wei(envelope.message.ocean_amt),
+            bpool = self.ocean.create_pool(
+                erc20_token=ERC20Token(
+                    self.ocean.web3, address=envelope.message.datatoken_address
+                ),
+                base_token=ERC20Token(
+                    self.ocean.web3, address=self.ocean.OCEAN_address
+                ),
+                rate=self.ocean.to_wei(envelope.message.rate),
+                vesting_amount=self.ocean.to_wei(10000),
+                vesting_blocks=2500000,
+                base_token_amount=self.ocean.to_wei(envelope.message.ocean_amt),
+                lp_swap_fee_amount=self.ocean.to_wei("0.01"),
+                publish_market_swap_fee_amount=self.ocean.to_wei("0.01"),
                 from_wallet=self.wallet,
             )
-            pool_address = pool.address
+            pool_address = bpool.address
             print(f"Deployed pool_address = '{pool_address}'")
         except (web3.exceptions.TransactionNotFound, ValueError) as e:
             self.logger.error(f"Failed to deploy pool!")
@@ -424,8 +434,8 @@ class OceanConnection(BaseSyncConnection):
         msg = OceanMessage(
             performative=OceanMessage.Performative.DEPLOYMENT_RECIEPT,
             type="permissions",
-            did="",
-            datatoken_contract_address="",
+            did=data_ddo.did,
+            datatoken_contract_address=data_ddo.datatokens[0].get("address"),
         )
         msg.sender = envelope.to
         msg.to = envelope.sender
