@@ -90,20 +90,10 @@ models:
         author: Trent
         license: CCO
         date_created: '2019-12-28T10:55:11Z'
-      datapool_params:
-        datatoken_address: ''
-        datatoken_amt: 100
-        ocean_amt: 10
       deployments:
         data_to_compute: {}
         data_download: {}
         algorithm: {}
-      download_params:
-        datatoken_address: ''
-        datatoken_amt: 1
-        max_cost_ocean: 10
-        asset_did: ''
-        pool_address: ''
       has_data_source: false
       is_ledger_tx: true
       location:

@@ -99,7 +99,9 @@ _FILESTORAGEMESSAGE_ERRORCODE = _descriptor.Descriptor(
     ],
     extensions=[],
     nested_types=[],
-    enum_types=[_FILESTORAGEMESSAGE_ERRORCODE_ERRORCODEENUM,],
+    enum_types=[
+        _FILESTORAGEMESSAGE_ERRORCODE_ERRORCODEENUM,
+    ],
     serialized_options=None,
     is_extendable=False,
     syntax="proto3",
@@ -358,7 +360,9 @@ _FILESTORAGEMESSAGE_ERROR_PERFORMATIVE = _descriptor.Descriptor(
         ),
     ],
     extensions=[],
-    nested_types=[_FILESTORAGEMESSAGE_ERROR_PERFORMATIVE_ERRORDATAENTRY,],
+    nested_types=[
+        _FILESTORAGEMESSAGE_ERROR_PERFORMATIVE_ERRORDATAENTRY,
+    ],
     enum_types=[],
     serialized_options=None,
     is_extendable=False,

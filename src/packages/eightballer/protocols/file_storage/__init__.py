@@ -23,9 +23,9 @@ This module contains the support resources for the file_storage protocol.
 It was created with protocol buffer compiler version `libprotoc 3.6.1` and aea version `1.1.0`.
 """
 
-from packages.eightballer.protocols.file_storage.message import \
-    FileStorageMessage
-from packages.eightballer.protocols.file_storage.serialization import \
-    FileStorageSerializer
+from packages.eightballer.protocols.file_storage.message import FileStorageMessage
+from packages.eightballer.protocols.file_storage.serialization import (
+    FileStorageSerializer,
+)
 
 FileStorageMessage.serializer = FileStorageSerializer

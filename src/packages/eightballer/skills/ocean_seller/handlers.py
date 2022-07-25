@@ -124,16 +124,6 @@ class OceanHandler(Handler):
                 strategy.has_completed_download_job = True
 
             strategy.is_in_flight = False
-        elif message.performative == OceanMessage.Performative.POOL_DEPLOYMENT_RECIEPT:
-            self.log.info(f"Sucecssfully deployed pool for asset!")
-            strategy.is_in_flight = False
-            strategy.is_pool_deployed = True
-
-            if not strategy.download_params.get("datapool_address", None):
-                strategy.download_params["datapool_address"] = message.pool_address
-            else:
-                strategy.download_params["algpool_address"] = message.pool_address
-
         else:
             raise ValueError("Unhandled Message!!!")
 
@@ -476,10 +466,6 @@ class GenericLedgerApiHandler(Handler):
             fipa_dialogues.dialogue_stats.add_dialogue_endstate(
                 FipaDialogue.EndState.SUCCESSFUL, fipa_dialogue.is_self_initiated
             )
-
-            strategy = cast(GenericStrategy, self.context.strategy)
-            fipa_dialogue.data_for_sale["datapool_address"] = strategy.download_params["datapool_address"]
-            fipa_dialogue.data_for_sale["algpool_address"] = strategy.download_params["algpool_address"]
 
             self.context.logger.info(
                 "transaction confirmed, sending data={} to buyer={}.".format(

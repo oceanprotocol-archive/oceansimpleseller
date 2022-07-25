@@ -214,58 +214,9 @@ class OceanConnection(BaseSyncConnection):
             == OceanMessage.Performative.DEPLOY_DATA_DOWNLOAD
         ):
             self._deploy_data_to_download(envelope)
-        if envelope.message.performative == OceanMessage.Performative.CREATE_POOL:
-            self._create_pool(envelope)
-        if envelope.message.performative == OceanMessage.Performative.DOWNLOAD_JOB:
-            self._purchase_datatoken(envelope)
-
-    def _purchase_datatoken(self, envelope: Envelope):
-        try:
-            self.ocean.pool.buy_data_tokens(
-                pool_address=envelope.message.pool_address,
-                amount=to_wei(envelope.message.datatoken_amt),
-                max_OCEAN_amount=to_wei(envelope.message.max_cost_ocean),
-                from_wallet=self.wallet,
-            )
-
-            msg = OceanMessage(
-                performative=OceanMessage.Performative.DOWNLOAD_JOB,
-                **{
-                    "datatoken_address": "unused",
-                    "datatoken_amt": -1,
-                    "max_cost_ocean": -1,
-                    "asset_did": "unused",
-                    "pool_address": "unused",
-                },
-            )
-            msg.sender = envelope.to
-            msg.to = envelope.sender
-
-            envelope = Envelope(to=msg.to, sender=msg.sender, message=msg)
-            self.put_envelope(envelope)
-            self.logger.info(f"Purchased 1 datatoken")
-
-        except Exception as e:
-            self.logger.error("Couldn't purchase datatokens")
-            self.logger.error(e)
 
     def _download_asset(self, envelope: Envelope):
         did = envelope.message.asset_did
-        token_address = envelope.message.datatoken_address
-        data_token = self.ocean.get_data_token(token_address)
-        if data_token.balanceOf(self.wallet.address) < envelope.message.datatoken_amt:
-            self.logger.info(
-                f"insufficient data tokens.. Purchasing from the open market."
-            )
-            self.ocean.pool.buy_data_tokens(
-                envelope.message.pool_address,
-                amount=to_wei(envelope.message.datatoken_amt),
-                max_OCEAN_amount=to_wei(envelope.message.max_cost_ocean),
-                from_wallet=self.wallet,
-            )
-        else:
-            self.logger.info(f"Already has sufficient Datatokens.")
-
         asset = self.ocean.assets.resolve(did)
         service = asset.get_service(ServiceTypes.ASSET_ACCESS)
 
@@ -302,41 +253,6 @@ class OceanConnection(BaseSyncConnection):
         envelope = Envelope(to=msg.to, sender=msg.sender, message=msg)
         self.put_envelope(envelope)
         self.logger.info(f"completed download! Sending result to handler!")
-
-    def _create_pool(self, envelope: Envelope, retries=2):
-        if retries == 0:
-            raise ValueError("Failed to deploy pool...")
-        try:
-            bpool = self.ocean.create_pool(
-                erc20_token=ERC20Token(
-                    self.ocean.web3, address=envelope.message.datatoken_address
-                ),
-                base_token=ERC20Token(
-                    self.ocean.web3, address=self.ocean.OCEAN_address
-                ),
-                rate=self.ocean.to_wei(envelope.message.rate),
-                vesting_amount=self.ocean.to_wei(10000),
-                vesting_blocks=2500000,
-                base_token_amount=self.ocean.to_wei(envelope.message.ocean_amt),
-                lp_swap_fee_amount=self.ocean.to_wei("0.01"),
-                publish_market_swap_fee_amount=self.ocean.to_wei("0.01"),
-                from_wallet=self.wallet,
-            )
-            pool_address = bpool.address
-            print(f"Deployed pool_address = '{pool_address}'")
-        except (web3.exceptions.TransactionNotFound, ValueError) as e:
-            self.logger.error(f"Failed to deploy pool!")
-            self._create_pool(envelope, retries - 1)
-
-        msg = OceanMessage(
-            performative=OceanMessage.Performative.POOL_DEPLOYMENT_RECIEPT,
-            pool_address=pool_address,
-        )
-        msg.sender = envelope.to
-        msg.to = envelope.sender
-        envelope = Envelope(to=msg.to, sender=msg.sender, message=msg)
-        self.put_envelope(envelope)
-        self.logger.info(f"Data pool created! Sending result to handler!")
 
     def _create_d2c_job(self, envelope):
         DATA_did = envelope.message.data_did  # for convenience

@@ -27,8 +27,9 @@ from aea.configurations.base import PublicId
 from aea.exceptions import AEAEnforceError, enforce
 from aea.protocols.base import Message
 
-from packages.eightballer.protocols.ocean.custom_types import \
-    ErrorCode as CustomErrorCode
+from packages.eightballer.protocols.ocean.custom_types import (
+    ErrorCode as CustomErrorCode,
+)
 
 _default_logger = logging.getLogger("aea.packages.eightballer.protocols.ocean.message")
 
@@ -46,7 +47,6 @@ class OceanMessage(Message):
     class Performative(Message.Performative):
         """Performatives for the ocean protocol."""
 
-        CREATE_POOL = "create_pool"
         D2C_JOB = "d2c_job"
         DEPLOY_ALGORITHM = "deploy_algorithm"
         DEPLOY_D2C = "deploy_d2c"
@@ -56,7 +56,6 @@ class OceanMessage(Message):
         END = "end"
         ERROR = "error"
         PERMISSION_DATASET = "permission_dataset"
-        POOL_DEPLOYMENT_RECIEPT = "pool_deployment_reciept"
         RESULTS = "results"
 
         def __str__(self) -> str:
@@ -64,17 +63,14 @@ class OceanMessage(Message):
             return str(self.value)
 
     _performatives = {
-        "create_pool",
         "d2c_job",
         "deploy_algorithm",
         "deploy_d2c",
         "deploy_data_download",
         "deployment_reciept",
-        "download_job",
         "end",
         "error",
         "permission_dataset",
-        "pool_deployment_reciept",
         "results",
     }
     __slots__: Tuple[str, ...] = tuple()
@@ -109,7 +105,6 @@ class OceanMessage(Message):
             "description",
             "ocean_amt",
             "performative",
-            "pool_address",
             "tag",
             "target",
             "token0_name",
@@ -119,7 +114,7 @@ class OceanMessage(Message):
             "checksum",
             "data_nft_name",
             "datatoken_name",
-            "rate"
+            "rate",
         )
 
     def __init__(
@@ -337,12 +332,6 @@ class OceanMessage(Message):
         return cast(int, self.get("ocean_amt"))
 
     @property
-    def pool_address(self) -> str:
-        """Get the 'pool_address' content from the message."""
-        enforce(self.is_set("pool_address"), "'pool_address' content is not set.")
-        return cast(str, self.get("pool_address"))
-
-    @property
     def tag(self) -> str:
         """Get the 'tag' content from the message."""
         enforce(self.is_set("tag"), "'tag' content is not set.")
@@ -377,7 +366,7 @@ class OceanMessage(Message):
         """Get the 'rate' content from the message."""
         enforce(self.is_set("rate"), "'rate' content is not set.")
         return cast(str, self.get("rate"))
-    
+
     @property
     def type(self) -> str:
         """Get the 'type' content from the message."""
@@ -634,14 +623,6 @@ class OceanMessage(Message):
                         type(self.license)
                     ),
                 )
-            elif self.performative == OceanMessage.Performative.POOL_DEPLOYMENT_RECIEPT:
-                expected_nb_of_contents = 1
-                enforce(
-                    isinstance(self.pool_address, str),
-                    "Invalid type for content 'pool_address'. Expected 'str'. Found '{}'.".format(
-                        type(self.pool_address)
-                    ),
-                )
             elif self.performative == OceanMessage.Performative.DEPLOYMENT_RECIEPT:
                 expected_nb_of_contents = 3
                 enforce(
@@ -660,58 +641,6 @@ class OceanMessage(Message):
                     isinstance(self.datatoken_contract_address, str),
                     "Invalid type for content 'datatoken_contract_address'. Expected 'str'. Found '{}'.".format(
                         type(self.datatoken_contract_address)
-                    ),
-                )
-            elif self.performative == OceanMessage.Performative.CREATE_POOL:
-                expected_nb_of_contents = 3
-                enforce(
-                    isinstance(self.datatoken_address, str),
-                    "Invalid type for content 'datatoken_address'. Expected 'str'. Found '{}'.".format(
-                        type(self.datatoken_address)
-                    ),
-                )
-                enforce(
-                    type(self.ocean_amt) is int,
-                    "Invalid type for content 'ocean_amt'. Expected 'int'. Found '{}'.".format(
-                        type(self.ocean_amt)
-                    ),
-                )
-                enforce(
-                    type(self.rate) is int,
-                    "Invalid type for content 'rate'. Expected 'int'. Found '{}'.".format(
-                        type(self.rate)
-                    ),
-                )
-            elif self.performative == OceanMessage.Performative.DOWNLOAD_JOB:
-                expected_nb_of_contents = 5
-                enforce(
-                    isinstance(self.datatoken_address, str),
-                    "Invalid type for content 'datatoken_address'. Expected 'str'. Found '{}'.".format(
-                        type(self.datatoken_address)
-                    ),
-                )
-                enforce(
-                    type(self.datatoken_amt) is int,
-                    "Invalid type for content 'datatoken_amt'. Expected 'int'. Found '{}'.".format(
-                        type(self.datatoken_amt)
-                    ),
-                )
-                enforce(
-                    type(self.max_cost_ocean) is int,
-                    "Invalid type for content 'max_cost_ocean'. Expected 'int'. Found '{}'.".format(
-                        type(self.max_cost_ocean)
-                    ),
-                )
-                enforce(
-                    isinstance(self.asset_did, str),
-                    "Invalid type for content 'asset_did'. Expected 'str'. Found '{}'.".format(
-                        type(self.asset_did)
-                    ),
-                )
-                enforce(
-                    isinstance(self.pool_address, str),
-                    "Invalid type for content 'pool_address'. Expected 'str'. Found '{}'.".format(
-                        type(self.pool_address)
                     ),
                 )
             elif self.performative == OceanMessage.Performative.PERMISSION_DATASET:
