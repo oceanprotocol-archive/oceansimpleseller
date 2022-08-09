@@ -112,7 +112,7 @@ def test_deploy_algorithm(put_envelope):
 
 @patch.object(OceanConnection, "put_envelope")
 def test_permission_dataset(put_envelope):
-    """Tests that _deploy_algorithm function works as expected."""
+    """Tests that _permission_dataset function works as expected."""
     global data_ddo
     global algo_ddo
 
