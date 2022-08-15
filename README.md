@@ -22,9 +22,9 @@ To run the project you will need two terminals open simultaneously.
 Export the following on vars on both of them:
 
 ```bash
-export FETCH_URL=https://rest-capricorn.fetch.ai:443
+export FETCH_URL=https://rpc-dorado.fetch.ai:443
 export FETCH_DENOM=atestfet
-export FETCH_CHAIN_ID=capricorn-1
+export FETCH_CHAIN_ID=dorado-1
 
 # export SELLER_AEA_KEY_ETHEREUM="0x4a7b2cc2d0a9574f9e207fcfb6b13f6daf4e90b9e0f50e389a68f507f9767880" # Rinkeby
 export SELLER_AEA_KEY_ETHEREUM="0xc594c6e5def4bab63ac29eed19a134c130388f74f019bc74b8f4389df2837a58" # BARGE/GANACHE TEST_PRIVATE_KEY1 from pytest.ini
