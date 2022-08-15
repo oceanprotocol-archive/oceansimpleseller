@@ -112,7 +112,7 @@ aea config set --type dict vendor.eightballer.skills.ocean_seller.strategy.args 
         "author": "Trent",
         "license": "CCO",
         "date_created": "2019-12-28T10:55:11Z"
-        },
+        }
 }'
 
 
