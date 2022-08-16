@@ -22,24 +22,24 @@ aea add-key fetchai fetchai_private_key.txt --connection
 
 # setup fetch libraries
 # generic protocols
-aea add protocol fetchai/acn:1.0.0
-aea add protocol fetchai/contract_api:1.0.0
-aea add protocol fetchai/fipa:1.0.0
-aea add protocol fetchai/ledger_api:1.0.0
-aea add protocol fetchai/oef_search:1.0.0
+aea add protocol fetchai/acn:1.1.2
+aea add protocol fetchai/contract_api:1.1.2
+aea add protocol fetchai/fipa:1.1.2
+aea add protocol fetchai/ledger_api:1.1.2
+aea add protocol fetchai/oef_search:1.1.2
 
 #generic connections
-aea add connection fetchai/ledger:0.19.0
-aea add connection fetchai/p2p_libp2p:0.25.0
-aea add connection fetchai/soef:0.26.0
+aea add connection fetchai/ledger:0.21.1
+aea add connection fetchai/p2p_libp2p:0.27.1
+aea add connection fetchai/soef:0.27.2
 
 # routing
 aea config set --type dict agent.default_routing \
 '{
-  "fetchai/ledger_api:1.0.0": "fetchai/ledger:0.19.0",
-  "fetchai/oef_search:1.0.0": "fetchai/soef:0.26.0"
+  "fetchai/ledger_api:1.1.2": "fetchai/ledger:0.21.1",
+  "fetchai/oef_search:1.1.2": "fetchai/soef:0.27.2"
 }'
-aea config set agent.default_connection fetchai/p2p_libp2p:0.25.0
+aea config set agent.default_connection fetchai/p2p_libp2p:0.27.1
 # soef setup and configuration for p2p nodes
 
 aea config set --type dict vendor.fetchai.connections.p2p_libp2p.config \
@@ -112,7 +112,7 @@ aea config set --type dict vendor.eightballer.skills.ocean_seller.strategy.args 
         "author": "Trent",
         "license": "CCO",
         "date_created": "2019-12-28T10:55:11Z"
-        },
+        }
 }'
 
 

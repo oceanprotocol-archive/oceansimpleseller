@@ -8,26 +8,26 @@ license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   __init__.py: QmeRVgNCPPftthrxLRAD5T8zPioqYUWbUTctXZuXGz92ib
-  behaviours.py: QmeYSzexdrnP1ovuXqugW8xw7bM4GeXQHSZYUbReVAJgZL
+  behaviours.py: QmcnhzRM3N6xXG6uR4yMBKAxYu12ic7KSEuBrYURdEdzk9
   dialogues.py: QmWxj5PGgc7AhXyG8mReJ41LYP6eRZ8mUQtWwFrwCZjMKg
-  handlers.py: QmQApSvkGg4tmM7Ffc6Bg6t5UosYFhrUcxGcrjQHvXir2B
-  strategy.py: QmfXga4J2NwZxEr2BncrwKsm5KZFXTCgGS9srXSJHHuVGi
-fingerprint_ignore_patterns: []
+  handlers.py: QmQHHcPRWaGbLHNucYeJ8EPAhFL1JimY9uaFozcaDFPvMt
+  strategy.py: QmQGJGJ3MyJwABnFkE9TYzMzwXQpdcv9D9WEBHo2w3Rk75
+fingerprint_ignore_patterns: [ ]
 connections:
-- fetchai/ledger:0.19.0
-contracts: []
+  - fetchai/ledger:0.21.1
+contracts: [ ]
 protocols:
-- fetchai/default:1.1.0
-- fetchai/fipa:1.0.0
-- fetchai/ledger_api:1.0.0
-- fetchai/oef_search:1.0.0
-skills: []
+  - fetchai/default:1.1.2
+  - fetchai/fipa:1.1.2
+  - fetchai/ledger_api:1.1.2
+  - fetchai/oef_search:1.1.2
+skills: [ ]
 behaviours:
   ocean_behaviour:
-    args: {}
+    args: { }
     class_name: OceanSellerBehaviour
   ocean_c2d:
-    args: {}
+    args: { }
     class_name: OceanC2DBehaviour
   service_registration:
     args:
@@ -35,32 +35,32 @@ behaviours:
     class_name: GenericServiceRegistrationBehaviour
 handlers:
   fipa:
-    args: {}
+    args: { }
     class_name: GenericFipaHandler
   ledger_api:
-    args: {}
+    args: { }
     class_name: GenericLedgerApiHandler
   ocean:
-    args: {}
+    args: { }
     class_name: OceanHandler
   oef_search:
-    args: {}
+    args: { }
     class_name: GenericOefSearchHandler
   storj:
-    args: {}
+    args: { }
     class_name: StorjHandler
 models:
   default_dialogues:
-    args: {}
+    args: { }
     class_name: DefaultDialogues
   fipa_dialogues:
-    args: {}
+    args: { }
     class_name: FipaDialogues
   ledger_api_dialogues:
-    args: {}
+    args: { }
     class_name: LedgerApiDialogues
   oef_search_dialogues:
-    args: {}
+    args: { }
     class_name: OefSearchDialogues
   strategy:
     args:
@@ -79,21 +79,27 @@ models:
         author: Trent
         license: CCO
         date_created: '2019-12-28T10:55:11Z'
+        data_nft_name: "algo_nft_c2d"
+        datatoken_name: "algo_token"
+        checksum: "44e10daa6637893f4276bb8d7301eb35306ece50f61ca34dcab550"
+        description: "gpr"
       data_for_sale:
         generic: data
       data_to_compute_params:
         token0_name: DATA1
         token1_name: DATA1
         amount_to_mint: 100
+        data_nft_name: "data_nft_c2d"
+        datatoken_name: "datatoken_c2d"
         dataset_url: https://raw.githubusercontent.com/trentmc/branin/main/branin.arff
         name: example
         author: Trent
         license: CCO
         date_created: '2019-12-28T10:55:11Z'
       deployments:
-        data_to_compute: {}
-        data_download: {}
-        algorithm: {}
+        data_to_compute: { }
+        data_download: { }
+        algorithm: { }
       has_data_source: false
       is_ledger_tx: true
       location:
@@ -106,4 +112,4 @@ models:
       unit_price: 10
     class_name: GenericStrategy
 is_abstract: false
-dependencies: {}
+dependencies: { }
