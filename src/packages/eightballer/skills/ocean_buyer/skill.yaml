@@ -20,7 +20,7 @@ protocols:
 - fetchai/fipa:1.0.0
 - fetchai/ledger_api:1.0.0
 - fetchai/oef_search:1.0.0
-- fetchai/signing:1.1.0
+- fetchai/signing:1.1.2
 skills: []
 behaviours:
   ocean:
