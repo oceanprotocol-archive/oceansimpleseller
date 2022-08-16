@@ -22,7 +22,7 @@ To run the project you will need two terminals open simultaneously.
 Export the following on vars on both of them:
 
 ```bash
-export FETCH_URL=https://rpc-dorado.fetch.ai:443
+export FETCH_URL=https://rest-dorado.fetch.ai:443
 export FETCH_DENOM=atestfet
 export FETCH_CHAIN_ID=dorado-1
 
