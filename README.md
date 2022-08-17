@@ -12,7 +12,7 @@ make install_env
 go is required by the libp2p connection. Install go using the official
 installation docs: https://go.dev/doc/install
 
-If running the project with a local eth network with [Barge](https://github.com/oceanprotocol/barge/branches) use the barge branch `v3` and run barge with:
+If running the project with a local eth network with [Barge](https://github.com/oceanprotocol/barge/branches) use the barge branch `main` and run barge with:
 ```
 ./start_ocean.sh --with-provider2
 ```
@@ -42,7 +42,7 @@ export TARGET_SKILL="eightballer/storj_file_transfer:0.1.0"
 export RPC_URL="http://127.0.0.1:8545" # Use a local ETH network i.e. ganache / barge
 # export RPC_URL="https://rinkeby.infura.io/v3/{infura_key}" # Use a local ETH network i.e. ganache / barge
 
-# Make sure to copy the Ocean v3 address.json from https://github.com/oceanprotocol/contracts/blob/main/artifacts/address.json
+# Make sure to copy the Ocean V4 address.json from https://github.com/oceanprotocol/contracts/blob/main/addresses/address.json
 export ADDRESS_FILE=~/.ocean/ocean-contracts/artifacts/address.json
 export OCEAN_NETWORK_URL=http://127.0.0.1:8545
 
