@@ -32,8 +32,7 @@ Sync (inherited from BaseSyncConnection) or Async (inherited from Connection) co
 
 CONNECTION_ID = PublicId.from_str("eightballer/storj_file_transfer:0.1.0")
 
-from packages.eightballer.protocols.file_storage.message import \
-    FileStorageMessage
+from packages.eightballer.protocols.file_storage.message import FileStorageMessage
 
 
 class StorjSyncConnection(BaseSyncConnection):
@@ -115,7 +114,10 @@ class StorjSyncConnection(BaseSyncConnection):
         )
         url = self.s3.generate_presigned_url(
             ClientMethod="get_object",
-            Params={"Bucket": self.bucket_name, "Key": envelope.message.key,},
+            Params={
+                "Bucket": self.bucket_name,
+                "Key": envelope.message.key,
+            },
             ExpiresIn=604800,
         )
         msg = FileStorageMessage(

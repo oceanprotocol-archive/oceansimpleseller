@@ -17,18 +17,13 @@
 #
 # ------------------------------------------------------------------------------
 """Scaffold connection and channel."""
-import hashlib
-import os
 import time
-from datetime import datetime
-from typing import Any, Dict, Optional, Union
+from typing import Any
 
-import requests
+from datetime import datetime, timedelta
 from aea.configurations.base import PublicId
-from aea.connections.base import BaseSyncConnection, Connection
+from aea.connections.base import BaseSyncConnection
 from aea.mail.base import Envelope
-from ocean_lib.structures.file_objects import UrlFile
-from ocean_lib.models.erc20_token import ERC20Token
 from packages.eightballer.protocols.ocean.message import OceanMessage
 
 """
@@ -39,103 +34,21 @@ Sync (inherited from BaseSyncConnection) or Async (inherited from Connection) co
 
 CONNECTION_ID = PublicId.from_str("eightballer/ocean:0.1.0")
 
-import json
 import os
 
 import ocean_lib
-import web3
 from eth_account import Account
-from ocean_lib.agreements.service_types import ServiceTypes
 from ocean_lib.data_provider.data_service_provider import DataServiceProvider
 from ocean_lib.example_config import ExampleConfig
 from ocean_lib.models.compute_input import ComputeInput
 from ocean_lib.ocean.ocean import Ocean
+from ocean_lib.structures.file_objects import UrlFile
 from ocean_lib.services.service import Service
 from ocean_lib.web3_internal.constants import ZERO_ADDRESS
-from ocean_lib.web3_internal.currency import to_wei
 from ocean_lib.web3_internal.wallet import Wallet
 from web3._utils.threads import Timeout
 
 Account.enable_unaudited_hdwallet_features()
-
-from string import Template
-
-D2C_TEMPLATE = Template(
-    """{
-    "main": {
-        "type": "dataset",
-        "files": [
-     {
-       "url": "$url",
-     "index": 0,
-       "contentType": "text/text"
-     }
-    ],
-    "name": "$name", "author": "$author", "license": "$license",
-    "dateCreated": "$date_created"
-    }
-}
-"""
-)
-
-
-DATA_SERVICES_TEMPLATE = Template(
-    """{
-    "main": {
-        "name": "DATA_dataAssetAccessServiceAgreement",
-        "creator": "$creator_address",
-        "timeout": 86400,
-        "datePublished": "$date_published",
-        "cost": 1.0
-        }
-    }
-"""
-)
-
-
-# Specify metadata and service attributes, for "GPR" algorithm script.
-# In same location as Branin test dataset. GPR = Gaussian Process Regression.
-ALGO_TEMPLATE = Template(
-    """{
-    "main": {
-        "type": "algorithm",
-        "algorithm": {
-           "language": "$language",
-            "format": "$format",
-            "version": "$version",
-            "container": {
-              "entrypoint": "$entrypoint",
-              "image": "$image",
-              "tag": "$tag"
-            }
-        },
-        "files": [
-	  {
-	    "url": "$files_url",
-	    "index": 0,
-	    "contentType": "text/text"
-	  }
-	],
-	"name": "$name",
-    "author": "$author",
-    "license": "$license",
-	"dateCreated": "$date_created"
-    }
-}
-"""
-)
-
-ALGO_SERVICE_TEMPLATE = Template(
-    """{
-        "main": {
-            "name": "ALG_dataAssetAccessServiceAgreement",
-            "creator": "$address",
-            "timeout": 3600,
-            "datePublished": "$date_published",
-            "cost": 1.0
-        }
-    }"""
-)
 
 
 class OceanConnection(BaseSyncConnection):
@@ -214,84 +127,30 @@ class OceanConnection(BaseSyncConnection):
             == OceanMessage.Performative.DEPLOY_DATA_DOWNLOAD
         ):
             self._deploy_data_to_download(envelope)
-        if envelope.message.performative == OceanMessage.Performative.CREATE_POOL:
-            self._create_pool(envelope)
-        if envelope.message.performative == OceanMessage.Performative.DOWNLOAD_JOB:
-            self._purchase_datatoken(envelope)
-
-    def _purchase_datatoken(self, envelope: Envelope):
-        try:
-            self.ocean.pool.buy_data_tokens(
-                pool_address=envelope.message.pool_address,
-                amount=to_wei(envelope.message.datatoken_amt),
-                max_OCEAN_amount=to_wei(envelope.message.max_cost_ocean),
-                from_wallet=self.wallet,
-            )
-
-            msg = OceanMessage(
-                performative=OceanMessage.Performative.DOWNLOAD_JOB,
-                **{
-                    "datatoken_address": "unused",
-                    "datatoken_amt": -1,
-                    "max_cost_ocean": -1,
-                    "asset_did": "unused",
-                    "pool_address": "unused",
-                },
-            )
-            msg.sender = envelope.to
-            msg.to = envelope.sender
-
-            envelope = Envelope(to=msg.to, sender=msg.sender, message=msg)
-            self.put_envelope(envelope)
-            self.logger.info(f"Purchased 1 datatoken")
-
-        except Exception as e:
-            self.logger.error("Couldn't purchase datatokens")
-            self.logger.error(e)
 
     def _download_asset(self, envelope: Envelope):
         did = envelope.message.asset_did
-        token_address = envelope.message.datatoken_address
-        data_token = self.ocean.get_data_token(token_address)
-        if data_token.balanceOf(self.wallet.address) < envelope.message.datatoken_amt:
-            self.logger.info(
-                f"insufficient data tokens.. Purchasing from the open market."
-            )
-            self.ocean.pool.buy_data_tokens(
-                envelope.message.pool_address,
-                amount=to_wei(envelope.message.datatoken_amt),
-                max_OCEAN_amount=to_wei(envelope.message.max_cost_ocean),
-                from_wallet=self.wallet,
-            )
-        else:
-            self.logger.info(f"Already has sufficient Datatokens.")
-
         asset = self.ocean.assets.resolve(did)
-        service = asset.get_service(ServiceTypes.ASSET_ACCESS)
+        service = asset.get_service_by_id("0")
 
-        # Bob sends his datatoken to the service
-        quote = self.ocean.assets.order(
-            asset.did, self.wallet.address, service_index=service.index
+        order_tx_id = self.ocean.assets.pay_for_access_service(
+            asset,
+            service,
+            consume_market_order_fee_address=self.wallet.address,
+            consume_market_order_fee_token=service.datatoken.address,
+            consume_market_order_fee_amount=0,
+            wallet=self.wallet,
         )
-        order_tx_id = self.ocean.assets.pay_for_service(
-            self.ocean.web3,
-            quote.amount,
-            quote.data_token_address,
-            asset.did,
-            service.index,
-            ZERO_ADDRESS,
-            self.wallet,
-            service.get_c2d_address(),
-        )
+
         print(f"order_tx_id = '{order_tx_id}'")
 
         # Bob downloads. If the connection breaks, Bob can request again by showing order_tx_id.
         file_path = self.ocean.assets.download(
-            asset.did,
-            service.index,
-            self.wallet,
-            order_tx_id,
+            asset=asset,
+            service=service,
+            consumer_wallet=self.wallet,
             destination="./downloads/",
+            order_tx_id=order_tx_id,
         )
         print(f"file_path = '{file_path}'")  # e.g. datafile.0xAf07...
         data = open(file_path, "rb").read()
@@ -302,41 +161,6 @@ class OceanConnection(BaseSyncConnection):
         envelope = Envelope(to=msg.to, sender=msg.sender, message=msg)
         self.put_envelope(envelope)
         self.logger.info(f"completed download! Sending result to handler!")
-
-    def _create_pool(self, envelope: Envelope, retries=2):
-        if retries == 0:
-            raise ValueError("Failed to deploy pool...")
-        try:
-            bpool = self.ocean.create_pool(
-                erc20_token=ERC20Token(
-                    self.ocean.web3, address=envelope.message.datatoken_address
-                ),
-                base_token=ERC20Token(
-                    self.ocean.web3, address=self.ocean.OCEAN_address
-                ),
-                rate=self.ocean.to_wei(envelope.message.rate),
-                vesting_amount=self.ocean.to_wei(10000),
-                vesting_blocks=2500000,
-                base_token_amount=self.ocean.to_wei(envelope.message.ocean_amt),
-                lp_swap_fee_amount=self.ocean.to_wei("0.01"),
-                publish_market_swap_fee_amount=self.ocean.to_wei("0.01"),
-                from_wallet=self.wallet,
-            )
-            pool_address = bpool.address
-            print(f"Deployed pool_address = '{pool_address}'")
-        except (web3.exceptions.TransactionNotFound, ValueError) as e:
-            self.logger.error(f"Failed to deploy pool!")
-            self._create_pool(envelope, retries - 1)
-
-        msg = OceanMessage(
-            performative=OceanMessage.Performative.POOL_DEPLOYMENT_RECIEPT,
-            pool_address=pool_address,
-        )
-        msg.sender = envelope.to
-        msg.to = envelope.sender
-        envelope = Envelope(to=msg.to, sender=msg.sender, message=msg)
-        self.put_envelope(envelope)
-        self.logger.info(f"Data pool created! Sending result to handler!")
 
     def _create_d2c_job(self, envelope):
         DATA_did = envelope.message.data_did  # for convenience
@@ -349,50 +173,41 @@ class OceanConnection(BaseSyncConnection):
         compute_service = DATA_DDO.get_service("compute")
         algo_service = ALG_DDO.get_service("access")
 
-        self.logger.info(f"ordering dataset {DATA_did}")
-        dataset_order_requirements = self.ocean.assets.order(
-            DATA_did, self.wallet.address, service_type=compute_service.type
-        )
-        self.logger.info(f"paying for dataset {DATA_did}")
-        DATA_order_tx_id = self.ocean.assets.pay_for_service(
-            self.ocean.web3,
-            dataset_order_requirements.amount,
-            dataset_order_requirements.data_token_address,
-            DATA_did,
-            compute_service.index,
-            ZERO_ADDRESS,
-            self.wallet,
-            dataset_order_requirements.computeAddress,
-        )
-        self.logger.info(f"paid for dataset {DATA_did} receipt: {DATA_order_tx_id}")
+        # allows the algorithm for C2D for that data asset
+        compute_service.add_publisher_trusted_algorithm(ALG_DDO)
+        DATA_DDO = self.ocean.assets.update(DATA_DDO, self.wallet)
 
-        self.logger.info(f"ordering algorithm {ALG_did}")
-        algo_order_requirements = self.ocean.assets.order(
-            ALG_did, self.wallet.address, service_type=algo_service.type
+        free_c2d_env = self.ocean.compute.get_free_c2d_environment(
+            compute_service.service_endpoint
         )
-        self.logger.info(f"paying for algorithm {ALG_did}")
-        ALG_order_tx_id = self.ocean.assets.pay_for_service(
-            self.ocean.web3,
-            algo_order_requirements.amount,
-            algo_order_requirements.data_token_address,
-            ALG_did,
-            algo_service.index,
-            ZERO_ADDRESS,
-            self.wallet,
-            algo_order_requirements.computeAddress,
+
+        DATA_compute_input = ComputeInput(DATA_DDO, compute_service)
+        ALGO_compute_input = ComputeInput(ALG_DDO, algo_service)
+
+        # Pay for dataset and algo for 1 day
+
+        self.logger.info(f"paying for dataset {DATA_did}")
+        datasets, algorithm = self.ocean.assets.pay_for_compute_service(
+            datasets=[DATA_compute_input],
+            algorithm_data=ALGO_compute_input,
+            consume_market_order_fee_address=self.wallet.address,
+            wallet=self.wallet,
+            compute_environment=free_c2d_env["id"],
+            valid_until=int((datetime.utcnow() + timedelta(days=1)).timestamp()),
+            consumer_address=free_c2d_env["consumerAddress"],
         )
-        self.logger.info(f"paid for algo {ALG_did} receipt: {ALG_order_tx_id}")
+
+        self.logger.info(
+            f"paid for dataset {DATA_did} receipt: {datasets} with algorithm {algorithm}"
+        )
         self.logger.info(f"starting compute job....")
-        compute_inputs = [
-            ComputeInput(DATA_did, DATA_order_tx_id, compute_service.index)
-        ]
         job_id = self.ocean.compute.start(
-            compute_inputs,
-            self.wallet,
-            algorithm_did=ALG_did,
-            algorithm_tx_id=ALG_order_tx_id,
-            algorithm_data_token=ALG_DDO.data_token_address,
+            consumer_wallet=self.wallet,
+            dataset=datasets[0],
+            compute_environment=free_c2d_env["id"],
+            algorithm=algorithm,
         )
+
         self.logger.info(f"Started compute job with id: {job_id}")
         res = self.ocean.compute.status(DATA_did, job_id, self.wallet)
         while True:
@@ -406,7 +221,9 @@ class OceanConnection(BaseSyncConnection):
                     break
             time.sleep(2)
 
-        result_file = self.ocean.compute.result_file(DATA_did, job_id, 0, self.wallet)
+        result_file = self.ocean.compute.compute_job_result_logs(
+            DATA_DDO, compute_service, job_id, self.wallet
+        )[0]
 
         msg = OceanMessage(
             performative=OceanMessage.Performative.RESULTS, content=result_file
@@ -444,38 +261,35 @@ class OceanConnection(BaseSyncConnection):
         self.logger.info(f"Permissioned datasets. ")
 
     def _deploy_data_to_download(self, envelope: Envelope):
-        datatoken = self._deploy_datatoken(envelope)
+        data_nft, datatoken = self._deploy_datatoken(envelope)
 
         provider_url = DataServiceProvider.get_url(self.ocean.config)
-
-        # Calc DATA service compute descriptor
-        service_attributes = json.loads(
-            DATA_SERVICES_TEMPLATE.substitute(
-                creator_address=self.wallet.address,
-                date_published=datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
-            )
-        )
+        DATA_files = [envelope.message.data_url_file]
 
         DATA_service = Service(
+            service_id="0",
+            service_type="access",
             service_endpoint=provider_url,
-            service_type=ServiceTypes.ASSET_ACCESS,
-            attributes=service_attributes,
+            datatoken=datatoken.address,
+            files=DATA_files,
+            timeout=0,
         )
 
-        data_metadata = json.loads(
-            D2C_TEMPLATE.substitute(
-                url=envelope.message.dataset_url,
-                name=envelope.message.name,
-                author=envelope.message.author,
-                license=envelope.message.license,
-                date_created=envelope.message.date_created,
-            )
-        )
+        DATA_metadata = {
+            "created": envelope.message.date_created,
+            "updated": envelope.message.date_created,
+            "description": "envelope.message.description",
+            "name": envelope.message.name,
+            "type": "dataset",
+            "author": envelope.message.author,
+            "license": envelope.message.license,
+        }
 
         try:
             DATA_ddo = self.ocean.assets.create(
-                metadata=data_metadata,
+                metadata=DATA_metadata,
                 publisher_wallet=self.wallet,
+                data_nft_address=data_nft.address,
                 services=[DATA_service],
                 data_token_address=datatoken.address,
                 encrypt=True,
@@ -517,9 +331,6 @@ class OceanConnection(BaseSyncConnection):
 
         DATA_url_file = UrlFile(url=envelope.message.dataset_url)
 
-        # Encrypt file(s) using provider
-        DATA_encrypted_files = self.ocean.assets.encrypt_files([DATA_url_file])
-
         # Set the compute values for compute service
         DATA_compute_values = {
             "allowRawAlgorithm": False,
@@ -536,7 +347,7 @@ class OceanConnection(BaseSyncConnection):
             service_type="compute",
             service_endpoint=self.ocean.config.provider_url,
             datatoken=erc20_token.address,
-            files=DATA_encrypted_files,
+            files=[DATA_url_file],
             timeout=3600,
             compute_values=DATA_compute_values,
         )
@@ -545,10 +356,10 @@ class OceanConnection(BaseSyncConnection):
         DATA_asset = self.ocean.assets.create(
             metadata=DATA_metadata,
             publisher_wallet=self.wallet,
-            encrypted_files=DATA_encrypted_files,
+            files=[DATA_url_file],
             services=[DATA_compute_service],
-            erc721_address=erc721_nft.address,
-            deployed_erc20_tokens=[erc20_token],
+            data_nft_address=erc721_nft.address,
+            deployed_datatokens=[erc20_token],
         )
         self.logger.info(f"DATA did = '{DATA_asset.did}'")
 
@@ -591,17 +402,14 @@ class OceanConnection(BaseSyncConnection):
 
         ALGO_url_file = UrlFile(url=envelope.message.files_url)
 
-        # Encrypt file(s) using provider
-        ALGO_encrypted_files = self.ocean.assets.encrypt_files([ALGO_url_file])
-
         # Publish asset with compute service on-chain.
         # The download (access service) is automatically created, but you can explore other options as well
         ALGO_asset = self.ocean.assets.create(
             metadata=ALGO_metadata,
             publisher_wallet=self.wallet,
-            encrypted_files=ALGO_encrypted_files,
-            erc721_address=ALGO_nft_token.address,
-            deployed_erc20_tokens=[ALGO_datatoken],
+            files=[ALGO_url_file],
+            data_nft_address=ALGO_nft_token.address,
+            deployed_datatokens=[ALGO_datatoken],
         )
 
         self.logger.info(f"ALG did = '{ALGO_asset.did}'")
@@ -636,13 +444,11 @@ class OceanConnection(BaseSyncConnection):
 
         print("Create ERC721 data NFT: begin.")
 
-        erc721_nft = self.ocean.create_erc721_nft(
-            envelope.message.data_nft_name, envelope.message.datatoken_name, self.wallet
+        erc721_nft = self.ocean.create_data_nft(
+            name=envelope.message.data_nft_name,
+            symbol=envelope.message.datatoken_name,
+            from_wallet=self.wallet,
         )
-
-        cap = self.ocean.to_wei(100)
-
-        # nft_factory = self.ocean.get_nft_factory()
 
         erc20_token = erc721_nft.create_datatoken(
             template_index=1,  # default value
@@ -652,7 +458,6 @@ class OceanConnection(BaseSyncConnection):
             fee_manager=self.wallet.address,  # fee manager for this ERC20 token
             publish_market_order_fee_address=self.wallet.address,  # publishing Market Address
             publish_market_order_fee_token=ZERO_ADDRESS,  # publishing Market Fee Token
-            cap=cap,
             publish_market_order_fee_amount=0,
             bytess=[b""],
             from_wallet=self.wallet,
@@ -664,75 +469,6 @@ class OceanConnection(BaseSyncConnection):
             f"DATA_datatoken.address = '{erc20_token.address}'\n publishing"
         )
         return erc721_nft, erc20_token
-
-    def add_publisher_trusted_algorithm(
-        self, asset_or_did: str, algo_did: str, metadata_cache_uri: str
-    ) -> list:
-        """
-        :return: List of trusted algos
-        """
-        asset = self.ocean.assets.resolve(asset_or_did)
-
-        compute_service = asset.get_service(ServiceTypes.CLOUD_COMPUTE)
-        assert (
-            compute_service
-        ), "Cannot add trusted algorithm to this asset because it has no compute service."
-        privacy_values = compute_service.attributes["main"].get("privacy")
-        if not privacy_values:
-            privacy_values = {}
-            compute_service.attributes["main"]["privacy"] = privacy_values
-
-        assert isinstance(privacy_values, dict), "Privacy key is not a dictionary."
-        trusted_algos = privacy_values.get("publisherTrustedAlgorithms", [])
-        # remove algo_did if already in the list
-        trusted_algos = [ta for ta in trusted_algos if ta["did"] != algo_did]
-
-        # now add this algo_did as trusted algo
-        algo_ddo = self.ocean.assets.resolve(algo_did)
-        trusted_algos.append(self.generate_trusted_algo_dict(asset_or_did=algo_ddo.did))
-
-        # update with the new list
-        privacy_values["publisherTrustedAlgorithms"] = trusted_algos
-        assert (
-            compute_service.attributes["main"]["privacy"] == privacy_values
-        ), "New trusted algorithm was not added. Failed when updating the privacy key. "
-        return trusted_algos
-
-    def generate_trusted_algo_dict(
-        self, asset_or_did: str = None, metadata_cache_uri: Optional[str] = None
-    ) -> dict:
-        """
-        :return: Object as follows:
-        ```
-        {
-            "did": <did>,
-            "filesChecksum": <str>,
-            "containerSectionChecksum": <str>
-        }
-        ```
-        """
-        ddo = self.ocean.assets.resolve(asset_or_did)
-
-        algo_metadata = ddo.metadata
-        return {
-            "did": ddo.did,
-            "filesChecksum": self.create_checksum(
-                algo_metadata.get("encryptedFiles", "")
-                + json.dumps(algo_metadata["main"]["files"], separators=(",", ":"))
-            ),
-            "containerSectionChecksum": self.create_checksum(
-                json.dumps(
-                    algo_metadata["main"]["algorithm"]["container"],
-                    separators=(",", ":"),
-                )
-            ),
-        }
-
-    def create_checksum(self, text: str) -> str:
-        """
-        :return: str
-        """
-        return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
     def on_connect(self) -> None:
         """

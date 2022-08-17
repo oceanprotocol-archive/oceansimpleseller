@@ -248,9 +248,6 @@ class GenericFipaHandler(Handler):
             )
             strategy = cast(GenericStrategy, self.context.strategy)
             strategy.successful_trade_with_counterparty(fipa_msg.sender, data)
-            strategy.purchased_data = json.loads(data["data"])
-            strategy.purchased_data["datapool_address"] = data["datapool_address"]
-            strategy.purchased_data["algpool_address"] = data["algpool_address"]
             strategy.is_c2d_active = True
         else:
             self.context.logger.info(
