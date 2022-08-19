@@ -11,20 +11,20 @@ fingerprint:
   dialogues.py: QmQYEojSSSjq49QaDGhnScXTL1QSu3RtKNjnizRHeGw8Sa
   handlers.py: QmbVoS285JGtqUVgnPGi7nv9BnDYRXxJnXAEamwpkQ3hMx
   strategy.py: QmRQsXA4m95x7UsD1KREXenXNCkExxkey5FMbEbN9kkr47
-fingerprint_ignore_patterns: [ ]
+fingerprint_ignore_patterns: []
 connections:
-  - fetchai/ledger:0.21.1
-contracts: [ ]
+- fetchai/ledger:0.21.1
+contracts: []
 protocols:
-  - fetchai/default:1.1.0
-  - fetchai/fipa:1.1.2
-  - fetchai/ledger_api:1.1.2
-  - fetchai/oef_search:1.1.2
-  - fetchai/signing:1.1.0
+- fetchai/default:1.1.0
+- fetchai/fipa:1.1.2
+- fetchai/ledger_api:1.1.2
+- fetchai/oef_search:1.1.2
+- fetchai/signing:1.1.0
 skills: []
 behaviours:
   ocean:
-    args: { }
+    args: {}
     class_name: OceanC2DBehaviour
   search:
     args:
@@ -37,35 +37,35 @@ behaviours:
     class_name: GenericTransactionBehaviour
 handlers:
   fipa:
-    args: { }
+    args: {}
     class_name: GenericFipaHandler
   ledger_api:
-    args: { }
+    args: {}
     class_name: GenericLedgerApiHandler
   ocean:
-    args: { }
+    args: {}
     class_name: OceanHandler
   oef_search:
-    args: { }
+    args: {}
     class_name: GenericOefSearchHandler
   signing:
-    args: { }
+    args: {}
     class_name: GenericSigningHandler
 models:
   default_dialogues:
-    args: { }
+    args: {}
     class_name: DefaultDialogues
   fipa_dialogues:
-    args: { }
+    args: {}
     class_name: FipaDialogues
   ledger_api_dialogues:
-    args: { }
+    args: {}
     class_name: LedgerApiDialogues
   oef_search_dialogues:
-    args: { }
+    args: {}
     class_name: OefSearchDialogues
   signing_dialogues:
-    args: { }
+    args: {}
     class_name: SigningDialogues
   strategy:
     args:
@@ -86,4 +86,4 @@ models:
       stop_searching_on_result: true
     class_name: GenericStrategy
 is_abstract: false
-dependencies: { }
+dependencies: {}

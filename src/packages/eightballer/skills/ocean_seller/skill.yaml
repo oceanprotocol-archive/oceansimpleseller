@@ -12,22 +12,22 @@ fingerprint:
   dialogues.py: QmWxj5PGgc7AhXyG8mReJ41LYP6eRZ8mUQtWwFrwCZjMKg
   handlers.py: QmQApSvkGg4tmM7Ffc6Bg6t5UosYFhrUcxGcrjQHvXir2B
   strategy.py: QmfXga4J2NwZxEr2BncrwKsm5KZFXTCgGS9srXSJHHuVGi
-fingerprint_ignore_patterns: [ ]
+fingerprint_ignore_patterns: []
 connections:
-  - fetchai/ledger:0.21.1
-contracts: [ ]
+- fetchai/ledger:0.21.1
+contracts: []
 protocols:
-  - fetchai/default:1.1.2
-  - fetchai/fipa:1.1.2
-  - fetchai/ledger_api:1.1.2
-  - fetchai/oef_search:1.1.2
+- fetchai/default:1.1.2
+- fetchai/fipa:1.1.2
+- fetchai/ledger_api:1.1.2
+- fetchai/oef_search:1.1.2
 skills: []
 behaviours:
   ocean_behaviour:
-    args: { }
+    args: {}
     class_name: OceanSellerBehaviour
   ocean_c2d:
-    args: { }
+    args: {}
     class_name: OceanC2DBehaviour
   service_registration:
     args:
@@ -35,32 +35,32 @@ behaviours:
     class_name: GenericServiceRegistrationBehaviour
 handlers:
   fipa:
-    args: { }
+    args: {}
     class_name: GenericFipaHandler
   ledger_api:
-    args: { }
+    args: {}
     class_name: GenericLedgerApiHandler
   ocean:
-    args: { }
+    args: {}
     class_name: OceanHandler
   oef_search:
-    args: { }
+    args: {}
     class_name: GenericOefSearchHandler
   storj:
-    args: { }
+    args: {}
     class_name: StorjHandler
 models:
   default_dialogues:
-    args: { }
+    args: {}
     class_name: DefaultDialogues
   fipa_dialogues:
-    args: { }
+    args: {}
     class_name: FipaDialogues
   ledger_api_dialogues:
-    args: { }
+    args: {}
     class_name: LedgerApiDialogues
   oef_search_dialogues:
-    args: { }
+    args: {}
     class_name: OefSearchDialogues
   strategy:
     args:
@@ -101,9 +101,9 @@ models:
         datatoken_amt: 100
         ocean_amt: 10
       deployments:
-        data_to_compute: { }
-        data_download: { }
-        algorithm: { }
+        data_to_compute: {}
+        data_download: {}
+        algorithm: {}
       download_params:
         datatoken_address: ''
         datatoken_amt: 1
@@ -122,4 +122,4 @@ models:
       unit_price: 10
     class_name: GenericStrategy
 is_abstract: false
-dependencies: { }
+dependencies: {}
