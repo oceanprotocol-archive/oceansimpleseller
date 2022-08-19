@@ -18,14 +18,29 @@
 # ------------------------------------------------------------------------------
 """Scaffold connection and channel."""
 import time
+import web3.exceptions
+import os
+import ocean_lib
 from datetime import datetime
 from typing import Any
 
 from aea.configurations.base import PublicId
 from aea.connections.base import BaseSyncConnection
 from aea.mail.base import Envelope
-from ocean_lib.structures.file_objects import UrlFile
 from packages.eightballer.protocols.ocean.message import OceanMessage
+from eth_account import Account
+from ocean_lib.data_provider.data_service_provider import DataServiceProvider
+from ocean_lib.example_config import ExampleConfig
+from ocean_lib.models.compute_input import ComputeInput
+from ocean_lib.models.datatoken import Datatoken
+from ocean_lib.models.fixed_rate_exchange import FixedRateExchangeDetails
+from ocean_lib.ocean.ocean import Ocean
+from ocean_lib.services.service import Service
+from ocean_lib.structures.file_objects import UrlFile
+from ocean_lib.web3_internal.constants import ZERO_ADDRESS
+from ocean_lib.web3_internal.currency import to_wei
+from ocean_lib.web3_internal.wallet import Wallet
+from web3._utils.threads import Timeout
 
 """
 Choose one of the possible implementations:
@@ -35,21 +50,8 @@ Sync (inherited from BaseSyncConnection) or Async (inherited from Connection) co
 
 CONNECTION_ID = PublicId.from_str("eightballer/ocean:0.1.0")
 
-import os
-
-import ocean_lib
-from eth_account import Account
-from ocean_lib.data_provider.data_service_provider import DataServiceProvider
-from ocean_lib.example_config import ExampleConfig
-from ocean_lib.models.compute_input import ComputeInput
-from ocean_lib.ocean.ocean import Ocean
-from ocean_lib.services.service import Service
-from ocean_lib.web3_internal.constants import ZERO_ADDRESS
-from ocean_lib.web3_internal.currency import to_wei
-from ocean_lib.web3_internal.wallet import Wallet
-from web3._utils.threads import Timeout
-
 Account.enable_unaudited_hdwallet_features()
+
 
 # Specify metadata and service attributes, for "GPR" algorithm script.
 # In same location as Branin test dataset. GPR = Gaussian Process Regression.
@@ -132,16 +134,30 @@ class OceanConnection(BaseSyncConnection):
         ):
             self._deploy_data_to_download(envelope)
         if envelope.message.performative == OceanMessage.Performative.CREATE_POOL:
-            self._create_pool(envelope)
+            self._create_fixed_rate(envelope)
         if envelope.message.performative == OceanMessage.Performative.DOWNLOAD_JOB:
             self._purchase_datatoken(envelope)
 
     def _purchase_datatoken(self, envelope: Envelope):
         try:
-            self.ocean.pool.buy_data_tokens(
-                pool_address=envelope.message.pool_address,
-                amount=to_wei(envelope.message.datatoken_amt),
-                max_OCEAN_amount=to_wei(envelope.message.max_cost_ocean),
+            fixed_price_address = self.ocean.fixed_rate_exchange.address
+            exchange_details = self.ocean.fixed_rate_exchange.get_exchange(
+                envelope.message.pool_address
+            )
+            datatoken = self.ocean.get_datatoken(
+                exchange_details[FixedRateExchangeDetails.DATATOKEN]
+            )
+            OCEAN_token = self.ocean.OCEAN_token
+
+            datatoken.approve(fixed_price_address, self.ocean.to_wei(100), self.wallet)
+            OCEAN_token.approve(
+                fixed_price_address, self.ocean.to_wei(100), self.wallet
+            )
+
+            self.ocean.fixed_rate_exchange.buy_dt(
+                exchange_id=envelope.message.pool_address,
+                data_token_amount=envelope.message.datatoken_amt,
+                max_base_token_amount=envelope.message.max_cost_ocean,
                 from_wallet=self.wallet,
             )
 
@@ -169,15 +185,15 @@ class OceanConnection(BaseSyncConnection):
     def _download_asset(self, envelope: Envelope):
         did = envelope.message.asset_did
         token_address = envelope.message.datatoken_address
-        data_token = self.ocean.get_data_token(token_address)
-        if data_token.balanceOf(self.wallet.address) < envelope.message.datatoken_amt:
+        datatoken = self.ocean.get_datatoken(token_address)
+        if datatoken.balanceOf(self.wallet.address) < envelope.message.datatoken_amt:
             self.logger.info(
                 f"insufficient data tokens.. Purchasing from the open market."
             )
-            self.ocean.pool.buy_data_tokens(
-                envelope.message.pool_address,
-                amount=to_wei(envelope.message.datatoken_amt),
-                max_OCEAN_amount=to_wei(envelope.message.max_cost_ocean),
+            self.ocean.fixed_rate_exchange.buy_dt(
+                exchange_id=envelope.message.pool_address,
+                data_token_amount=envelope.message.datatoken_amt,
+                max_base_token_amount=envelope.message.max_cost_ocean,
                 from_wallet=self.wallet,
             )
         else:
@@ -216,40 +232,33 @@ class OceanConnection(BaseSyncConnection):
         self.put_envelope(envelope)
         self.logger.info(f"completed download! Sending result to handler!")
 
-    # def _create_pool(self, envelope: Envelope, retries=2):
-    #     if retries == 0:
-    #         raise ValueError("Failed to deploy pool...")
-    #     try:
-    #         bpool = self.ocean.create_pool(
-    #             erc20_token=Datatoken(
-    #                 self.ocean.web3, address=envelope.message.datatoken_address
-    #             ),
-    #             base_token=ERC20Token(
-    #                 self.ocean.web3, address=self.ocean.OCEAN_address
-    #             ),
-    #             rate=self.ocean.to_wei(envelope.message.rate),
-    #             vesting_amount=self.ocean.to_wei(10000),
-    #             vesting_blocks=2500000,
-    #             base_token_amount=self.ocean.to_wei(envelope.message.ocean_amt),
-    #             lp_swap_fee_amount=self.ocean.to_wei("0.01"),
-    #             publish_market_swap_fee_amount=self.ocean.to_wei("0.01"),
-    #             from_wallet=self.wallet,
-    #         )
-    #         pool_address = bpool.address
-    #         print(f"Deployed pool_address = '{pool_address}'")
-    #     except (web3.exceptions.TransactionNotFound, ValueError) as e:
-    #         self.logger.error(f"Failed to deploy pool!")
-    #         self._create_pool(envelope, retries - 1)
-    #
-    #     msg = OceanMessage(
-    #         performative=OceanMessage.Performative.POOL_DEPLOYMENT_RECIEPT,
-    #         pool_address=pool_address,
-    #     )
-    #     msg.sender = envelope.to
-    #     msg.to = envelope.sender
-    #     envelope = Envelope(to=msg.to, sender=msg.sender, message=msg)
-    #     self.put_envelope(envelope)
-    #     self.logger.info(f"Data pool created! Sending result to handler!")
+    def _create_fixed_rate(self, envelope: Envelope, retries=2):
+        if retries == 0:
+            raise ValueError("Failed to deploy fixed rate exchange...")
+        try:
+            exchange_id = self.ocean.create_fixed_rate(
+                erc20_token=Datatoken(
+                    self.ocean.web3, address=envelope.message.datatoken_address
+                ),
+                base_token=Datatoken(self.ocean.web3, address=self.ocean.OCEAN_address),
+                rate=self.ocean.to_wei(envelope.message.rate),
+                amount=self.ocean.to_wei(envelope.message.ocean_amt),
+                from_wallet=self.wallet,
+            )
+            print(f"Deployed fixed rate exchange = '{exchange_id}'")
+        except (web3.exceptions.TransactionNotFound, ValueError) as e:
+            self.logger.error(f"Failed to deploy fixed rate exchange!")
+            self._create_fixed_rate(envelope, retries - 1)
+
+        msg = OceanMessage(
+            performative=OceanMessage.Performative.POOL_DEPLOYMENT_RECIEPT,
+            pool_address=exchange_id,
+        )
+        msg.sender = envelope.to
+        msg.to = envelope.sender
+        envelope = Envelope(to=msg.to, sender=msg.sender, message=msg)
+        self.put_envelope(envelope)
+        self.logger.info(f"Fixed rate exchange created! Sending result to handler!")
 
     def _create_d2c_job(self, envelope):
         DATA_did = envelope.message.data_did  # for convenience
