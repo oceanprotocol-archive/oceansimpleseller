@@ -17,18 +17,14 @@
 #
 # ------------------------------------------------------------------------------
 """Scaffold connection and channel."""
-import hashlib
-import os
 import time
 from datetime import datetime
-from typing import Any, Dict, Optional, Union
+from typing import Any
 
-import requests
 from aea.configurations.base import PublicId
-from aea.connections.base import BaseSyncConnection, Connection
+from aea.connections.base import BaseSyncConnection
 from aea.mail.base import Envelope
 from ocean_lib.structures.file_objects import UrlFile
-from ocean_lib.models.erc20_token import ERC20Token
 from packages.eightballer.protocols.ocean.message import OceanMessage
 
 """
@@ -58,84 +54,8 @@ from web3._utils.threads import Timeout
 
 Account.enable_unaudited_hdwallet_features()
 
-from string import Template
-
-D2C_TEMPLATE = Template(
-    """{
-    "main": {
-        "type": "dataset",
-        "files": [
-     {
-       "url": "$url",
-     "index": 0,
-       "contentType": "text/text"
-     }
-    ],
-    "name": "$name", "author": "$author", "license": "$license",
-    "dateCreated": "$date_created"
-    }
-}
-"""
-)
-
-
-DATA_SERVICES_TEMPLATE = Template(
-    """{
-    "main": {
-        "name": "DATA_dataAssetAccessServiceAgreement",
-        "creator": "$creator_address",
-        "timeout": 86400,
-        "datePublished": "$date_published",
-        "cost": 1.0
-        }
-    }
-"""
-)
-
-
 # Specify metadata and service attributes, for "GPR" algorithm script.
 # In same location as Branin test dataset. GPR = Gaussian Process Regression.
-ALGO_TEMPLATE = Template(
-    """{
-    "main": {
-        "type": "algorithm",
-        "algorithm": {
-           "language": "$language",
-            "format": "$format",
-            "version": "$version",
-            "container": {
-              "entrypoint": "$entrypoint",
-              "image": "$image",
-              "tag": "$tag"
-            }
-        },
-        "files": [
-	  {
-	    "url": "$files_url",
-	    "index": 0,
-	    "contentType": "text/text"
-	  }
-	],
-	"name": "$name",
-    "author": "$author",
-    "license": "$license",
-	"dateCreated": "$date_created"
-    }
-}
-"""
-)
-
-ALGO_SERVICE_TEMPLATE = Template(
-    """{
-        "main": {
-            "name": "ALG_dataAssetAccessServiceAgreement",
-            "creator": "$address",
-            "timeout": 3600,
-            "datePublished": "$date_published",
-            "cost": 1.0
-        }
-    }"""
-)
 
 
 class OceanConnection(BaseSyncConnection):
@@ -267,31 +187,27 @@ class OceanConnection(BaseSyncConnection):
             self.logger.info(f"Already has sufficient Datatokens.")
 
         asset = self.ocean.assets.resolve(did)
-        service = asset.get_service(ServiceTypes.ASSET_ACCESS)
 
-        # Bob sends his datatoken to the service
-        quote = self.ocean.assets.order(
-            asset.did, self.wallet.address, service_index=service.index
+        service = asset.get_service_by_id("0")
+
+        order_tx_id = self.ocean.assets.pay_for_access_service(
+            asset,
+            service,
+            consume_market_order_fee_address=self.wallet.address,
+            consume_market_order_fee_token=service.datatoken.address,
+            consume_market_order_fee_amount=0,
+            wallet=self.wallet,
         )
-        order_tx_id = self.ocean.assets.pay_for_service(
-            self.ocean.web3,
-            quote.amount,
-            quote.data_token_address,
-            asset.did,
-            service.index,
-            ZERO_ADDRESS,
-            self.wallet,
-            service.get_c2d_address(),
-        )
+
         print(f"order_tx_id = '{order_tx_id}'")
 
         # Bob downloads. If the connection breaks, Bob can request again by showing order_tx_id.
         file_path = self.ocean.assets.download(
-            asset.did,
-            service.index,
-            self.wallet,
-            order_tx_id,
+            asset=asset,
+            service=service,
+            consumer_wallet=self.wallet,
             destination="./downloads/",
+            order_tx_id=order_tx_id,
         )
         print(f"file_path = '{file_path}'")  # e.g. datafile.0xAf07...
         data = open(file_path, "rb").read()
@@ -303,40 +219,40 @@ class OceanConnection(BaseSyncConnection):
         self.put_envelope(envelope)
         self.logger.info(f"completed download! Sending result to handler!")
 
-    def _create_pool(self, envelope: Envelope, retries=2):
-        if retries == 0:
-            raise ValueError("Failed to deploy pool...")
-        try:
-            bpool = self.ocean.create_pool(
-                erc20_token=ERC20Token(
-                    self.ocean.web3, address=envelope.message.datatoken_address
-                ),
-                base_token=ERC20Token(
-                    self.ocean.web3, address=self.ocean.OCEAN_address
-                ),
-                rate=self.ocean.to_wei(envelope.message.rate),
-                vesting_amount=self.ocean.to_wei(10000),
-                vesting_blocks=2500000,
-                base_token_amount=self.ocean.to_wei(envelope.message.ocean_amt),
-                lp_swap_fee_amount=self.ocean.to_wei("0.01"),
-                publish_market_swap_fee_amount=self.ocean.to_wei("0.01"),
-                from_wallet=self.wallet,
-            )
-            pool_address = bpool.address
-            print(f"Deployed pool_address = '{pool_address}'")
-        except (web3.exceptions.TransactionNotFound, ValueError) as e:
-            self.logger.error(f"Failed to deploy pool!")
-            self._create_pool(envelope, retries - 1)
-
-        msg = OceanMessage(
-            performative=OceanMessage.Performative.POOL_DEPLOYMENT_RECIEPT,
-            pool_address=pool_address,
-        )
-        msg.sender = envelope.to
-        msg.to = envelope.sender
-        envelope = Envelope(to=msg.to, sender=msg.sender, message=msg)
-        self.put_envelope(envelope)
-        self.logger.info(f"Data pool created! Sending result to handler!")
+    # def _create_pool(self, envelope: Envelope, retries=2):
+    #     if retries == 0:
+    #         raise ValueError("Failed to deploy pool...")
+    #     try:
+    #         bpool = self.ocean.create_pool(
+    #             erc20_token=Datatoken(
+    #                 self.ocean.web3, address=envelope.message.datatoken_address
+    #             ),
+    #             base_token=ERC20Token(
+    #                 self.ocean.web3, address=self.ocean.OCEAN_address
+    #             ),
+    #             rate=self.ocean.to_wei(envelope.message.rate),
+    #             vesting_amount=self.ocean.to_wei(10000),
+    #             vesting_blocks=2500000,
+    #             base_token_amount=self.ocean.to_wei(envelope.message.ocean_amt),
+    #             lp_swap_fee_amount=self.ocean.to_wei("0.01"),
+    #             publish_market_swap_fee_amount=self.ocean.to_wei("0.01"),
+    #             from_wallet=self.wallet,
+    #         )
+    #         pool_address = bpool.address
+    #         print(f"Deployed pool_address = '{pool_address}'")
+    #     except (web3.exceptions.TransactionNotFound, ValueError) as e:
+    #         self.logger.error(f"Failed to deploy pool!")
+    #         self._create_pool(envelope, retries - 1)
+    #
+    #     msg = OceanMessage(
+    #         performative=OceanMessage.Performative.POOL_DEPLOYMENT_RECIEPT,
+    #         pool_address=pool_address,
+    #     )
+    #     msg.sender = envelope.to
+    #     msg.to = envelope.sender
+    #     envelope = Envelope(to=msg.to, sender=msg.sender, message=msg)
+    #     self.put_envelope(envelope)
+    #     self.logger.info(f"Data pool created! Sending result to handler!")
 
     def _create_d2c_job(self, envelope):
         DATA_did = envelope.message.data_did  # for convenience
@@ -637,7 +553,9 @@ class OceanConnection(BaseSyncConnection):
         print("Create ERC721 data NFT: begin.")
 
         erc721_nft = self.ocean.create_data_nft(
-            envelope.message.data_nft_name, envelope.message.datatoken_name, self.wallet
+            name=envelope.message.data_nft_name,
+            symbol=envelope.message.datatoken_name,
+            from_wallet=self.wallet,
         )
 
         erc20_token = erc721_nft.create_datatoken(

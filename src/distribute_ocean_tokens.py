@@ -3,8 +3,8 @@
 import os
 from typing import List
 from ocean_lib.example_config import ExampleConfig
-from ocean_lib.ocean.ocean import Ocean
 from ocean_lib.models.datatoken import Datatoken
+from ocean_lib.ocean.ocean import Ocean
 from ocean_lib.web3_internal.wallet import Wallet
 
 
