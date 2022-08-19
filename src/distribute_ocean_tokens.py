@@ -4,7 +4,7 @@ import os
 from typing import List
 from ocean_lib.example_config import ExampleConfig
 from ocean_lib.ocean.ocean import Ocean
-from ocean_lib.models.data_token import DataToken
+from ocean_lib.models.datatoken import Datatoken
 from ocean_lib.web3_internal.wallet import Wallet
 
 
@@ -17,11 +17,11 @@ def distribute_ocean_tokens(
     """
     Mint OCEAN tokens to seller and buyer
     """
-    OCEAN_token = DataToken(ocean.web3, address=ocean.OCEAN_address)
+    OCEAN_token = Datatoken(ocean.web3, address=ocean.OCEAN_address)
 
     for recipient in recipients:
         if OCEAN_token.balanceOf(recipient) < amount:
-            OCEAN_token.mint(recipient, amount, from_wallet=ocean_deployer_wallet)
+            OCEAN_token.transfer(recipient, amount, from_wallet=ocean_deployer_wallet)
 
 
 if __name__ == "__main__":
