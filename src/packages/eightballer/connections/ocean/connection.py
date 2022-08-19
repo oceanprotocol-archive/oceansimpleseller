@@ -35,13 +35,10 @@ Sync (inherited from BaseSyncConnection) or Async (inherited from Connection) co
 
 CONNECTION_ID = PublicId.from_str("eightballer/ocean:0.1.0")
 
-import json
 import os
 
 import ocean_lib
-import web3
 from eth_account import Account
-from ocean_lib.agreements.service_types import ServiceTypes
 from ocean_lib.data_provider.data_service_provider import DataServiceProvider
 from ocean_lib.example_config import ExampleConfig
 from ocean_lib.models.compute_input import ComputeInput
@@ -360,41 +357,34 @@ class OceanConnection(BaseSyncConnection):
         self.logger.info(f"Permissioned datasets. ")
 
     def _deploy_data_to_download(self, envelope: Envelope):
-        datatoken = self._deploy_datatoken(envelope)
-
+        data_nft, datatoken = self._deploy_datatoken(envelope)
         provider_url = DataServiceProvider.get_url(self.ocean.config)
-
-        # Calc DATA service compute descriptor
-        service_attributes = json.loads(
-            DATA_SERVICES_TEMPLATE.substitute(
-                creator_address=self.wallet.address,
-                date_published=datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
-            )
-        )
-
+        DATA_files = [envelope.message.data_url_file]
         DATA_service = Service(
+            service_id="0",
+            service_type="access",
             service_endpoint=provider_url,
-            service_type=ServiceTypes.ASSET_ACCESS,
-            attributes=service_attributes,
+            datatoken=datatoken.address,
+            files=DATA_files,
+            timeout=0,
         )
-
-        data_metadata = json.loads(
-            D2C_TEMPLATE.substitute(
-                url=envelope.message.dataset_url,
-                name=envelope.message.name,
-                author=envelope.message.author,
-                license=envelope.message.license,
-                date_created=envelope.message.date_created,
-            )
-        )
+        DATA_metadata = {
+            "created": envelope.message.date_created,
+            "updated": envelope.message.date_created,
+            "description": "envelope.message.description",
+            "name": envelope.message.name,
+            "type": "dataset",
+            "author": envelope.message.author,
+            "license": envelope.message.license,
+        }
 
         try:
             DATA_ddo = self.ocean.assets.create(
-                metadata=data_metadata,
+                metadata=DATA_metadata,
                 publisher_wallet=self.wallet,
+                data_nft_address=data_nft.address,
                 services=[DATA_service],
                 data_token_address=datatoken.address,
-                encrypt=True,
             )
             self.logger.info(f"DATA did = '{DATA_ddo.did}'")
         except ocean_lib.exceptions.AquariusError as error:  # and how exactly is the did generated???
@@ -433,9 +423,6 @@ class OceanConnection(BaseSyncConnection):
 
         DATA_url_file = UrlFile(url=envelope.message.dataset_url)
 
-        # Encrypt file(s) using provider
-        DATA_encrypted_files = self.ocean.assets.encrypt_files([DATA_url_file])
-
         # Set the compute values for compute service
         DATA_compute_values = {
             "allowRawAlgorithm": False,
@@ -445,14 +432,12 @@ class OceanConnection(BaseSyncConnection):
         }
 
         # Create the Service
-        from ocean_lib.services.service import Service
-
         DATA_compute_service = Service(
             service_id="2",
             service_type="compute",
             service_endpoint=self.ocean.config.provider_url,
             datatoken=erc20_token.address,
-            files=DATA_encrypted_files,
+            files=[DATA_url_file],
             timeout=3600,
             compute_values=DATA_compute_values,
         )
@@ -461,10 +446,10 @@ class OceanConnection(BaseSyncConnection):
         DATA_asset = self.ocean.assets.create(
             metadata=DATA_metadata,
             publisher_wallet=self.wallet,
-            encrypted_files=DATA_encrypted_files,
+            files=[DATA_url_file],
             services=[DATA_compute_service],
-            erc721_address=erc721_nft.address,
-            deployed_erc20_tokens=[erc20_token],
+            data_nft_address=erc721_nft.address,
+            deployed_datatokens=[erc20_token],
         )
         self.logger.info(f"DATA did = '{DATA_asset.did}'")
 
@@ -507,17 +492,14 @@ class OceanConnection(BaseSyncConnection):
 
         ALGO_url_file = UrlFile(url=envelope.message.files_url)
 
-        # Encrypt file(s) using provider
-        ALGO_encrypted_files = self.ocean.assets.encrypt_files([ALGO_url_file])
-
         # Publish asset with compute service on-chain.
         # The download (access service) is automatically created, but you can explore other options as well
         ALGO_asset = self.ocean.assets.create(
             metadata=ALGO_metadata,
             publisher_wallet=self.wallet,
-            encrypted_files=ALGO_encrypted_files,
-            erc721_address=ALGO_nft_token.address,
-            deployed_erc20_tokens=[ALGO_datatoken],
+            files=[ALGO_url_file],
+            data_nft_address=ALGO_nft_token.address,
+            deployed_datatokens=[ALGO_datatoken],
         )
 
         self.logger.info(f"ALG did = '{ALGO_asset.did}'")
