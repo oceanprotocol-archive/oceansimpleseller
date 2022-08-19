@@ -20,7 +20,7 @@
 import time
 import web3.exceptions
 import os
-import ocean_lib
+import ocean_lib.exceptions
 from datetime import datetime
 from typing import Any
 
@@ -38,7 +38,6 @@ from ocean_lib.ocean.ocean import Ocean
 from ocean_lib.services.service import Service
 from ocean_lib.structures.file_objects import UrlFile
 from ocean_lib.web3_internal.constants import ZERO_ADDRESS
-from ocean_lib.web3_internal.currency import to_wei
 from ocean_lib.web3_internal.wallet import Wallet
 from web3._utils.threads import Timeout
 
@@ -140,27 +139,7 @@ class OceanConnection(BaseSyncConnection):
 
     def _purchase_datatoken(self, envelope: Envelope):
         try:
-            fixed_price_address = self.ocean.fixed_rate_exchange.address
-            exchange_details = self.ocean.fixed_rate_exchange.get_exchange(
-                envelope.message.pool_address
-            )
-            datatoken = self.ocean.get_datatoken(
-                exchange_details[FixedRateExchangeDetails.DATATOKEN]
-            )
-            OCEAN_token = self.ocean.OCEAN_token
-
-            datatoken.approve(fixed_price_address, self.ocean.to_wei(100), self.wallet)
-            OCEAN_token.approve(
-                fixed_price_address, self.ocean.to_wei(100), self.wallet
-            )
-
-            self.ocean.fixed_rate_exchange.buy_dt(
-                exchange_id=envelope.message.pool_address,
-                data_token_amount=envelope.message.datatoken_amt,
-                max_base_token_amount=envelope.message.max_cost_ocean,
-                from_wallet=self.wallet,
-            )
-
+            self._buy_dt_from_fre(envelope=envelope)
             msg = OceanMessage(
                 performative=OceanMessage.Performative.DOWNLOAD_JOB,
                 **{
@@ -190,12 +169,7 @@ class OceanConnection(BaseSyncConnection):
             self.logger.info(
                 f"insufficient data tokens.. Purchasing from the open market."
             )
-            self.ocean.fixed_rate_exchange.buy_dt(
-                exchange_id=envelope.message.pool_address,
-                data_token_amount=envelope.message.datatoken_amt,
-                max_base_token_amount=envelope.message.max_cost_ocean,
-                from_wallet=self.wallet,
-            )
+            self._buy_dt_from_fre(envelope=envelope)
         else:
             self.logger.info(f"Already has sufficient Datatokens.")
 
@@ -237,12 +211,12 @@ class OceanConnection(BaseSyncConnection):
             raise ValueError("Failed to deploy fixed rate exchange...")
         try:
             exchange_id = self.ocean.create_fixed_rate(
-                erc20_token=Datatoken(
+                datatoken=Datatoken(
                     self.ocean.web3, address=envelope.message.datatoken_address
                 ),
                 base_token=Datatoken(self.ocean.web3, address=self.ocean.OCEAN_address),
-                rate=self.ocean.to_wei(envelope.message.rate),
                 amount=self.ocean.to_wei(envelope.message.ocean_amt),
+                fixed_rate=self.ocean.to_wei(envelope.message.rate),
                 from_wallet=self.wallet,
             )
             print(f"Deployed fixed rate exchange = '{exchange_id}'")
@@ -568,6 +542,28 @@ class OceanConnection(BaseSyncConnection):
             f"DATA_datatoken.address = '{erc20_token.address}'\n publishing"
         )
         return erc721_nft, erc20_token
+
+    def _buy_dt_from_fre(self, envelope: Envelope):
+        fixed_price_address = self.ocean.fixed_rate_exchange.address
+        exchange_details = self.ocean.fixed_rate_exchange.get_exchange(
+            envelope.message.pool_address
+        )
+        datatoken = self.ocean.get_datatoken(
+            exchange_details[FixedRateExchangeDetails.DATATOKEN]
+        )
+        OCEAN_token = self.ocean.OCEAN_token
+
+        datatoken.approve(fixed_price_address, self.ocean.to_wei(100), self.wallet)
+        OCEAN_token.approve(fixed_price_address, self.ocean.to_wei(100), self.wallet)
+
+        self.ocean.fixed_rate_exchange.buy_dt(
+            exchange_id=envelope.message.pool_address,
+            datatoken_amount=self.ocean.to_wei(envelope.message.datatoken_amt),
+            max_base_token_amount=self.ocean.to_wei(envelope.message.max_cost_ocean),
+            consume_market_swap_fee_address=ZERO_ADDRESS,
+            consume_market_swap_fee_amount=self.ocean.to_wei("0.01"),
+            from_wallet=self.wallet,
+        )
 
     def on_connect(self) -> None:
         """
