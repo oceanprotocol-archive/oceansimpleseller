@@ -636,13 +636,9 @@ class OceanConnection(BaseSyncConnection):
 
         print("Create ERC721 data NFT: begin.")
 
-        erc721_nft = self.ocean.create_erc721_nft(
+        erc721_nft = self.ocean.create_data_nft(
             envelope.message.data_nft_name, envelope.message.datatoken_name, self.wallet
         )
-
-        cap = self.ocean.to_wei(100)
-
-        # nft_factory = self.ocean.get_nft_factory()
 
         erc20_token = erc721_nft.create_datatoken(
             template_index=1,  # default value
@@ -652,7 +648,6 @@ class OceanConnection(BaseSyncConnection):
             fee_manager=self.wallet.address,  # fee manager for this ERC20 token
             publish_market_order_fee_address=self.wallet.address,  # publishing Market Address
             publish_market_order_fee_token=ZERO_ADDRESS,  # publishing Market Fee Token
-            cap=cap,
             publish_market_order_fee_amount=0,
             bytess=[b""],
             from_wallet=self.wallet,
@@ -664,75 +659,6 @@ class OceanConnection(BaseSyncConnection):
             f"DATA_datatoken.address = '{erc20_token.address}'\n publishing"
         )
         return erc721_nft, erc20_token
-
-    def add_publisher_trusted_algorithm(
-        self, asset_or_did: str, algo_did: str, metadata_cache_uri: str
-    ) -> list:
-        """
-        :return: List of trusted algos
-        """
-        asset = self.ocean.assets.resolve(asset_or_did)
-
-        compute_service = asset.get_service(ServiceTypes.CLOUD_COMPUTE)
-        assert (
-            compute_service
-        ), "Cannot add trusted algorithm to this asset because it has no compute service."
-        privacy_values = compute_service.attributes["main"].get("privacy")
-        if not privacy_values:
-            privacy_values = {}
-            compute_service.attributes["main"]["privacy"] = privacy_values
-
-        assert isinstance(privacy_values, dict), "Privacy key is not a dictionary."
-        trusted_algos = privacy_values.get("publisherTrustedAlgorithms", [])
-        # remove algo_did if already in the list
-        trusted_algos = [ta for ta in trusted_algos if ta["did"] != algo_did]
-
-        # now add this algo_did as trusted algo
-        algo_ddo = self.ocean.assets.resolve(algo_did)
-        trusted_algos.append(self.generate_trusted_algo_dict(asset_or_did=algo_ddo.did))
-
-        # update with the new list
-        privacy_values["publisherTrustedAlgorithms"] = trusted_algos
-        assert (
-            compute_service.attributes["main"]["privacy"] == privacy_values
-        ), "New trusted algorithm was not added. Failed when updating the privacy key. "
-        return trusted_algos
-
-    def generate_trusted_algo_dict(
-        self, asset_or_did: str = None, metadata_cache_uri: Optional[str] = None
-    ) -> dict:
-        """
-        :return: Object as follows:
-        ```
-        {
-            "did": <did>,
-            "filesChecksum": <str>,
-            "containerSectionChecksum": <str>
-        }
-        ```
-        """
-        ddo = self.ocean.assets.resolve(asset_or_did)
-
-        algo_metadata = ddo.metadata
-        return {
-            "did": ddo.did,
-            "filesChecksum": self.create_checksum(
-                algo_metadata.get("encryptedFiles", "")
-                + json.dumps(algo_metadata["main"]["files"], separators=(",", ":"))
-            ),
-            "containerSectionChecksum": self.create_checksum(
-                json.dumps(
-                    algo_metadata["main"]["algorithm"]["container"],
-                    separators=(",", ":"),
-                )
-            ),
-        }
-
-    def create_checksum(self, text: str) -> str:
-        """
-        :return: str
-        """
-        return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
     def on_connect(self) -> None:
         """

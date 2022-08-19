@@ -27,8 +27,9 @@ from aea.configurations.base import PublicId
 from aea.exceptions import AEAEnforceError, enforce
 from aea.protocols.base import Message
 
-from packages.eightballer.protocols.ocean.custom_types import \
-    ErrorCode as CustomErrorCode
+from packages.eightballer.protocols.ocean.custom_types import (
+    ErrorCode as CustomErrorCode,
+)
 
 _default_logger = logging.getLogger("aea.packages.eightballer.protocols.ocean.message")
 
@@ -119,7 +120,7 @@ class OceanMessage(Message):
             "checksum",
             "data_nft_name",
             "datatoken_name",
-            "rate"
+            "rate",
         )
 
     def __init__(
@@ -377,7 +378,7 @@ class OceanMessage(Message):
         """Get the 'rate' content from the message."""
         enforce(self.is_set("rate"), "'rate' content is not set.")
         return cast(str, self.get("rate"))
-    
+
     @property
     def type(self) -> str:
         """Get the 'type' content from the message."""

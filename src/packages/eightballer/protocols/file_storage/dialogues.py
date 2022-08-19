@@ -31,8 +31,7 @@ from aea.common import Address
 from aea.protocols.base import Message
 from aea.protocols.dialogue.base import Dialogue, DialogueLabel, Dialogues
 
-from packages.eightballer.protocols.file_storage.message import \
-    FileStorageMessage
+from packages.eightballer.protocols.file_storage.message import FileStorageMessage
 
 
 class FileStorageDialogue(Dialogue):

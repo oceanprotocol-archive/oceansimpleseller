@@ -365,4 +365,3 @@ def test_create_pool(put_envelope):
     envelope = Envelope(to="test", sender="msg.sender", message=ocean_message)
 
     ocean.on_send(envelope)
-

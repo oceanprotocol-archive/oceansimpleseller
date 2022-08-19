@@ -28,8 +28,7 @@ from aea.protocols.base import Message, Serializer
 
 from packages.eightballer.protocols.file_storage import file_storage_pb2
 from packages.eightballer.protocols.file_storage.custom_types import ErrorCode
-from packages.eightballer.protocols.file_storage.message import \
-    FileStorageMessage
+from packages.eightballer.protocols.file_storage.message import FileStorageMessage
 
 
 class FileStorageSerializer(Serializer):

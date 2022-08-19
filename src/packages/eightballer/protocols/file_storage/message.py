@@ -27,8 +27,9 @@ from aea.configurations.base import PublicId
 from aea.exceptions import AEAEnforceError, enforce
 from aea.protocols.base import Message
 
-from packages.eightballer.protocols.file_storage.custom_types import \
-    ErrorCode as CustomErrorCode
+from packages.eightballer.protocols.file_storage.custom_types import (
+    ErrorCode as CustomErrorCode,
+)
 
 _default_logger = logging.getLogger(
     "aea.packages.eightballer.protocols.file_storage.message"
