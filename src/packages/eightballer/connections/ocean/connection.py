@@ -21,7 +21,7 @@ import time
 import web3.exceptions
 import os
 import ocean_lib.exceptions
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
 
 from aea.configurations.base import PublicId
@@ -33,6 +33,7 @@ from ocean_lib.data_provider.data_service_provider import DataServiceProvider
 from ocean_lib.example_config import ExampleConfig
 from ocean_lib.models.compute_input import ComputeInput
 from ocean_lib.models.datatoken import Datatoken
+from ocean_lib.models.data_nft_factory import DataNFTFactoryContract
 from ocean_lib.models.fixed_rate_exchange import FixedRateExchangeDetails
 from ocean_lib.ocean.ocean import Ocean
 from ocean_lib.services.service import Service
@@ -112,7 +113,7 @@ class OceanConnection(BaseSyncConnection):
         """
         Send an envelope.
 
-        :param envelope: the envelope to send.
+        param envelope: the envelope to send.
         """
         self.logger.debug(f"Receieved {envelope} in connection")
 
@@ -138,16 +139,21 @@ class OceanConnection(BaseSyncConnection):
             self._purchase_datatoken(envelope)
 
     def _purchase_datatoken(self, envelope: Envelope):
+        """
+        Buys datatokens available on the fixed rate exchange in order to consume services.
+
+        param envelope: the envelope to send.
+        """
         try:
             self._buy_dt_from_fre(envelope=envelope)
             msg = OceanMessage(
                 performative=OceanMessage.Performative.DOWNLOAD_JOB,
                 **{
-                    "datatoken_address": "unused",
-                    "datatoken_amt": -1,
-                    "max_cost_ocean": -1,
-                    "asset_did": "unused",
-                    "pool_address": "unused",
+                    "datatoken_address": envelope.message.datatoken_address,
+                    "datatoken_amt": envelope.message.datatoken_amt,
+                    "max_cost_ocean": envelope.message.max_cost_ocean,
+                    "asset_did": envelope.message.asset_did,
+                    "pool_address": envelope.message.pool_address,
                 },
             )
             msg.sender = envelope.to
@@ -162,9 +168,14 @@ class OceanConnection(BaseSyncConnection):
             self.logger.error(e)
 
     def _download_asset(self, envelope: Envelope):
+        """
+        Downloads files from the asset.
+
+        param envelope: the envelope to send.
+        """
         did = envelope.message.asset_did
-        token_address = envelope.message.datatoken_address
-        datatoken = self.ocean.get_datatoken(token_address)
+        datatoken = self.ocean.get_datatoken(envelope.message.datatoken_address)
+
         if datatoken.balanceOf(self.wallet.address) < envelope.message.datatoken_amt:
             self.logger.info(
                 f"insufficient data tokens.. Purchasing from the open market."
@@ -174,9 +185,9 @@ class OceanConnection(BaseSyncConnection):
             self.logger.info(f"Already has sufficient Datatokens.")
 
         asset = self.ocean.assets.resolve(did)
-
         service = asset.get_service_by_id("0")
 
+        # Agent needs to pay in order to have rights for consume service.
         order_tx_id = self.ocean.assets.pay_for_access_service(
             asset,
             service,
@@ -185,10 +196,9 @@ class OceanConnection(BaseSyncConnection):
             consume_market_order_fee_amount=0,
             wallet=self.wallet,
         )
+        self.logger.info(f"order_tx_id = '{order_tx_id}'")
 
-        print(f"order_tx_id = '{order_tx_id}'")
-
-        # Bob downloads. If the connection breaks, Bob can request again by showing order_tx_id.
+        # Download has begun for the agent. If the connection breaks, agent can request again by showing order_tx_id.
         file_path = self.ocean.assets.download(
             asset=asset,
             service=service,
@@ -196,7 +206,7 @@ class OceanConnection(BaseSyncConnection):
             destination="./downloads/",
             order_tx_id=order_tx_id,
         )
-        print(f"file_path = '{file_path}'")  # e.g. datafile.0xAf07...
+        self.logger.info(f"file_path = '{file_path}'")
         data = open(file_path, "rb").read()
 
         msg = OceanMessage(performative=OceanMessage.Performative.RESULTS, content=data)
@@ -206,20 +216,18 @@ class OceanConnection(BaseSyncConnection):
         self.put_envelope(envelope)
         self.logger.info(f"completed download! Sending result to handler!")
 
-    def _create_fixed_rate(self, envelope: Envelope, retries=2):
+    def _create_fixed_rate(self, envelope: Envelope, retries: int = 2):
+        """
+        Creates a fixed rate exchange with OCEAN as base tokens.
+
+        param envelope: the envelope to send.
+        param retries: number of retries for creating the FRE.
+        """
         if retries == 0:
             raise ValueError("Failed to deploy fixed rate exchange...")
         try:
-            exchange_id = self.ocean.create_fixed_rate(
-                datatoken=Datatoken(
-                    self.ocean.web3, address=envelope.message.datatoken_address
-                ),
-                base_token=Datatoken(self.ocean.web3, address=self.ocean.OCEAN_address),
-                amount=self.ocean.to_wei(envelope.message.ocean_amt),
-                fixed_rate=self.ocean.to_wei(envelope.message.rate),
-                from_wallet=self.wallet,
-            )
-            print(f"Deployed fixed rate exchange = '{exchange_id}'")
+            exchange_id = self._create_fixed_rate_helper(envelope=envelope)
+            self.logger.info(f"Deployed fixed rate exchange = '{exchange_id}'")
         except (web3.exceptions.TransactionNotFound, ValueError) as e:
             self.logger.error(f"Failed to deploy fixed rate exchange!")
             self._create_fixed_rate(envelope, retries - 1)
@@ -235,60 +243,53 @@ class OceanConnection(BaseSyncConnection):
         self.logger.info(f"Fixed rate exchange created! Sending result to handler!")
 
     def _create_d2c_job(self, envelope):
-        DATA_did = envelope.message.data_did  # for convenience
+        """
+        Pays for compute service & starts the compute job.
+
+        param envelope: the envelope to send.
+        """
+        DATA_did = envelope.message.data_did
         ALG_did = envelope.message.algo_did
-        DATA_DDO = self.ocean.assets.resolve(
-            DATA_did
-        )  # make sure we operate on the updated and indexed metadata_cache_uri versions
+        DATA_DDO = self.ocean.assets.resolve(DATA_did)
         ALG_DDO = self.ocean.assets.resolve(ALG_did)
 
         compute_service = DATA_DDO.get_service("compute")
         algo_service = ALG_DDO.get_service("access")
 
-        self.logger.info(f"ordering dataset {DATA_did}")
-        dataset_order_requirements = self.ocean.assets.order(
-            DATA_did, self.wallet.address, service_type=compute_service.type
-        )
-        self.logger.info(f"paying for dataset {DATA_did}")
-        DATA_order_tx_id = self.ocean.assets.pay_for_service(
-            self.ocean.web3,
-            dataset_order_requirements.amount,
-            dataset_order_requirements.data_token_address,
-            DATA_did,
-            compute_service.index,
-            ZERO_ADDRESS,
-            self.wallet,
-            dataset_order_requirements.computeAddress,
-        )
-        self.logger.info(f"paid for dataset {DATA_did} receipt: {DATA_order_tx_id}")
+        # Allows the algorithm for C2D for that data asset
+        compute_service.add_publisher_trusted_algorithm(ALG_DDO)
+        DATA_DDO = self.ocean.assets.update(DATA_DDO, self.wallet)
 
-        self.logger.info(f"ordering algorithm {ALG_did}")
-        algo_order_requirements = self.ocean.assets.order(
-            ALG_did, self.wallet.address, service_type=algo_service.type
+        free_c2d_env = self.ocean.compute.get_free_c2d_environment(
+            compute_service.service_endpoint
         )
-        self.logger.info(f"paying for algorithm {ALG_did}")
-        ALG_order_tx_id = self.ocean.assets.pay_for_service(
-            self.ocean.web3,
-            algo_order_requirements.amount,
-            algo_order_requirements.data_token_address,
-            ALG_did,
-            algo_service.index,
-            ZERO_ADDRESS,
-            self.wallet,
-            algo_order_requirements.computeAddress,
+
+        DATA_compute_input = ComputeInput(DATA_DDO, compute_service)
+        ALGO_compute_input = ComputeInput(ALG_DDO, algo_service)
+
+        # Pay for dataset and algo for 1 day
+        self.logger.info(f"paying for dataset {DATA_did}")
+        datasets, algorithm = self.ocean.assets.pay_for_compute_service(
+            datasets=[DATA_compute_input],
+            algorithm_data=ALGO_compute_input,
+            consume_market_order_fee_address=self.wallet.address,
+            wallet=self.wallet,
+            compute_environment=free_c2d_env["id"],
+            valid_until=int((datetime.utcnow() + timedelta(days=1)).timestamp()),
+            consumer_address=free_c2d_env["consumerAddress"],
         )
-        self.logger.info(f"paid for algo {ALG_did} receipt: {ALG_order_tx_id}")
+
+        self.logger.info(
+            f"paid for dataset {DATA_did} receipt: {datasets} with algorithm {algorithm}"
+        )
         self.logger.info(f"starting compute job....")
-        compute_inputs = [
-            ComputeInput(DATA_did, DATA_order_tx_id, compute_service.index)
-        ]
         job_id = self.ocean.compute.start(
-            compute_inputs,
-            self.wallet,
-            algorithm_did=ALG_did,
-            algorithm_tx_id=ALG_order_tx_id,
-            algorithm_data_token=ALG_DDO.data_token_address,
+            consumer_wallet=self.wallet,
+            dataset=datasets[0],
+            compute_environment=free_c2d_env["id"],
+            algorithm=algorithm,
         )
+
         self.logger.info(f"Started compute job with id: {job_id}")
         res = self.ocean.compute.status(DATA_did, job_id, self.wallet)
         while True:
@@ -302,7 +303,9 @@ class OceanConnection(BaseSyncConnection):
                     break
             time.sleep(2)
 
-        result_file = self.ocean.compute.result_file(DATA_did, job_id, 0, self.wallet)
+        result_file = self.ocean.compute.compute_job_result_logs(
+            DATA_DDO, compute_service, job_id, self.wallet
+        )[0]
 
         msg = OceanMessage(
             performative=OceanMessage.Performative.RESULTS, content=result_file
@@ -314,12 +317,17 @@ class OceanConnection(BaseSyncConnection):
         self.logger.info(f"completed D2C! Sending result to handler!")
 
     def _permission_dataset(self, envelope: Envelope):
+        """
+        Updates the trusted algorithm publishers list in order to start a compute job.
+
+        param envelope: the envelope to send.
+        """
         data_ddo = self.ocean.assets.resolve(envelope.message.data_did)
         algo_ddo = self.ocean.assets.resolve(envelope.message.algo_did)
 
         if data_ddo is None or algo_ddo is None:
             raise ValueError(
-                f"Unable to loaded the assets from their dids. Please confirm correct deployemnt on ocean!"
+                f"Unable to loaded the assets from their dids. Please confirm correct deployment on Ocean!"
             )
 
         compute_service = data_ddo.services[0]
@@ -340,6 +348,11 @@ class OceanConnection(BaseSyncConnection):
         self.logger.info(f"Permissioned datasets. ")
 
     def _deploy_data_to_download(self, envelope: Envelope):
+        """
+        Creates an Ocean asset with access service.
+
+        param envelope: the envelope to send.
+        """
         data_nft, datatoken = self._deploy_datatoken(envelope)
         provider_url = DataServiceProvider.get_url(self.ocean.config)
         DATA_files = [envelope.message.data_url_file]
@@ -392,6 +405,11 @@ class OceanConnection(BaseSyncConnection):
         self.put_envelope(deployment_envelope)
 
     def _deploy_data_for_d2c(self, envelope: Envelope):
+        """
+        Creates data NFT, datatoken & data asset for compute.
+
+        param envelope: the envelope to send.
+        """
         erc721_nft, erc20_token = self._deploy_datatoken(envelope)
 
         DATA_metadata = {
@@ -448,7 +466,11 @@ class OceanConnection(BaseSyncConnection):
         self.put_envelope(deployment_envelope)
 
     def _deploy_algorithm(self, envelope: Envelope):
-        """ """
+        """
+        Creates data NFT, datatoken & asset for the algorithm for compute.
+
+        param envelope: the envelope to send.
+        """
         ALGO_nft_token, ALGO_datatoken = self._deploy_datatoken(envelope)
 
         ALGO_date_created = envelope.message.date_created
@@ -501,7 +523,8 @@ class OceanConnection(BaseSyncConnection):
     def _ensure_asset_cached_in_aquarius(
         self, did: str, timeout: float = 600, poll_latency: float = 1
     ):
-        """Ensure asset is cached in Aquarius
+        """
+        Ensure asset is cached in Aquarius
         Default timeout = 10 mins
         Default poll_latency = 1 second
         """
@@ -513,6 +536,11 @@ class OceanConnection(BaseSyncConnection):
                 _timeout.sleep(poll_latency)
 
     def _deploy_datatoken(self, envelope: Envelope):
+        """
+        Creates a data NFT & a datatoken.
+
+        param envelope: the envelope to send.
+        """
         self.logger.info(f"interacting with ocean to deploy data token ...")
 
         print("Create ERC721 data NFT: begin.")
@@ -543,7 +571,48 @@ class OceanConnection(BaseSyncConnection):
         )
         return erc721_nft, erc20_token
 
+    def _create_fixed_rate_helper(self, envelope: Envelope) -> bytes:
+        """
+        Helper for creating a fixed rate exchange with minting option activated.
+
+        param envelope: the envelope to send.
+        """
+        datatoken = self.ocean.get_datatoken(envelope.message.datatoken_address)
+        self.ocean.OCEAN_token.approve(
+            self.ocean.fixed_rate_exchange.address,
+            self.ocean.to_wei(envelope.message.ocean_amt),
+            self.wallet,
+        )
+        tx_result = datatoken.create_fixed_rate(
+            fixed_price_address=self.ocean.fixed_rate_exchange.address,
+            base_token_address=self.ocean.OCEAN_address,
+            owner=self.wallet.address,
+            publish_market_swap_fee_collector=ZERO_ADDRESS,
+            allowed_swapper=ZERO_ADDRESS,
+            base_token_decimals=self.ocean.OCEAN_token.decimals(),
+            datatoken_decimals=datatoken.decimals(),
+            fixed_rate=self.ocean.to_wei(envelope.message.rate),
+            publish_market_swap_fee_amount=self.ocean.to_wei("0.01"),
+            with_mint=1,
+            from_wallet=self.wallet,
+        )
+        tx_receipt = self.ocean.web3.eth.wait_for_transaction_receipt(tx_result)
+        fixed_rate_event = datatoken.get_event_log(
+            DataNFTFactoryContract.EVENT_NEW_FIXED_RATE,
+            tx_receipt.blockNumber,
+            self.ocean.web3.eth.block_number,
+            None,
+        )
+        exchange_id = fixed_rate_event[0].args.exchangeId
+
+        return exchange_id
+
     def _buy_dt_from_fre(self, envelope: Envelope):
+        """
+        Helper function for approving tokens from the fixed rate exchange & buying datatokens.
+
+        param envelope: the envelope to send.
+        """
         fixed_price_address = self.ocean.fixed_rate_exchange.address
         exchange_details = self.ocean.fixed_rate_exchange.get_exchange(
             envelope.message.pool_address
@@ -553,7 +622,11 @@ class OceanConnection(BaseSyncConnection):
         )
         OCEAN_token = self.ocean.OCEAN_token
 
-        datatoken.approve(fixed_price_address, self.ocean.to_wei(100), self.wallet)
+        datatoken.approve(
+            fixed_price_address,
+            self.ocean.to_wei(envelope.message.datatoken_amt),
+            self.wallet,
+        )
         OCEAN_token.approve(fixed_price_address, self.ocean.to_wei(100), self.wallet)
 
         self.ocean.fixed_rate_exchange.buy_dt(

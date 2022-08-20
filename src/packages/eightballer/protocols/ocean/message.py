@@ -338,10 +338,10 @@ class OceanMessage(Message):
         return cast(int, self.get("ocean_amt"))
 
     @property
-    def pool_address(self) -> str:
+    def pool_address(self) -> bytes:
         """Get the 'pool_address' content from the message."""
         enforce(self.is_set("pool_address"), "'pool_address' content is not set.")
-        return cast(str, self.get("pool_address"))
+        return cast(bytes, self.get("pool_address"))
 
     @property
     def tag(self) -> str:
