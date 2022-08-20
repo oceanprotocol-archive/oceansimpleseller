@@ -11,7 +11,7 @@ aea create $NAME
 cd $NAME
 
 # setup the private key
-echo -n $BUYER_AEA_KEY_ETHEREUM > ethereum_private_key.txt
+echo -n $BUYER_AEA_KEY_ETHEREUM > buyer_private_key.txt
 echo -n $BUYER_AEA_KEY_FETCHAI > fetchai_private_key.txt
 
 aea add-key fetchai
