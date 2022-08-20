@@ -69,6 +69,7 @@ aea config set vendor.fetchai.connections.ledger.config.ledger_apis.fetchai.chai
 aea config set vendor.eightballer.connections.ocean.config.ocean_network_url $RPC_URL
 aea config set vendor.fetchai.connections.ledger.config.ledger_apis.ethereum.address $RPC_URL
 aea config set vendor.eightballer.connections.ocean.config.key_path ethereum_private_key.txt
+aea config set vendor.eightballer.connections.ocean.config.key_path buyer_private_key.txt
 aea config set --type dict vendor.eightballer.connections.storj_file_transfer.config.storj_creds \
 '{
   "aws_access_key_id": "jx7bgg74ceog3eznrovaiqcy23sa",

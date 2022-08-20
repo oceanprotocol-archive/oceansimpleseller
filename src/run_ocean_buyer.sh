@@ -68,6 +68,7 @@ aea config set vendor.fetchai.connections.ledger.config.ledger_apis.fetchai.chai
 aea config set vendor.eightballer.connections.ocean.config.ocean_network_url  $RPC_URL
 aea config set vendor.fetchai.connections.ledger.config.ledger_apis.ethereum.address $RPC_URL
 aea config set vendor.eightballer.connections.ocean.config.key_path ethereum_private_key.txt
+aea config set vendor.eightballer.connections.ocean.config.key_path buyer_private_key.txt
 
 
 aea install
