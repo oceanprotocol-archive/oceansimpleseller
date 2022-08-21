@@ -11,7 +11,7 @@ aea create $NAME
 cd $NAME
 
 # setup the private key
-echo -n $BUYER_AEA_KEY_ETHEREUM > buyer_private_key.txt
+echo -n $BUYER_AEA_KEY_ETHEREUM > ethereum_private_key.txt
 echo -n $BUYER_AEA_KEY_FETCHAI > fetchai_private_key.txt
 
 aea add-key fetchai
@@ -68,7 +68,7 @@ aea config set vendor.fetchai.connections.ledger.config.ledger_apis.fetchai.chai
 aea config set vendor.eightballer.connections.ocean.config.ocean_network_url  $RPC_URL
 aea config set vendor.fetchai.connections.ledger.config.ledger_apis.ethereum.address $RPC_URL
 aea config set vendor.eightballer.connections.ocean.config.key_path ethereum_private_key.txt
-aea config set vendor.eightballer.connections.ocean.config.key_path buyer_private_key.txt
+#aea config set vendor.eightballer.connections.ocean.config.key_path buyer_private_key.txt
 
 
 aea install
