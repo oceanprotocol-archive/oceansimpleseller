@@ -11,7 +11,7 @@ fingerprint:
   behaviours.py: QmW1a2PAzzBKg78htBXVtQyBqKffV1fY3yyyrMr6WTsS2o
   dialogues.py: QmWxj5PGgc7AhXyG8mReJ41LYP6eRZ8mUQtWwFrwCZjMKg
   handlers.py: QmQApSvkGg4tmM7Ffc6Bg6t5UosYFhrUcxGcrjQHvXir2B
-  strategy.py: QmfXga4J2NwZxEr2BncrwKsm5KZFXTCgGS9srXSJHHuVGi
+  strategy.py: QmS5JD5voqWRWSAh8oUpNBoGKSEHRiGtyxuoqeX5MRFsbs
 fingerprint_ignore_patterns: []
 connections:
 - fetchai/ledger:0.21.1

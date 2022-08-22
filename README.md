@@ -9,12 +9,19 @@ make new_env
 make install_env
 ```
 
-go is required by the libp2p connection. Install go using the official
+`go` is required by the libp2p connection. Install go using the official
 installation docs: https://go.dev/doc/install
 
-If running the project with a local eth network with [Barge](https://github.com/oceanprotocol/barge/branches) use the barge branch `main` and run barge with:
+`protobuf-compiler` is required for compiling the `.proto` files.
+Install it using the following command:
+```bash
+sudo apt install protobuf-compiler
 ```
-./start_ocean.sh --with-provider2
+
+If running the project with a local eth network with [Barge](https://github.com/oceanprotocol/barge/branches) use the barge branch `main` and run barge with
+Compute to Data feature:
+```
+./start_ocean.sh --with-c2d
 ```
 
 To run the project you will need two terminals open simultaneously.
@@ -22,6 +29,8 @@ To run the project you will need two terminals open simultaneously.
 Export the following on vars on both of them:
 
 ```bash
+# for go installation
+export PATH=$PATH:/usr/local/go/bin
 export FETCH_URL=https://rest-dorado.fetch.ai:443
 export FETCH_DENOM=atestfet
 export FETCH_CHAIN_ID=dorado-1

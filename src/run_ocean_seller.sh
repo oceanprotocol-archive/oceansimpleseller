@@ -115,7 +115,7 @@ aea config set --type dict vendor.eightballer.skills.ocean_seller.strategy.args 
         },
     "datapool_params":{
         "datatoken_address": "",
-        "ocean_amt": 10
+        "ocean_amt": 10,
         "rate": 1
     },
 }'

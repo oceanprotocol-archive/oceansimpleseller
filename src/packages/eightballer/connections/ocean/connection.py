@@ -146,6 +146,9 @@ class OceanConnection(BaseSyncConnection):
         """
         try:
             self._buy_dt_from_fre(envelope=envelope)
+            self.logger.info(
+                f"a trecut de exceptie pt buy dt: {envelope.message.pool_address}"
+            )
             msg = OceanMessage(
                 performative=OceanMessage.Performative.DOWNLOAD_JOB,
                 **{
@@ -234,7 +237,7 @@ class OceanConnection(BaseSyncConnection):
 
         msg = OceanMessage(
             performative=OceanMessage.Performative.POOL_DEPLOYMENT_RECIEPT,
-            pool_address=exchange_id,
+            pool_address=str(exchange_id),
         )
         msg.sender = envelope.to
         msg.to = envelope.sender
@@ -253,12 +256,8 @@ class OceanConnection(BaseSyncConnection):
         DATA_DDO = self.ocean.assets.resolve(DATA_did)
         ALG_DDO = self.ocean.assets.resolve(ALG_did)
 
-        compute_service = DATA_DDO.get_service("compute")
-        algo_service = ALG_DDO.get_service("access")
-
-        # Allows the algorithm for C2D for that data asset
-        compute_service.add_publisher_trusted_algorithm(ALG_DDO)
-        DATA_DDO = self.ocean.assets.update(DATA_DDO, self.wallet)
+        compute_service = DATA_DDO.services[0]
+        algo_service = ALG_DDO.services[0]
 
         free_c2d_env = self.ocean.compute.get_free_c2d_environment(
             compute_service.service_endpoint
@@ -615,7 +614,7 @@ class OceanConnection(BaseSyncConnection):
         """
         fixed_price_address = self.ocean.fixed_rate_exchange.address
         exchange_details = self.ocean.fixed_rate_exchange.get_exchange(
-            envelope.message.pool_address
+            eval(envelope.message.pool_address)  ## TODO: modify
         )
         datatoken = self.ocean.get_datatoken(
             exchange_details[FixedRateExchangeDetails.DATATOKEN]
@@ -630,7 +629,7 @@ class OceanConnection(BaseSyncConnection):
         OCEAN_token.approve(fixed_price_address, self.ocean.to_wei(100), self.wallet)
 
         self.ocean.fixed_rate_exchange.buy_dt(
-            exchange_id=envelope.message.pool_address,
+            exchange_id=eval(envelope.message.pool_address),
             datatoken_amount=self.ocean.to_wei(envelope.message.datatoken_amt),
             max_base_token_amount=self.ocean.to_wei(envelope.message.max_cost_ocean),
             consume_market_swap_fee_address=ZERO_ADDRESS,

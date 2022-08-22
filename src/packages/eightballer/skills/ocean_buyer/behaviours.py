@@ -192,7 +192,7 @@ class OceanC2DBehaviour(Behaviour):
                 OceanMessage.Performative.DOWNLOAD_JOB, **{
                     "datatoken_address": "unused",
                     "datatoken_amt": 2,
-                    "max_cost_ocean": 1,
+                    "max_cost_ocean": 5,
                     "asset_did": "unused",
                     "pool_address": strategy.purchased_data["datapool_address"],
                 }
@@ -207,7 +207,7 @@ class OceanC2DBehaviour(Behaviour):
                 OceanMessage.Performative.DOWNLOAD_JOB, **{
                     "datatoken_address": "unused",
                     "datatoken_amt": 2,
-                    "max_cost_ocean": 1,
+                    "max_cost_ocean": 5,
                     "asset_did": "unused",
                     "pool_address": strategy.purchased_data["algpool_address"],
                 }

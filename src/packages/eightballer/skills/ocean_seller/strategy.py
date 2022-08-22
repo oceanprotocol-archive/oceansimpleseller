@@ -496,5 +496,6 @@ class GenericStrategy(Model):
         return {
             "datatoken_address": data_did,
             "datatoken_amt": 50,
-            "ocean_amt": 1
+            "ocean_amt": 1,
+            "rate": 1
         }
