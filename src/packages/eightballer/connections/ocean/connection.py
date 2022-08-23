@@ -42,6 +42,8 @@ from ocean_lib.web3_internal.constants import ZERO_ADDRESS
 from ocean_lib.web3_internal.wallet import Wallet
 from web3._utils.threads import Timeout
 
+from src.tests.utils import convert_to_bytes_format
+
 """
 Choose one of the possible implementations:
 
@@ -608,8 +610,9 @@ class OceanConnection(BaseSyncConnection):
         param envelope: the envelope to send.
         """
         fixed_price_address = self.ocean.fixed_rate_exchange.address
+        exchange_id = convert_to_bytes_format(data=envelope.message.pool_address)
         exchange_details = self.ocean.fixed_rate_exchange.get_exchange(
-            eval(envelope.message.pool_address) ## TODO: to modify
+            exchange_id=exchange_id
         )
         datatoken = self.ocean.get_datatoken(
             exchange_details[FixedRateExchangeDetails.DATATOKEN]
@@ -624,7 +627,7 @@ class OceanConnection(BaseSyncConnection):
         OCEAN_token.approve(fixed_price_address, self.ocean.to_wei(100), self.wallet)
 
         self.ocean.fixed_rate_exchange.buy_dt(
-            exchange_id=eval(envelope.message.pool_address),
+            exchange_id=exchange_id,
             datatoken_amount=self.ocean.to_wei(envelope.message.datatoken_amt),
             max_base_token_amount=self.ocean.to_wei(envelope.message.max_cost_ocean),
             consume_market_swap_fee_address=ZERO_ADDRESS,
