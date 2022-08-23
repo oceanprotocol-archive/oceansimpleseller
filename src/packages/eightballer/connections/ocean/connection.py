@@ -28,6 +28,7 @@ from decimal import Decimal
 from aea.configurations.base import PublicId
 from aea.connections.base import BaseSyncConnection
 from aea.mail.base import Envelope
+from ocean_lib.utils.utilities import convert_to_bytes
 from packages.eightballer.protocols.ocean.message import OceanMessage
 from eth_account import Account
 from ocean_lib.data_provider.data_service_provider import DataServiceProvider
@@ -609,7 +610,7 @@ class OceanConnection(BaseSyncConnection):
         """
         fixed_price_address = self.ocean.fixed_rate_exchange.address
         exchange_details = self.ocean.fixed_rate_exchange.get_exchange(
-            eval(envelope.message.pool_address)  ## TODO: modify
+            convert_to_bytes(envelope.message.pool_address)
         )
         datatoken = self.ocean.get_datatoken(
             exchange_details[FixedRateExchangeDetails.DATATOKEN]
@@ -624,7 +625,7 @@ class OceanConnection(BaseSyncConnection):
         OCEAN_token.approve(fixed_price_address, self.ocean.to_wei(100), self.wallet)
 
         self.ocean.fixed_rate_exchange.buy_dt(
-            exchange_id=eval(envelope.message.pool_address),
+            exchange_id=convert_to_bytes(envelope.message.pool_address),
             datatoken_amount=self.ocean.to_wei(envelope.message.datatoken_amt),
             max_base_token_amount=self.ocean.to_wei(envelope.message.max_cost_ocean),
             consume_market_swap_fee_address=ZERO_ADDRESS,
