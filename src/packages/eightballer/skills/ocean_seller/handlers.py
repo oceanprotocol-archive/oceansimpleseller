@@ -120,12 +120,12 @@ class OceanHandler(Handler):
                 strategy.has_completed_d2c_job = True
 
             if strategy.is_download_active:
-                self.log.info(f"Recieved results down job!")
+                self.log.info(f"Received results down job!")
                 strategy.has_completed_download_job = True
 
             strategy.is_in_flight = False
         elif message.performative == OceanMessage.Performative.POOL_DEPLOYMENT_RECIEPT:
-            self.log.info(f"Sucecssfully deployed pool for asset!")
+            self.log.info(f"Successfully deployed pool for asset!")
             strategy.is_in_flight = False
             strategy.is_pool_deployed = True
 

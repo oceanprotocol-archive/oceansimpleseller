@@ -23,6 +23,7 @@ import os
 import ocean_lib.exceptions
 from datetime import datetime, timedelta
 from typing import Any
+from decimal import Decimal
 
 from aea.configurations.base import PublicId
 from aea.connections.base import BaseSyncConnection
@@ -32,7 +33,6 @@ from eth_account import Account
 from ocean_lib.data_provider.data_service_provider import DataServiceProvider
 from ocean_lib.example_config import ExampleConfig
 from ocean_lib.models.compute_input import ComputeInput
-from ocean_lib.models.datatoken import Datatoken
 from ocean_lib.models.data_nft_factory import DataNFTFactoryContract
 from ocean_lib.models.fixed_rate_exchange import FixedRateExchangeDetails
 from ocean_lib.ocean.ocean import Ocean
@@ -146,9 +146,6 @@ class OceanConnection(BaseSyncConnection):
         """
         try:
             self._buy_dt_from_fre(envelope=envelope)
-            self.logger.info(
-                f"a trecut de exceptie pt buy dt: {envelope.message.pool_address}"
-            )
             msg = OceanMessage(
                 performative=OceanMessage.Performative.DOWNLOAD_JOB,
                 **{
@@ -164,7 +161,7 @@ class OceanConnection(BaseSyncConnection):
 
             envelope = Envelope(to=msg.to, sender=msg.sender, message=msg)
             self.put_envelope(envelope)
-            self.logger.info(f"Purchased 1 datatoken")
+            self.logger.info(f"Purchased datatokens successfully!")
 
         except Exception as e:
             self.logger.error("Couldn't purchase datatokens")
@@ -290,17 +287,15 @@ class OceanConnection(BaseSyncConnection):
         )
 
         self.logger.info(f"Started compute job with id: {job_id}")
-        res = self.ocean.compute.status(DATA_did, job_id, self.wallet)
-        while True:
-            res_1 = self.ocean.compute.status(DATA_did, job_id, self.wallet)
-            if res_1 != res:
-                res = res_1
-                self.logger.info(f"compute job with id: {job_id} @ {res_1}")
-                if (code := res_1["status"]) in [20, 30, 40, 50, 60]:
-                    continue
-                elif code == 70:
-                    break
-            time.sleep(2)
+        succeeded = False
+        for _ in range(0, 200):
+            status = self.ocean.compute.status(
+                DATA_DDO, compute_service, job_id, self.wallet
+            )
+            if status.get("dateFinished") and Decimal(status["dateFinished"]) > 0:
+                succeeded = True
+                break
+            time.sleep(5)
 
         result_file = self.ocean.compute.compute_job_result_logs(
             DATA_DDO, compute_service, job_id, self.wallet

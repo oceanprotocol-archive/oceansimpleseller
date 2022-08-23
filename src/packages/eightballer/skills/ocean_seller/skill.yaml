@@ -10,7 +10,7 @@ fingerprint:
   __init__.py: QmeRVgNCPPftthrxLRAD5T8zPioqYUWbUTctXZuXGz92ib
   behaviours.py: QmW1a2PAzzBKg78htBXVtQyBqKffV1fY3yyyrMr6WTsS2o
   dialogues.py: QmWxj5PGgc7AhXyG8mReJ41LYP6eRZ8mUQtWwFrwCZjMKg
-  handlers.py: QmQApSvkGg4tmM7Ffc6Bg6t5UosYFhrUcxGcrjQHvXir2B
+  handlers.py: QmNtueANMrMsZ3ZJQk8h9ZzUnmPnQmqN7T55didVu3JrbY
   strategy.py: QmS5JD5voqWRWSAh8oUpNBoGKSEHRiGtyxuoqeX5MRFsbs
 fingerprint_ignore_patterns: []
 connections:
@@ -74,6 +74,7 @@ models:
         entrypoint: python $ALGO
         image: oceanprotocol/algo_dockers
         tag: python-branin
+        checksum: sha256:8221d20c1c16491d7d56b9657ea09082c0ee4a8ab1a6621fa720da58b09580e4
         files_url: https://raw.githubusercontent.com/trentmc/branin/main/gpr.py
         name: gdr
         author: Trent
@@ -81,7 +82,6 @@ models:
         date_created: '2019-12-28T10:55:11Z'
         data_nft_name: algo_nft_c2d
         datatoken_name: algo_token
-        checksum: 44e10daa6637893f4276bb8d7301eb35306ece50f61ca34dcab550
         description: gpr
       data_for_sale:
         generic: data

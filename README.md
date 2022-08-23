@@ -49,11 +49,12 @@ export STORJ_ACCESS_KEY_ID="jx7bgg74ceog3eznrovaiqcy23sa"
 export TARGET_SKILL="eightballer/storj_file_transfer:0.1.0"
 
 export RPC_URL="http://127.0.0.1:8545" # Use a local ETH network i.e. ganache / barge
-# export RPC_URL="https://rinkeby.infura.io/v3/{infura_key}" # Use a local ETH network i.e. ganache / barge
+# export RPC_URL="https://rinkeby.infura.io/v3/{infura_key}" # Use rinkeby
 
 # Make sure to copy the Ocean V4 address.json from https://github.com/oceanprotocol/contracts/blob/main/addresses/address.json
 export ADDRESS_FILE=~/.ocean/ocean-contracts/artifacts/address.json
 export OCEAN_NETWORK_URL=http://127.0.0.1:8545
+# export OCEAN_NETWORK_URL="https://rinkeby.infura.io/v3/{infura_key}" # Use rinkeby
 
 #needed to mint OCEAN for testing with barge and ganache
 export FACTORY_DEPLOYER_PRIVATE_KEY=0xc594c6e5def4bab63ac29eed19a134c130388f74f019bc74b8f4389df2837a58
