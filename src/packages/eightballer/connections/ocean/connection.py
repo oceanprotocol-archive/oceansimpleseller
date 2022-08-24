@@ -42,8 +42,6 @@ from ocean_lib.web3_internal.constants import ZERO_ADDRESS
 from ocean_lib.web3_internal.wallet import Wallet
 from web3._utils.threads import Timeout
 
-from src.tests.utils import convert_to_bytes_format
-
 """
 Choose one of the possible implementations:
 
@@ -155,7 +153,7 @@ class OceanConnection(BaseSyncConnection):
                     "datatoken_amt": envelope.message.datatoken_amt,
                     "max_cost_ocean": envelope.message.max_cost_ocean,
                     "asset_did": envelope.message.asset_did,
-                    "pool_address": envelope.message.pool_address,
+                    "pool_address": str(envelope.message.pool_address),
                 },
             )
             msg.sender = envelope.to
@@ -288,20 +286,30 @@ class OceanConnection(BaseSyncConnection):
             algorithm=algorithm,
         )
 
+        status = self.ocean.compute.status(
+            DATA_DDO, compute_service, job_id, self.wallet
+        )
+        print(f"got job status: {status}")
+
+        assert (
+            status and status["ok"]
+        ), f"something not right about the compute job, got status: {status}"
+
         self.logger.info(f"Started compute job with id: {job_id}")
         succeeded = False
         for _ in range(0, 200):
             status = self.ocean.compute.status(
                 DATA_DDO, compute_service, job_id, self.wallet
             )
-            if status.get("dateFinished") and Decimal(status["dateFinished"]) > 0:
+            if status["status"] > 60:
                 succeeded = True
                 break
-            time.sleep(5)
 
         result_file = self.ocean.compute.compute_job_result_logs(
             DATA_DDO, compute_service, job_id, self.wallet
         )[0]
+
+        self.logger.info(f"got algo log file: {str(result_file)}")
 
         msg = OceanMessage(
             performative=OceanMessage.Performative.RESULTS, content=result_file
@@ -610,7 +618,7 @@ class OceanConnection(BaseSyncConnection):
         param envelope: the envelope to send.
         """
         fixed_price_address = self.ocean.fixed_rate_exchange.address
-        exchange_id = convert_to_bytes_format(data=envelope.message.pool_address)
+        exchange_id = eval(envelope.message.pool_address)  ## TODO: modify
         exchange_details = self.ocean.fixed_rate_exchange.get_exchange(
             exchange_id=exchange_id
         )
@@ -634,6 +642,16 @@ class OceanConnection(BaseSyncConnection):
             consume_market_swap_fee_amount=self.ocean.to_wei("0.01"),
             from_wallet=self.wallet,
         )
+
+    # TODO: correct this function for the above eval
+    @staticmethod
+    def convert_to_bytes_format(data: str) -> bytes:
+        """Converts a bytes string into bytes."""
+        assert data[0:2] == "b'"
+        indexes = slice(2, len(data) - 1)
+        data = data[indexes]
+
+        return data.encode("utf-8")
 
     def on_connect(self) -> None:
         """

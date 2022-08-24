@@ -560,3 +560,12 @@ def test_purchase_datatoken(put_envelope, caplog):
     envelope = Envelope(to="test", sender="msg.sender", message=ocean_message)
 
     ocean2.on_send(envelope)
+
+
+def test_convert_to_bytes_format():
+    """Tests convert_to_bytes_format function."""
+    data = str(b"0x//&652898")
+    assert isinstance(data, str)
+    new_data = OceanConnection.convert_to_bytes_format(data=data)
+    assert isinstance(new_data, bytes)
+    assert new_data == b"0x//&652898"
