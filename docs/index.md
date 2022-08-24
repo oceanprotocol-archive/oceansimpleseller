@@ -5,7 +5,7 @@ This repo contains all the code needed to demo a simple seller and buyer AEAs on
 The following list briefly explains the workflow:
 
 - Seller agent uploads data to StorJ and receives public URL for that data
-- Seller agent creates data token, it publishes the data asset to Ocean as well as the algorithm for C2D and then it creates the data pool.
+- Seller agent creates data token, it publishes the data asset to Ocean as well as the algorithm for C2D and then it creates the fixed rate exchange for purchasing datatokens.
 - Seller agent registers itself on the SOEF with this service.
 
 - Buyer agent searches for this agent on the SOEF, and when it finds the seller agent, it buys the service and it receives metadata needed for further inquires.
