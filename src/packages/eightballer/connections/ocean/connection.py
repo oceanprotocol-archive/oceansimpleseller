@@ -17,6 +17,7 @@
 #
 # ------------------------------------------------------------------------------
 """Scaffold connection and channel."""
+import pickle
 import time
 import web3.exceptions
 import os
@@ -276,8 +277,9 @@ class OceanConnection(BaseSyncConnection):
         )
 
         self.logger.info(
-            f"paid for dataset {DATA_did} receipt: {datasets} with algorithm {algorithm}"
+            f"paid for dataset {DATA_did} receipt: {[dataset.as_dictionary() for dataset in datasets]} with algorithm {algorithm.as_dictionary()}"
         )
+
         self.logger.info(f"starting compute job....")
         job_id = self.ocean.compute.start(
             consumer_wallet=self.wallet,
@@ -296,23 +298,26 @@ class OceanConnection(BaseSyncConnection):
         ), f"something not right about the compute job, got status: {status}"
 
         self.logger.info(f"Started compute job with id: {job_id}")
-        succeeded = False
+
         for _ in range(0, 200):
             status = self.ocean.compute.status(
                 DATA_DDO, compute_service, job_id, self.wallet
             )
-            if status["status"] > 60:
-                succeeded = True
+            if status.get("dateFinished") and Decimal(status["dateFinished"]) > 0:
                 break
+            time.sleep(5)
 
-        result_file = self.ocean.compute.compute_job_result_logs(
-            DATA_DDO, compute_service, job_id, self.wallet
-        )[0]
+        result = self.ocean.compute.result(
+            DATA_DDO, compute_service, job_id, 0, self.wallet
+        )
+        assert result
+        model = pickle.loads(result)
 
-        self.logger.info(f"got algo log file: {str(result_file)}")
+        self.logger.info(f"got compute result: {model}")
+        assert len(model) > 0, "unpickle result unsuccessful"
 
         msg = OceanMessage(
-            performative=OceanMessage.Performative.RESULTS, content=result_file
+            performative=OceanMessage.Performative.RESULTS, content=model
         )
         msg.sender = envelope.to
         msg.to = envelope.sender
@@ -547,7 +552,7 @@ class OceanConnection(BaseSyncConnection):
         """
         self.logger.info(f"interacting with ocean to deploy data token ...")
 
-        print("Create ERC721 data NFT: begin.")
+        self.logger.info("Create ERC721 data NFT: begin.")
 
         erc721_nft = self.ocean.create_data_nft(
             name=envelope.message.data_nft_name,

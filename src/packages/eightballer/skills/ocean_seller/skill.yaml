@@ -75,8 +75,8 @@ models:
         image: oceanprotocol/algo_dockers
         tag: python-branin
         checksum: sha256:8221d20c1c16491d7d56b9657ea09082c0ee4a8ab1a6621fa720da58b09580e4
-        files_url: https://raw.githubusercontent.com/trentmc/branin/main/gpr.py
-        name: gdr
+        files_url: https://raw.githubusercontent.com/oceanprotocol/c2d-examples/main/branin_and_gpr/gpr.py
+        name: gpr
         author: Trent
         license: CCO
         date_created: '2019-12-28T10:55:11Z'
@@ -91,7 +91,7 @@ models:
         amount_to_mint: 100
         data_nft_name: data_nft_c2d
         datatoken_name: datatoken_c2d
-        dataset_url: https://raw.githubusercontent.com/trentmc/branin/main/branin.arff
+        dataset_url: https://raw.githubusercontent.com/oceanprotocol/c2d-examples/main/branin_and_gpr/branin.arff
         name: example
         author: Trent
         license: CCO
