@@ -291,7 +291,7 @@ class OceanConnection(BaseSyncConnection):
         status = self.ocean.compute.status(
             DATA_DDO, compute_service, job_id, self.wallet
         )
-        print(f"got job status: {status}")
+        self.logger.info(f"got job status: {status}")
 
         assert (
             status and status["ok"]
@@ -303,17 +303,30 @@ class OceanConnection(BaseSyncConnection):
             status = self.ocean.compute.status(
                 DATA_DDO, compute_service, job_id, self.wallet
             )
-            if status.get("dateFinished") and Decimal(status["dateFinished"]) > 0:
+            if status.get("statusText") == "Job finished":
                 break
+
             time.sleep(5)
 
-        result = self.ocean.compute.result(
-            DATA_DDO, compute_service, job_id, 0, self.wallet
+        status = self.ocean.compute.status(
+            DATA_DDO, compute_service, job_id, self.wallet
         )
-        assert result
-        model = pickle.loads(result)
+        assert status[
+            "results"
+        ], f"something not right about the compute job, results were not fetched: {status} "
 
-        self.logger.info(f"got compute result: {model}")
+        function_result = []
+        for i in range(len(status["results"])):
+            result = None
+            result_type = status["results"][i]["type"]
+            if result_type == "output":
+                result = self.ocean.compute.result(
+                    DATA_DDO, compute_service, job_id, i, self.wallet
+                )
+                function_result.append(result)
+
+        assert len(function_result) > 0, f"empty results"
+        model = [pickle.loads(res) for res in function_result]
         assert len(model) > 0, "unpickle result unsuccessful"
 
         msg = OceanMessage(

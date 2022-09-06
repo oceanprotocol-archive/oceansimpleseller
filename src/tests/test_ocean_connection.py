@@ -371,7 +371,7 @@ def test_create_fixed_rate(put_envelope):
 
 
 @patch.object(OceanConnection, "put_envelope")
-def test_purchase_datatoken(put_envelope, caplog):
+def test_purchase_datatoken(put_envelope):
     """Tests that _purchase_datatoken function works as expected as buyer role."""
     global data_ddo
     global algo_ddo
