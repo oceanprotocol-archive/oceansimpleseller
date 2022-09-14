@@ -21,7 +21,7 @@ def distribute_ocean_tokens(
 
     for recipient in recipients:
         if OCEAN_token.balanceOf(recipient) < amount:
-            OCEAN_token.transfer(recipient, amount, from_wallet=ocean_deployer_wallet)
+            OCEAN_token.mint(recipient, amount, from_wallet=ocean_deployer_wallet)
 
 
 if __name__ == "__main__":

@@ -684,21 +684,25 @@ class OceanMessage(Message):
                     ),
                 )
             elif self.performative == OceanMessage.Performative.DOWNLOAD_JOB:
-                expected_nb_of_contents = 5
+                if self.datatoken_address:
+                    expected_nb_of_contents = 5
+                    enforce(
+                        isinstance(self.datatoken_address, str),
+                        "Invalid type for content 'datatoken_address'. Expected 'str'. Found '{}'.".format(
+                            type(self.datatoken_address)
+                        ),
+                    )
+                else:
+                    expected_nb_of_contents = 4
+
                 enforce(
-                    isinstance(self.datatoken_address, str),
-                    "Invalid type for content 'datatoken_address'. Expected 'str'. Found '{}'.".format(
-                        type(self.datatoken_address)
-                    ),
-                )
-                enforce(
-                    type(self.datatoken_amt) is int,
+                    isinstance(self.datatoken_amt, int),
                     "Invalid type for content 'datatoken_amt'. Expected 'int'. Found '{}'.".format(
                         type(self.datatoken_amt)
                     ),
                 )
                 enforce(
-                    type(self.max_cost_ocean) is int,
+                    isinstance(self.max_cost_ocean, int),
                     "Invalid type for content 'max_cost_ocean'. Expected 'int'. Found '{}'.".format(
                         type(self.max_cost_ocean)
                     ),

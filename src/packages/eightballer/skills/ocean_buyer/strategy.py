@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Union
 
 from aea.common import Address
 from aea.exceptions import enforce
@@ -36,6 +36,7 @@ class GenericStrategy(Model):
 
         :param kwargs: keyword arguments
         """
+        print(f"kwargs: {kwargs}")
         ledger_id = kwargs.pop("ledger_id", None)
         currency_id = kwargs.pop("currency_id", None)
         self._is_ledger_tx = kwargs.pop("is_ledger_tx", DEFAULT_IS_LEDGER_TX)
@@ -71,7 +72,7 @@ class GenericStrategy(Model):
         self._currency_id = currency_id
         self._is_searching = False
         self._balance = 0
-        self.purchased_data = None  # TODO add as properties....
+        self._purchased_data = None
         self.is_in_flight = False
         self.is_c2d_active = False
         self.is_processing = False
@@ -120,6 +121,14 @@ class GenericStrategy(Model):
     def max_negotiations(self) -> int:
         """Get the maximum number of negotiations the agent can start."""
         return self._max_negotiations
+
+    @property
+    def purchased_data(self):
+        return self._purchased_data
+
+    @purchased_data.setter
+    def purchased_data(self, value) -> None:
+        self._purchased_data = value
 
     def get_location_and_service_query(self) -> Query:
         """

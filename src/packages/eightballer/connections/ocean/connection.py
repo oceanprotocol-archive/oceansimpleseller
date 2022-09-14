@@ -17,8 +17,11 @@
 #
 # ------------------------------------------------------------------------------
 """Scaffold connection and channel."""
+import logging
 import pickle
 import time
+from _codecs import escape_decode
+
 import web3.exceptions
 import os
 import ocean_lib.exceptions
@@ -636,7 +639,11 @@ class OceanConnection(BaseSyncConnection):
         param envelope: the envelope to send.
         """
         fixed_price_address = self.ocean.fixed_rate_exchange.address
-        exchange_id = eval(envelope.message.pool_address)  ## TODO: modify
+        exchange_id = OceanConnection.convert_to_bytes_format(
+            envelope.message.pool_address
+        )
+
+        self.logger.info(f"exchange id: {exchange_id} type: {type(exchange_id)}\n")
         exchange_details = self.ocean.fixed_rate_exchange.get_exchange(
             exchange_id=exchange_id
         )
@@ -661,15 +668,15 @@ class OceanConnection(BaseSyncConnection):
             from_wallet=self.wallet,
         )
 
-    # TODO: correct this function for the above eval
     @staticmethod
     def convert_to_bytes_format(data: str) -> bytes:
         """Converts a bytes string into bytes."""
-        assert data[0:2] == "b'"
-        indexes = slice(2, len(data) - 1)
-        data = data[indexes]
 
-        return data.encode("utf-8")
+        assert data[0:2] == "b'", "Data has not the bytes literal prefix"
+        bytes_data = escape_decode(data[2:-1])[0]
+        assert isinstance(bytes_data, bytes), "Invalid data provided."
+
+        return bytes_data
 
     def on_connect(self) -> None:
         """
