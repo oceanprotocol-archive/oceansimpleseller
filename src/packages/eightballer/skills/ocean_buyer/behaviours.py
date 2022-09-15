@@ -186,7 +186,7 @@ class OceanC2DBehaviour(Behaviour):
             return
 
         if strategy.purchased_data is not None and not strategy.has_purchased_datatoken:
-            self.log.info("purchasing data from the datapool")
+            self.log.info("purchasing data from the data fixed rate exchange")
 
             self.__create_envelope(
                 OceanMessage.Performative.DOWNLOAD_JOB, **{
@@ -194,14 +194,14 @@ class OceanC2DBehaviour(Behaviour):
                     "datatoken_amt": 2,
                     "max_cost_ocean": 5,
                     "asset_did": strategy.purchased_data["data_did"],
-                    "pool_address": strategy.purchased_data["datapool_address"],
+                    "exchange_id": strategy.purchased_data["data_exchange_id"],
                 }
             )
 
             return
 
         if strategy.purchased_data is not None and strategy.has_purchased_datatoken and not strategy.has_purchased_algtoken:
-            self.log.info("purchasing data from the datapool")
+            self.log.info("purchasing data from the algorithm fixed rate exchange")
 
             self.__create_envelope(
                 OceanMessage.Performative.DOWNLOAD_JOB, **{
@@ -209,7 +209,7 @@ class OceanC2DBehaviour(Behaviour):
                     "datatoken_amt": 2,
                     "max_cost_ocean": 5,
                     "asset_did": strategy.purchased_data["algo_did"],
-                    "pool_address": strategy.purchased_data["algpool_address"],
+                    "exchange_id": strategy.purchased_data["algo_exchange_id"],
                 }
             )
 
@@ -217,8 +217,8 @@ class OceanC2DBehaviour(Behaviour):
 
         if strategy.purchased_data is not None and not strategy.has_completed_d2c_job:
             self.log.info(f"submitting the compute 2 data job!")
-            strategy.purchased_data.pop("algpool_address")
-            strategy.purchased_data.pop("datapool_address")
+            strategy.purchased_data.pop("algo_exchange_id")
+            strategy.purchased_data.pop("data_exchange_id")
             self.__create_envelope(
                 OceanMessage.Performative.D2C_JOB, **strategy.purchased_data
             )

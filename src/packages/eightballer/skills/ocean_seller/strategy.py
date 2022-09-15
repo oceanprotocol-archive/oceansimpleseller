@@ -1,6 +1,5 @@
 import json
 import uuid
-from decimal import Decimal
 from typing import Any, Dict, Optional, Tuple
 
 from aea.common import Address
@@ -40,7 +39,7 @@ class GenericStrategy(Model):
 
     _deployments = {}
 
-    _is_pool_deployed = False
+    _is_fixed_rate_exchange_deployed = False
 
     _is_algorithm_deployed = False
     _is_algorithm_minted = False
@@ -59,7 +58,7 @@ class GenericStrategy(Model):
     _data_to_compute_params = {}
     _algorithm_params = {}
     _download_params = {}
-    _datapool_params = {}
+    _data_exchange_params = {}
 
     _is_d2c_active = False
     _is_download_active = False
@@ -89,12 +88,12 @@ class GenericStrategy(Model):
         self._is_download_active = value
 
     @property
-    def is_pool_deployed(self):
+    def is_fixed_rate_exchange_deployed(self):
         return self._is_download_active
 
-    @is_pool_deployed.setter
-    def is_pool_deployed(self, value):
-        self._is_pool_deployed = value
+    @is_fixed_rate_exchange_deployed.setter
+    def is_fixed_rate_exchange_deployed(self, value):
+        self._is_fixed_rate_exchange_deployed = value
 
     @property
     def has_completed_download_job(self):
@@ -185,12 +184,12 @@ class GenericStrategy(Model):
         self._deployments["data_download"] = value
 
     @property
-    def is_pool_deployed(self):
-        return self._is_pool_deployed
+    def is_fixed_rate_exchange_deployed(self):
+        return self._is_fixed_rate_exchange_deployed
 
-    @is_pool_deployed.setter
-    def is_pool_deployed(self, value):
-        self._is_pool_deployed = value
+    @is_fixed_rate_exchange_deployed.setter
+    def is_fixed_rate_exchange_deployed(self, value):
+        self._is_fixed_rate_exchange_deployed = value
 
     @property
     def is_algorithm_deployed(self):
@@ -209,12 +208,12 @@ class GenericStrategy(Model):
         return self._data_to_compute_params
 
     @property
-    def datapool_params(self):
-        return self._datapool_params
+    def data_exchange_params(self):
+        return self._data_exchange_params
 
-    @datapool_params.setter
-    def datapool_params(self, value):
-        self._datapool_params = value
+    @data_exchange_params.setter
+    def data_exchange_params(self, value):
+        self._data_exchange_params = value
 
     @property
     def download_params(self):
@@ -280,7 +279,7 @@ class GenericStrategy(Model):
         self._data_to_compute_params = kwargs.pop("data_to_compute_params")
         self._algorithm_params = kwargs.pop("algorithm_params")
         self._download_params = kwargs.pop("download_params")
-        self._datapool_params = kwargs.pop("datapool_params")
+        self._data_exchange_params = kwargs.pop("data_exchange_params")
         self._deployments = kwargs.pop("deployments")
 
         self._is_seller_active = False
@@ -483,7 +482,7 @@ class GenericStrategy(Model):
             )
         return {"algo_did": algo_did, "data_did": data_did}
 
-    def get_create_pool_request(self, is_data=True):
+    def get_create_fixed_rate_exchange_request(self, is_data=True): # TODO: remove hardcoded values
         if is_data:
             data_did = self.data_to_compute_address.get("datatoken_contract_address", None)
         else:

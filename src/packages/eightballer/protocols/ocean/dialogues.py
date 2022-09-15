@@ -48,15 +48,15 @@ class OceanDialogue(Dialogue):
     TERMINAL_PERFORMATIVES = frozenset(
         {
             OceanMessage.Performative.DEPLOYMENT_RECIEPT,
-            OceanMessage.Performative.POOL_DEPLOYMENT_RECIEPT,
+            OceanMessage.Performative.EXCHANGE_DEPLOYMENT_RECIEPT,
             OceanMessage.Performative.END,
             OceanMessage.Performative.ERROR,
         }
     )
     VALID_REPLIES = {
-        OceanMessage.Performative.CREATE_POOL: frozenset(
+        OceanMessage.Performative.CREATE_FIXED_RATE_EXCHANGE: frozenset(
             {
-                OceanMessage.Performative.POOL_DEPLOYMENT_RECIEPT,
+                OceanMessage.Performative.EXCHANGE_DEPLOYMENT_RECIEPT,
                 OceanMessage.Performative.ERROR,
                 OceanMessage.Performative.END,
             }
@@ -102,7 +102,7 @@ class OceanDialogue(Dialogue):
         OceanMessage.Performative.PERMISSION_DATASET: frozenset(
             {OceanMessage.Performative.ERROR, OceanMessage.Performative.END}
         ),
-        OceanMessage.Performative.POOL_DEPLOYMENT_RECIEPT: frozenset(),
+        OceanMessage.Performative.EXCHANGE_DEPLOYMENT_RECIEPT: frozenset(),
         OceanMessage.Performative.RESULTS: frozenset(
             {OceanMessage.Performative.ERROR, OceanMessage.Performative.END}
         ),

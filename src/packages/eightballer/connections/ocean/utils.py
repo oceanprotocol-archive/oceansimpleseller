@@ -22,7 +22,8 @@ from _codecs import escape_decode
 
 
 def convert_to_bytes_format(data: str) -> bytes:
-    """Converts a bytes string into bytes."""
+    """Converts a bytes string into bytes.
+    Used for smart contracts calls."""
 
     assert data[0:2] in ["b'", 'b"'], "Data has not the bytes literal prefix"
     bytes_data = escape_decode(data[2:-1])[0]

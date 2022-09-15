@@ -350,7 +350,7 @@ def test_create_fixed_rate(put_envelope):
     ocean.on_send(envelope)
 
     ocean_message = OceanMessage(
-        OceanMessage.Performative.CREATE_POOL,
+        OceanMessage.Performative.CREATE_FIXED_RATE_EXCHANGE,
         _body={
             "datatoken_address": datatoken_address,
             "rate": 1,
@@ -361,7 +361,7 @@ def test_create_fixed_rate(put_envelope):
     def side_effect(envelope):
         assert (
             envelope.message.performative
-            == OceanMessage.Performative.POOL_DEPLOYMENT_RECIEPT
+            == OceanMessage.Performative.EXCHANGE_DEPLOYMENT_RECIEPT
         )
 
     put_envelope.side_effect = side_effect
@@ -376,7 +376,7 @@ def test_purchase_datatoken(put_envelope):
     """Tests that _purchase_datatoken function works as expected as buyer role."""
     global data_ddo
     global algo_ddo
-    global pool_address
+    global exchange_id
 
     def side_effect(envelope):
         global data_ddo
@@ -491,7 +491,7 @@ def test_purchase_datatoken(put_envelope):
     ocean.on_send(envelope)
 
     ocean_message = OceanMessage(
-        OceanMessage.Performative.CREATE_POOL,
+        OceanMessage.Performative.CREATE_FIXED_RATE_EXCHANGE,
         _body={
             "datatoken_address": datatoken_address,
             "rate": 1,
@@ -500,11 +500,11 @@ def test_purchase_datatoken(put_envelope):
     )
 
     def side_effect(envelope):
-        global pool_address
-        pool_address = envelope.message.pool_address
+        global exchange_id
+        exchange_id = envelope.message.exchange_id
         assert (
             envelope.message.performative
-            == OceanMessage.Performative.POOL_DEPLOYMENT_RECIEPT
+            == OceanMessage.Performative.EXCHANGE_DEPLOYMENT_RECIEPT
         )
 
     put_envelope.side_effect = side_effect
@@ -534,7 +534,7 @@ def test_purchase_datatoken(put_envelope):
             "datatoken_amt": 2,
             "max_cost_ocean": 5,
             "asset_did": data_ddo,
-            "pool_address": pool_address,
+            "exchange_id": exchange_id,
         },
     )
 

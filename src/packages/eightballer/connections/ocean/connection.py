@@ -134,7 +134,10 @@ class OceanConnection(BaseSyncConnection):
             == OceanMessage.Performative.DEPLOY_DATA_DOWNLOAD
         ):
             self._deploy_data_to_download(envelope)
-        if envelope.message.performative == OceanMessage.Performative.CREATE_POOL:
+        if (
+            envelope.message.performative
+            == OceanMessage.Performative.CREATE_FIXED_RATE_EXCHANGE
+        ):
             self._create_fixed_rate(envelope)
         if envelope.message.performative == OceanMessage.Performative.DOWNLOAD_JOB:
             self._purchase_datatoken(envelope)
@@ -154,7 +157,7 @@ class OceanConnection(BaseSyncConnection):
                     "datatoken_amt": envelope.message.datatoken_amt,
                     "max_cost_ocean": envelope.message.max_cost_ocean,
                     "asset_did": envelope.message.asset_did,
-                    "pool_address": str(envelope.message.pool_address),
+                    "exchange_id": str(envelope.message.exchange_id),
                 },
             )
             msg.sender = envelope.to
@@ -234,8 +237,8 @@ class OceanConnection(BaseSyncConnection):
             self._create_fixed_rate(envelope, retries - 1)
 
         msg = OceanMessage(
-            performative=OceanMessage.Performative.POOL_DEPLOYMENT_RECIEPT,
-            pool_address=str(exchange_id),
+            performative=OceanMessage.Performative.EXCHANGE_DEPLOYMENT_RECIEPT,
+            exchange_id=str(exchange_id),
         )
         msg.sender = envelope.to
         msg.to = envelope.sender
@@ -405,7 +408,7 @@ class OceanConnection(BaseSyncConnection):
                 data_token_address=datatoken.address,
             )
             self.logger.info(f"DATA did = '{DATA_ddo.did}'")
-        except ocean_lib.exceptions.AquariusError as error:  # and how exactly is the did generated???
+        except ocean_lib.exceptions.AquariusError as error:
             self.logger.error(f"Error with creating asset. {error}")
             msg = error.args[0]
             if "is already registered to another asset." in msg:
@@ -636,7 +639,7 @@ class OceanConnection(BaseSyncConnection):
         param envelope: the envelope to send.
         """
         fixed_price_address = self.ocean.fixed_rate_exchange.address
-        exchange_id = convert_to_bytes_format(envelope.message.pool_address)
+        exchange_id = convert_to_bytes_format(envelope.message.exchange_id)
 
         exchange_details = self.ocean.fixed_rate_exchange.get_exchange(
             exchange_id=exchange_id

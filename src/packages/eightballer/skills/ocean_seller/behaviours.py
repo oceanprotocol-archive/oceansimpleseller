@@ -222,12 +222,12 @@ class OceanC2DBehaviour(OceanBehaviourBase):
             strategy.is_data_permissioned
             and strategy.is_algorithm_deployed
             and strategy.is_data_to_compute_deployed
-            and not strategy.download_params.get("datapool_address", None)
+            and not strategy.download_params.get("data_exchange_id", None)
         ):
-            self.log.info(f"creating the datapool")
+            self.log.info(f"creating the data fixed rate exchange schema...")
             self.__create_envelope(
-                OceanMessage.Performative.CREATE_POOL,
-                **strategy.get_create_pool_request(),
+                OceanMessage.Performative.CREATE_FIXED_RATE_EXCHANGE,
+                **strategy.get_create_fixed_rate_exchange_request(),
             )
 
             return
@@ -235,13 +235,13 @@ class OceanC2DBehaviour(OceanBehaviourBase):
                 strategy.is_data_permissioned
                 and strategy.is_algorithm_deployed
                 and strategy.is_data_to_compute_deployed
-                and strategy.download_params.get("datapool_address", None)
-                and not strategy.download_params.get("algpool_address", None)
+                and strategy.download_params.get("data_exchange_id", None)
+                and not strategy.download_params.get("algo_exchange_id", None)
         ):
-            self.log.info(f"creating the algpool")
+            self.log.info(f"creating the algorithm fixed rate exchange schema...")
             self.__create_envelope(
-                OceanMessage.Performative.CREATE_POOL,
-                **strategy.get_create_pool_request(False),
+                OceanMessage.Performative.CREATE_FIXED_RATE_EXCHANGE,
+                **strategy.get_create_fixed_rate_exchange_request(False),
             )
 
             return
@@ -250,7 +250,7 @@ class OceanC2DBehaviour(OceanBehaviourBase):
             strategy.is_data_permissioned
             and strategy.is_algorithm_deployed
             and strategy.is_data_to_compute_deployed
-            and strategy.is_pool_deployed
+            and strategy.is_fixed_rate_exchange_deployed
         ):
             self.log.info(f"Completed the c2d deployment.")
             strategy.is_d2c_active = False
