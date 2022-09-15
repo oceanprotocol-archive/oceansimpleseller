@@ -17,22 +17,19 @@
 #
 # ------------------------------------------------------------------------------
 """Scaffold connection and channel."""
-import logging
 import pickle
 import time
-from _codecs import escape_decode
-
 import web3.exceptions
 import os
 import ocean_lib.exceptions
 from datetime import datetime, timedelta
 from typing import Any
-from decimal import Decimal
 
 from aea.configurations.base import PublicId
 from aea.connections.base import BaseSyncConnection
 from aea.mail.base import Envelope
 from packages.eightballer.protocols.ocean.message import OceanMessage
+from packages.eightballer.connections.ocean.utils import convert_to_bytes_format
 from eth_account import Account
 from ocean_lib.data_provider.data_service_provider import DataServiceProvider
 from ocean_lib.example_config import ExampleConfig
@@ -639,11 +636,8 @@ class OceanConnection(BaseSyncConnection):
         param envelope: the envelope to send.
         """
         fixed_price_address = self.ocean.fixed_rate_exchange.address
-        exchange_id = OceanConnection.convert_to_bytes_format(
-            envelope.message.pool_address
-        )
+        exchange_id = convert_to_bytes_format(envelope.message.pool_address)
 
-        self.logger.info(f"exchange id: {exchange_id} type: {type(exchange_id)}\n")
         exchange_details = self.ocean.fixed_rate_exchange.get_exchange(
             exchange_id=exchange_id
         )
@@ -667,16 +661,6 @@ class OceanConnection(BaseSyncConnection):
             consume_market_swap_fee_amount=self.ocean.to_wei("0.01"),
             from_wallet=self.wallet,
         )
-
-    @staticmethod
-    def convert_to_bytes_format(data: str) -> bytes:
-        """Converts a bytes string into bytes."""
-
-        assert data[0:2] == "b'", "Data has not the bytes literal prefix"
-        bytes_data = escape_decode(data[2:-1])[0]
-        assert isinstance(bytes_data, bytes), "Invalid data provided."
-
-        return bytes_data
 
     def on_connect(self) -> None:
         """

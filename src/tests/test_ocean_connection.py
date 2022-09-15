@@ -12,6 +12,7 @@ from packages.eightballer.protocols.ocean.message import OceanMessage
 from mock import patch, Mock
 from ocean_lib.models.datatoken import Datatoken
 
+from src.packages.eightballer.connections.ocean.utils import convert_to_bytes_format
 from src.tests.utils import _seller_wallet, _buyer_wallet
 
 
@@ -566,6 +567,6 @@ def test_convert_to_bytes_format():
     """Tests convert_to_bytes_format function."""
     data = str(b"0x//&652898")
     assert isinstance(data, str)
-    new_data = OceanConnection.convert_to_bytes_format(data=data)
+    new_data = convert_to_bytes_format(data=data)
     assert isinstance(new_data, bytes)
     assert new_data == b"0x//&652898"
