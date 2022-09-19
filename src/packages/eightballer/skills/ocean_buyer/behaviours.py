@@ -191,8 +191,8 @@ class OceanC2DBehaviour(Behaviour):
             self.__create_envelope(
                 OceanMessage.Performative.DOWNLOAD_JOB, **{
                     "datatoken_address": "",
-                    "datatoken_amt": 2,
-                    "max_cost_ocean": 5,
+                    "datatoken_amt": strategy.datatoken_amt,
+                    "max_cost_ocean": strategy.max_cost_ocean,
                     "asset_did": strategy.purchased_data["data_did"],
                     "exchange_id": strategy.purchased_data["data_exchange_id"],
                 }
@@ -206,8 +206,8 @@ class OceanC2DBehaviour(Behaviour):
             self.__create_envelope(
                 OceanMessage.Performative.DOWNLOAD_JOB, **{
                     "datatoken_address": "",
-                    "datatoken_amt": 2,
-                    "max_cost_ocean": 5,
+                    "datatoken_amt": strategy.datatoken_amt,
+                    "max_cost_ocean": strategy.max_cost_ocean,
                     "asset_did": strategy.purchased_data["algo_did"],
                     "exchange_id": strategy.purchased_data["algo_exchange_id"],
                 }

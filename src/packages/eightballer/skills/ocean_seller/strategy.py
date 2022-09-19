@@ -88,14 +88,6 @@ class GenericStrategy(Model):
         self._is_download_active = value
 
     @property
-    def is_fixed_rate_exchange_deployed(self):
-        return self._is_download_active
-
-    @is_fixed_rate_exchange_deployed.setter
-    def is_fixed_rate_exchange_deployed(self, value):
-        self._is_fixed_rate_exchange_deployed = value
-
-    @property
     def has_completed_download_job(self):
         return self._has_completed_download_job
 
@@ -482,7 +474,7 @@ class GenericStrategy(Model):
             )
         return {"algo_did": algo_did, "data_did": data_did}
 
-    def get_create_fixed_rate_exchange_request(self, is_data=True): # TODO: remove hardcoded values
+    def get_create_fixed_rate_exchange_request(self, is_data=True):
         if is_data:
             data_did = self.data_to_compute_address.get("datatoken_contract_address", None)
         else:
@@ -492,9 +484,10 @@ class GenericStrategy(Model):
             raise ValueError(
                 "Agent does not have data did! make sure it has been deployed."
             )
+
         return {
             "datatoken_address": data_did,
-            "datatoken_amt": 50,
-            "ocean_amt": 1,
-            "rate": 1
+            "datatoken_amt": self.data_exchange_params["datatoken_amt"],
+            "ocean_amt": self.data_exchange_params["ocean_amt"],
+            "rate": self.data_exchange_params["rate"]
         }

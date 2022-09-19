@@ -211,7 +211,7 @@ class OceanC2DBehaviour(OceanBehaviourBase):
             and strategy.is_algorithm_deployed
             and strategy.is_data_to_compute_deployed
         ):
-            self.log.info(f"permissioning the dataset to allow d 2 c !")
+            self.log.info(f"Permission the dataset to allow d 2 c !")
             self.__create_envelope(
                 OceanMessage.Performative.PERMISSION_DATASET,
                 **strategy.get_permission_request(),
@@ -224,7 +224,7 @@ class OceanC2DBehaviour(OceanBehaviourBase):
             and strategy.is_data_to_compute_deployed
             and not strategy.download_params.get("data_exchange_id", None)
         ):
-            self.log.info(f"creating the data fixed rate exchange schema...")
+            self.log.info(f"Creating the data fixed rate exchange schema...")
             self.__create_envelope(
                 OceanMessage.Performative.CREATE_FIXED_RATE_EXCHANGE,
                 **strategy.get_create_fixed_rate_exchange_request(),
@@ -238,7 +238,7 @@ class OceanC2DBehaviour(OceanBehaviourBase):
                 and strategy.download_params.get("data_exchange_id", None)
                 and not strategy.download_params.get("algo_exchange_id", None)
         ):
-            self.log.info(f"creating the algorithm fixed rate exchange schema...")
+            self.log.info(f"Creating the algorithm fixed rate exchange schema...")
             self.__create_envelope(
                 OceanMessage.Performative.CREATE_FIXED_RATE_EXCHANGE,
                 **strategy.get_create_fixed_rate_exchange_request(False),

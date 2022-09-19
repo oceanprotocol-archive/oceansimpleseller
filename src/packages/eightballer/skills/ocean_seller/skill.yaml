@@ -8,10 +8,10 @@ license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   __init__.py: QmeRVgNCPPftthrxLRAD5T8zPioqYUWbUTctXZuXGz92ib
-  behaviours.py: QmfW2HgJguvZT5DJuWY9zuf4XMs5bpzXeYN2o2QpCSetBF
+  behaviours.py: Qma5Lz9dDZFMMWqsFDRFn4MDJ4TyrqahXHHFKarvKuczpu
   dialogues.py: QmWxj5PGgc7AhXyG8mReJ41LYP6eRZ8mUQtWwFrwCZjMKg
   handlers.py: QmYtETVrSBKHRqksZE7FGfFSQEG4qWUvCqqRbSD6HBYAdq
-  strategy.py: Qme5ZEmZUZJbtwhpHB4cBH8jvBenHEZh3ENpCt2PgC1Dzu
+  strategy.py: QmcvofxYAJusNJQqRZakmNPbGNCvKQBFH9WxEkLNZUBwPV
 fingerprint_ignore_patterns: []
 connections:
 - fetchai/ledger:0.21.1
@@ -85,8 +85,9 @@ models:
         description: gpr
       data_exchange_params:
         datatoken_address: ''
-        datatoken_amt: 100
-        ocean_amt: 10
+        datatoken_amt: 50
+        ocean_amt: 1
+        rate: 1
       data_for_sale:
         generic: data
       data_to_compute_params:

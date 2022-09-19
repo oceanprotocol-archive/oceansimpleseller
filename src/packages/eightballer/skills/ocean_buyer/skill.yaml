@@ -7,10 +7,10 @@ license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   __init__.py: QmXdYL7HzJQNfXe22szymE6yUvZbPo2ZoWAj5UGg46iySD
-  behaviours.py: QmbXA4EnWyiyXrspuopgkDAYjnsyidAQ73hGFWPB9Dsp5Z
+  behaviours.py: QmQa57xisyBEUAL4nKL7g2JskYdkFxNe1YVWPwdt6knb2U
   dialogues.py: QmQYEojSSSjq49QaDGhnScXTL1QSu3RtKNjnizRHeGw8Sa
   handlers.py: QmdxiJYHBsHLrz5ig2fUrJr1hMFZQUS8QL3NHckiqh8Rzy
-  strategy.py: QmWLCi3eWVS2JpJP3ryb8kS1DCTiGDVdaX1ZXr2nHtG3Wx
+  strategy.py: QmUHKFRmunHHsrRj1AMb2r5JrupThrRHnC4LfjetdgDXk7
 fingerprint_ignore_patterns: []
 connections:
 - fetchai/ledger:0.21.1
@@ -69,10 +69,12 @@ models:
     class_name: SigningDialogues
   strategy:
     args:
+      datatoken_amt: 2
       is_ledger_tx: true
       location:
         latitude: 51.5194
         longitude: 0.127
+      max_cost_ocean: 5
       max_negotiations: 1
       max_tx_fee: 7500000000000000
       max_unit_price: 20
