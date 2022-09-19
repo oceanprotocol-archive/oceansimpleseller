@@ -101,6 +101,7 @@ models:
         author: Trent
         license: CCO
         date_created: '2019-12-28T10:55:11Z'
+        description: Compute service to run GPR algorithm.
       deployments:
         data_to_compute: {}
         data_download: {}

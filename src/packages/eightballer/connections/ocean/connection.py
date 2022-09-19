@@ -440,7 +440,7 @@ class OceanConnection(BaseSyncConnection):
         DATA_metadata = {
             "created": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
             "updated": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "description": "envelope.message.description",  # TODO replace description field
+            "description": envelope.message.description,
             "name": envelope.message.name,
             "type": "dataset",
             "author": envelope.message.author,

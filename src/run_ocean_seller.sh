@@ -108,7 +108,7 @@ aea config set --type dict vendor.eightballer.skills.ocean_seller.strategy.args 
         "amount_to_mint": 100,
         "dataset_url": "https://raw.githubusercontent.com/oceanprotocol/c2d-examples/main/branin_and_gpr/branin.arff",
         "name": "example",
-        "description": "example",
+        "description": "Compute service to run GPR algorithm.",
         "author": "Trent",
         "license": "CCO",
         "date_created": "2019-12-28T10:55:11Z"
