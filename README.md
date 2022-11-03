@@ -35,11 +35,11 @@ export FETCH_URL=https://rest-dorado.fetch.ai:443
 export FETCH_DENOM=atestfet
 export FETCH_CHAIN_ID=dorado-1
 
-# export SELLER_AEA_KEY_ETHEREUM="0x4a7b2cc2d0a9574f9e207fcfb6b13f6daf4e90b9e0f50e389a68f507f9767880" # Rinkeby
+# export SELLER_AEA_KEY_ETHEREUM="0x4a7b2cc2d0a9574f9e207fcfb6b13f6daf4e90b9e0f50e389a68f507f9767880" # Goerli
 export SELLER_AEA_KEY_ETHEREUM="0xc594c6e5def4bab63ac29eed19a134c130388f74f019bc74b8f4389df2837a58" # BARGE/GANACHE TEST_PRIVATE_KEY1 from pytest.ini
 export SELLER_AEA_KEY_FETCHAI="1437aebfadbb766b810894a7859db3574088e6909f229e484e2e14e00b7c0875"
 
-# export BUYER_AEA_KEY_ETHEREUM="0xef4b441145c1d0f3b4bc6d61d29f5c6e502359481152f869247c7a4244d45209" # Rinkeby
+# export BUYER_AEA_KEY_ETHEREUM="0xef4b441145c1d0f3b4bc6d61d29f5c6e502359481152f869247c7a4244d45209" # Goerli
 export BUYER_AEA_KEY_ETHEREUM="0xef4b441145c1d0f3b4bc6d61d29f5c6e502359481152f869247c7a4244d45209" # BARGE/GANACHE TEST_PRIVATE_KEY2 from pytest.ini
 export BUYER_AEA_KEY_FETCHAI="670c081eb3f674ae55e28ab714e7393abc74346a6fc738b1bf245140a038a3bb"
 
@@ -49,12 +49,12 @@ export STORJ_ACCESS_KEY_ID="jx7bgg74ceog3eznrovaiqcy23sa"
 export TARGET_SKILL="eightballer/storj_file_transfer:0.1.0"
 
 export RPC_URL="http://127.0.0.1:8545" # Use a local ETH network i.e. ganache / barge
-# export RPC_URL="https://rinkeby.infura.io/v3/{infura_key}" # Use rinkeby
+# export RPC_URL="https://goerli.infura.io/v3/{infura_key}" # Use goerli
 
 # Make sure to copy the Ocean V4 address.json from https://github.com/oceanprotocol/contracts/blob/main/addresses/address.json
 export ADDRESS_FILE=~/.ocean/ocean-contracts/artifacts/address.json
 export OCEAN_NETWORK_URL=http://127.0.0.1:8545
-# export OCEAN_NETWORK_URL="https://rinkeby.infura.io/v3/{infura_key}" # Use rinkeby
+# export OCEAN_NETWORK_URL="https://goerli.infura.io/v3/{infura_key}" # Use goerli
 
 #needed to mint OCEAN for testing with barge and ganache
 export FACTORY_DEPLOYER_PRIVATE_KEY=0xc594c6e5def4bab63ac29eed19a134c130388f74f019bc74b8f4389df2837a58
