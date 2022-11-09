@@ -542,10 +542,11 @@ def test_purchase_datatoken(put_envelope):
         assert envelope.message.performative == OceanMessage.Performative.DOWNLOAD_JOB
 
     put_envelope.side_effect = side_effect
+    seller_wallet = _seller_wallet()
+    buyer_wallet = _buyer_wallet()
+
     ocean2.on_connect()
 
-    seller_wallet = _seller_wallet(ocean2)
-    buyer_wallet = _buyer_wallet(ocean2)
     datatoken = Datatoken(ocean2.ocean.web3, datatoken_address)
     OCEAN_token = ocean2.ocean.OCEAN_token
     assert OCEAN_token.balanceOf(seller_wallet.address) > 0

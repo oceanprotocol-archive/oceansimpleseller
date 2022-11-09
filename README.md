@@ -48,12 +48,10 @@ export STORJ_ACCESS_KEY="j2wulv3drlgrt5apjr2csc5lmkzyqpqakgzuoc63fn6wedxmnu2ng"
 export STORJ_ACCESS_KEY_ID="jx7bgg74ceog3eznrovaiqcy23sa"
 export TARGET_SKILL="eightballer/storj_file_transfer:0.1.0"
 
-export RPC_URL="http://127.0.0.1:8545" # Use a local ETH network i.e. ganache / barge
+export RPC_URL="https://goerli.infura.io/v3/2cabacb986544022a02b84fbb06967c5" # Use a local ETH network i.e. ganache / barge
 # export RPC_URL="https://goerli.infura.io/v3/{infura_key}" # Use goerli
 
-# Make sure to copy the Ocean V4 address.json from https://github.com/oceanprotocol/contracts/blob/main/addresses/address.json
-export ADDRESS_FILE=~/.ocean/ocean-contracts/artifacts/address.json
-export OCEAN_NETWORK_URL=http://127.0.0.1:8545
+export OCEAN_NETWORK_NAME="mumbai"
 # export OCEAN_NETWORK_URL="https://goerli.infura.io/v3/{infura_key}" # Use goerli
 
 #needed to mint OCEAN for testing with barge and ganache

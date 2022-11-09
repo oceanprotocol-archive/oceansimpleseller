@@ -3,7 +3,7 @@
 NAME="ocean_buyer"
 
 # distribute_ocean_tokens if using barge and ganache
-if [ $OCEAN_NETWORK_URL == http://127.0.0.1:8545 ]; then
+if [ $OCEAN_NETWORK_NAME == developement ]; then
   python distribute_ocean_tokens.py
 fi
 

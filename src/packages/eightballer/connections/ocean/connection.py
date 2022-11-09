@@ -30,7 +30,7 @@ from aea.connections.base import BaseSyncConnection
 from aea.mail.base import Envelope
 from packages.eightballer.protocols.ocean.message import OceanMessage
 from packages.eightballer.connections.ocean.utils import convert_to_bytes_format
-from eth_account import Account
+from brownie.network import accounts
 from ocean_lib.data_provider.data_service_provider import DataServiceProvider
 from ocean_lib.example_config import ExampleConfig
 from ocean_lib.models.compute_input import ComputeInput
@@ -40,7 +40,7 @@ from ocean_lib.ocean.ocean import Ocean
 from ocean_lib.services.service import Service
 from ocean_lib.structures.file_objects import UrlFile
 from ocean_lib.web3_internal.constants import ZERO_ADDRESS
-from ocean_lib.web3_internal.wallet import Wallet
+from ocean_lib.web3_internal.utils import connect_to_network
 from web3._utils.threads import Timeout
 
 """
@@ -50,8 +50,6 @@ Sync (inherited from BaseSyncConnection) or Async (inherited from Connection) co
 """
 
 CONNECTION_ID = PublicId.from_str("eightballer/ocean:0.1.0")
-
-Account.enable_unaudited_hdwallet_features()
 
 
 # Specify metadata and service attributes, for "GPR" algorithm script.
@@ -193,8 +191,8 @@ class OceanConnection(BaseSyncConnection):
 
         # Agent needs to pay in order to have rights for consume service.
         order_tx_id = self.ocean.assets.pay_for_access_service(
-            asset,
-            service,
+            asset=asset,
+            service=service,
             consume_market_order_fee_address=self.wallet.address,
             consume_market_order_fee_token=service.datatoken.address,
             consume_market_order_fee_amount=0,
@@ -205,10 +203,10 @@ class OceanConnection(BaseSyncConnection):
         # Download has begun for the agent. If the connection breaks, agent can request again by showing order_tx_id.
         file_path = self.ocean.assets.download(
             asset=asset,
-            service=service,
             consumer_wallet=self.wallet,
             destination="./downloads/",
             order_tx_id=order_tx_id,
+            service=service,
         )
         self.logger.info(f"file_path = '{file_path}'")
         data = open(file_path, "rb").read()
@@ -461,7 +459,7 @@ class OceanConnection(BaseSyncConnection):
         DATA_compute_service = Service(
             service_id="2",
             service_type="compute",
-            service_endpoint=self.ocean.config.provider_url,
+            service_endpoint=self.ocean.config["PROVIDER_URL"],
             datatoken=erc20_token.address,
             files=[DATA_url_file],
             timeout=3600,
@@ -577,16 +575,16 @@ class OceanConnection(BaseSyncConnection):
         )
 
         erc20_token = erc721_nft.create_datatoken(
-            template_index=1,  # default value
             name=envelope.message.datatoken_name,  # name for ERC20 token
             symbol=envelope.message.datatoken_name,  # symbol for ERC20 token
+            from_wallet=self.wallet,
+            template_index=1,  # default value
             minter=self.wallet.address,  # minter address
             fee_manager=self.wallet.address,  # fee manager for this ERC20 token
             publish_market_order_fee_address=self.wallet.address,  # publishing Market Address
             publish_market_order_fee_token=ZERO_ADDRESS,  # publishing Market Fee Token
             publish_market_order_fee_amount=0,
             bytess=[b""],
-            from_wallet=self.wallet,
         )
 
         self.logger.info(f"created the data token.")
@@ -603,12 +601,13 @@ class OceanConnection(BaseSyncConnection):
         param envelope: the envelope to send.
         """
         datatoken = self.ocean.get_datatoken(envelope.message.datatoken_address)
+
         self.ocean.OCEAN_token.approve(
             self.ocean.fixed_rate_exchange.address,
             self.ocean.to_wei(envelope.message.ocean_amt),
-            self.wallet,
+            {"from": self.wallet},
         )
-        tx_result = datatoken.create_fixed_rate(
+        receipt = datatoken.create_fixed_rate(
             fixed_price_address=self.ocean.fixed_rate_exchange.address,
             base_token_address=self.ocean.OCEAN_address,
             owner=self.wallet.address,
@@ -619,16 +618,9 @@ class OceanConnection(BaseSyncConnection):
             fixed_rate=self.ocean.to_wei(envelope.message.rate),
             publish_market_swap_fee_amount=self.ocean.to_wei("0.01"),
             with_mint=1,
-            from_wallet=self.wallet,
+            transaction_parameters={"from": self.wallet},
         )
-        tx_receipt = self.ocean.web3.eth.wait_for_transaction_receipt(tx_result)
-        fixed_rate_event = datatoken.get_event_log(
-            DataNFTFactoryContract.EVENT_NEW_FIXED_RATE,
-            tx_receipt.blockNumber,
-            self.ocean.web3.eth.block_number,
-            None,
-        )
-        exchange_id = fixed_rate_event[0].args.exchangeId
+        exchange_id = receipt.events["NewFixedRate"]["exchangeId"]
 
         return exchange_id
 
@@ -641,9 +633,7 @@ class OceanConnection(BaseSyncConnection):
         fixed_price_address = self.ocean.fixed_rate_exchange.address
         exchange_id = convert_to_bytes_format(envelope.message.exchange_id)
 
-        exchange_details = self.ocean.fixed_rate_exchange.get_exchange(
-            exchange_id=exchange_id
-        )
+        exchange_details = self.ocean.fixed_rate_exchange.getExchange(exchange_id)
         datatoken = self.ocean.get_datatoken(
             exchange_details[FixedRateExchangeDetails.DATATOKEN]
         )
@@ -652,17 +642,19 @@ class OceanConnection(BaseSyncConnection):
         datatoken.approve(
             fixed_price_address,
             self.ocean.to_wei(envelope.message.datatoken_amt),
-            self.wallet,
+            {"from": self.wallet},
         )
-        OCEAN_token.approve(fixed_price_address, self.ocean.to_wei(100), self.wallet)
+        OCEAN_token.approve(
+            fixed_price_address, self.ocean.to_wei(100), {"from": self.wallet}
+        )
 
-        self.ocean.fixed_rate_exchange.buy_dt(
-            exchange_id=exchange_id,
-            datatoken_amount=self.ocean.to_wei(envelope.message.datatoken_amt),
-            max_base_token_amount=self.ocean.to_wei(envelope.message.max_cost_ocean),
-            consume_market_swap_fee_address=ZERO_ADDRESS,
-            consume_market_swap_fee_amount=self.ocean.to_wei("0.01"),
-            from_wallet=self.wallet,
+        self.ocean.fixed_rate_exchange.buyDT(
+            exchange_id,
+            self.ocean.to_wei(envelope.message.datatoken_amt),
+            self.ocean.to_wei(envelope.message.max_cost_ocean),
+            ZERO_ADDRESS,
+            self.ocean.to_wei("0.01"),
+            {"from": self.wallet},
         )
 
     def on_connect(self) -> None:
@@ -671,37 +663,27 @@ class OceanConnection(BaseSyncConnection):
 
         Connection status set automatically.
         """
-        os.environ["OCEAN_NETWORK_URL"] = self.configuration.config.get(
-            "ocean_network_url"
-        )
-        self.ocean_config = ExampleConfig.get_config()
+        network_name = os.environ["OCEAN_NETWORK_NAME"]
+        connect_to_network(network_name)
+        self.ocean_config = ExampleConfig.get_config(network_name)
         self.ocean = Ocean(self.ocean_config)
 
+        accounts.clear()
         with open(self.configuration.config.get("key_path"), "r") as f:
             key = f.read()
-        acct = Account.from_key(key)
+        wallet = accounts.add(key)
 
-        # Create wallet
-        self.wallet = Wallet(
-            self.ocean.web3,
-            acct.privateKey.hex(),
-            self.ocean_config.block_confirmations,
-            self.ocean_config.transaction_timeout,
+        self.logger.info(
+            f"connected to Ocean with config.network_name = '{self.ocean_config['NETWORK_NAME']}'"
         )
 
         self.logger.info(
-            f"connected to Ocean with config.network_url = '{self.ocean_config.network_url}'"
+            f"connected to Ocean with config.metadata_cache_uri = '{self.ocean_config['METADATA_CACHE_URI']}'"
         )
         self.logger.info(
-            f"connected to Ocean with config.block_confirmations = {self.ocean_config.block_confirmations.value}"
+            f"connected to Ocean with config.provider_url = '{self.ocean_config['PROVIDER_URL']}'"
         )
-        self.logger.info(
-            f"connected to Ocean with config.metadata_cache_uri = '{self.ocean_config.metadata_cache_uri}'"
-        )
-        self.logger.info(
-            f"connected to Ocean with config.provider_url = '{self.ocean_config.provider_url}'"
-        )
-        self.logger.info(f"Address used: {acct.address}")
+        self.logger.info(f"Address used: {wallet.address}")
 
     def on_disconnect(self) -> None:
         """
