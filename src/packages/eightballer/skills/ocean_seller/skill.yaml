@@ -14,13 +14,13 @@ fingerprint:
   strategy.py: QmcvofxYAJusNJQqRZakmNPbGNCvKQBFH9WxEkLNZUBwPV
 fingerprint_ignore_patterns: []
 connections:
-- fetchai/ledger:0.21.2
+- fetchai/ledger:0.21.1
 contracts: []
 protocols:
-- fetchai/default:1.1.3
-- fetchai/fipa:1.1.3
-- fetchai/ledger_api:1.1.3
-- fetchai/oef_search:1.1.3
+- fetchai/default:1.1.2
+- fetchai/fipa:1.1.2
+- fetchai/ledger_api:1.1.2
+- fetchai/oef_search:1.1.2
 skills: []
 behaviours:
   ocean_behaviour:
