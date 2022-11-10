@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-aea = "==1.2.3"
+aea = "==1.2.2"
 aea-ledger-ethereum = "<2.0.0, >=1.0.0"
 aea-ledger-fetchai = "<2.0.0, >=1.0.0"
 ocean-lib = "==2.0.0a1"
