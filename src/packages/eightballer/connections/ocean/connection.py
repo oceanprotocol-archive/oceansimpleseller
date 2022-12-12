@@ -24,6 +24,7 @@ import os
 import ocean_lib.exceptions
 from datetime import datetime, timedelta
 from typing import Any
+from brownie.network import accounts, chain, priority_fee
 
 from aea.configurations.base import PublicId
 from aea.connections.base import BaseSyncConnection
@@ -32,7 +33,7 @@ from packages.eightballer.protocols.ocean.message import OceanMessage
 from packages.eightballer.connections.ocean.utils import convert_to_bytes_format
 from brownie.network import accounts
 from ocean_lib.data_provider.data_service_provider import DataServiceProvider
-from ocean_lib.example_config import ExampleConfig
+from ocean_lib.example_config import get_config_dict
 from ocean_lib.models.compute_input import ComputeInput
 from ocean_lib.models.data_nft_factory import DataNFTFactoryContract
 from ocean_lib.models.fixed_rate_exchange import FixedRateExchangeDetails
@@ -121,20 +122,20 @@ class OceanConnection(BaseSyncConnection):
         if envelope.message.performative == OceanMessage.Performative.DEPLOY_ALGORITHM:
             self._deploy_algorithm(envelope)
         if (
-            envelope.message.performative
-            == OceanMessage.Performative.PERMISSION_DATASET
+                envelope.message.performative
+                == OceanMessage.Performative.PERMISSION_DATASET
         ):
             self._permission_dataset(envelope)
         if envelope.message.performative == OceanMessage.Performative.D2C_JOB:
             self._create_d2c_job(envelope)
         if (
-            envelope.message.performative
-            == OceanMessage.Performative.DEPLOY_DATA_DOWNLOAD
+                envelope.message.performative
+                == OceanMessage.Performative.DEPLOY_DATA_DOWNLOAD
         ):
             self._deploy_data_to_download(envelope)
         if (
-            envelope.message.performative
-            == OceanMessage.Performative.CREATE_FIXED_RATE_EXCHANGE
+                envelope.message.performative
+                == OceanMessage.Performative.CREATE_FIXED_RATE_EXCHANGE
         ):
             self._create_fixed_rate(envelope)
         if envelope.message.performative == OceanMessage.Performative.DOWNLOAD_JOB:
@@ -295,7 +296,7 @@ class OceanConnection(BaseSyncConnection):
         self.logger.info(f"got job status: {status}")
 
         assert (
-            status and status["ok"]
+                status and status["ok"]
         ), f"something not right about the compute job, got status: {status}"
 
         self.logger.info(f"Started compute job with id: {job_id}")
@@ -544,7 +545,7 @@ class OceanConnection(BaseSyncConnection):
         self.put_envelope(deployment_envelope)
 
     def _ensure_asset_cached_in_aquarius(
-        self, did: str, timeout: float = 600, poll_latency: float = 1
+            self, did: str, timeout: float = 600, poll_latency: float = 1
     ):
         """
         Ensure asset is cached in Aquarius
@@ -577,7 +578,6 @@ class OceanConnection(BaseSyncConnection):
         erc20_token = erc721_nft.create_datatoken(
             name=envelope.message.datatoken_name,  # name for ERC20 token
             symbol=envelope.message.datatoken_name,  # symbol for ERC20 token
-            from_wallet=self.wallet,
             template_index=1,  # default value
             minter=self.wallet.address,  # minter address
             fee_manager=self.wallet.address,  # fee manager for this ERC20 token
@@ -585,6 +585,7 @@ class OceanConnection(BaseSyncConnection):
             publish_market_order_fee_token=ZERO_ADDRESS,  # publishing Market Fee Token
             publish_market_order_fee_amount=0,
             bytess=[b""],
+            transaction_parameters={"from": self.wallet}
         )
 
         self.logger.info(f"created the data token.")
@@ -665,13 +666,15 @@ class OceanConnection(BaseSyncConnection):
         """
         network_name = os.environ["OCEAN_NETWORK_NAME"]
         connect_to_network(network_name)
-        self.ocean_config = ExampleConfig.get_config(network_name)
+        if network_name != 'development':
+            priority_fee(chain.priority_fee)
+        self.ocean_config = get_config_dict(network_name)
         self.ocean = Ocean(self.ocean_config)
 
         accounts.clear()
         with open(self.configuration.config.get("key_path"), "r") as f:
             key = f.read()
-        wallet = accounts.add(key)
+        self.wallet = accounts.add(key)
 
         self.logger.info(
             f"connected to Ocean with config.network_name = '{self.ocean_config['NETWORK_NAME']}'"
@@ -683,7 +686,7 @@ class OceanConnection(BaseSyncConnection):
         self.logger.info(
             f"connected to Ocean with config.provider_url = '{self.ocean_config['PROVIDER_URL']}'"
         )
-        self.logger.info(f"Address used: {wallet.address}")
+        self.logger.info(f"Address used: {self.wallet.address}")
 
     def on_disconnect(self) -> None:
         """

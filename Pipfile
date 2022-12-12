@@ -5,9 +5,9 @@ name = "pypi"
 
 [packages]
 aea = "==1.2.4"
-aea-ledger-ethereum = "==1.1.0"
+aea-ledger-ethereum = "==1.1.1"
 aea-ledger-fetchai = "==1.2.4"
-ocean-lib = "==2.0.0a3"
+ocean-lib = "==2.0.0a4"
 boto3 = "*"
 pipfile = "*"
 
