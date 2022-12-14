@@ -35,8 +35,9 @@ from brownie.network import accounts
 from ocean_lib.data_provider.data_service_provider import DataServiceProvider
 from ocean_lib.example_config import get_config_dict
 from ocean_lib.models.compute_input import ComputeInput
-from ocean_lib.models.data_nft_factory import DataNFTFactoryContract
-from ocean_lib.models.fixed_rate_exchange import FixedRateExchangeDetails
+from ocean_lib.models.arguments import DataNFTArguments
+from ocean_lib.models.arguments import DatatokenArguments
+from ocean_lib.models.fixed_rate_exchange import ExchangeDetails
 from ocean_lib.ocean.ocean import Ocean
 from ocean_lib.services.service import Service
 from ocean_lib.structures.file_objects import UrlFile
@@ -122,20 +123,20 @@ class OceanConnection(BaseSyncConnection):
         if envelope.message.performative == OceanMessage.Performative.DEPLOY_ALGORITHM:
             self._deploy_algorithm(envelope)
         if (
-                envelope.message.performative
-                == OceanMessage.Performative.PERMISSION_DATASET
+            envelope.message.performative
+            == OceanMessage.Performative.PERMISSION_DATASET
         ):
             self._permission_dataset(envelope)
         if envelope.message.performative == OceanMessage.Performative.D2C_JOB:
             self._create_d2c_job(envelope)
         if (
-                envelope.message.performative
-                == OceanMessage.Performative.DEPLOY_DATA_DOWNLOAD
+            envelope.message.performative
+            == OceanMessage.Performative.DEPLOY_DATA_DOWNLOAD
         ):
             self._deploy_data_to_download(envelope)
         if (
-                envelope.message.performative
-                == OceanMessage.Performative.CREATE_FIXED_RATE_EXCHANGE
+            envelope.message.performative
+            == OceanMessage.Performative.CREATE_FIXED_RATE_EXCHANGE
         ):
             self._create_fixed_rate(envelope)
         if envelope.message.performative == OceanMessage.Performative.DOWNLOAD_JOB:
@@ -296,7 +297,7 @@ class OceanConnection(BaseSyncConnection):
         self.logger.info(f"got job status: {status}")
 
         assert (
-                status and status["ok"]
+            status and status["ok"]
         ), f"something not right about the compute job, got status: {status}"
 
         self.logger.info(f"Started compute job with id: {job_id}")
@@ -434,7 +435,7 @@ class OceanConnection(BaseSyncConnection):
 
         param envelope: the envelope to send.
         """
-        erc721_nft, erc20_token = self._deploy_datatoken(envelope)
+        data_nft, datatoken = self._deploy_datatoken(envelope)
 
         DATA_metadata = {
             "created": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -460,21 +461,21 @@ class OceanConnection(BaseSyncConnection):
         DATA_compute_service = Service(
             service_id="2",
             service_type="compute",
-            service_endpoint=self.ocean.config["PROVIDER_URL"],
-            datatoken=erc20_token.address,
+            service_endpoint=self.ocean_config["PROVIDER_URL"],
+            datatoken=datatoken.address,
             files=[DATA_url_file],
             timeout=3600,
             compute_values=DATA_compute_values,
         )
 
         # Publish asset with compute service on-chain.
-        DATA_asset = self.ocean.assets.create(
+        _, _, DATA_asset = self.ocean.assets.create(
             metadata=DATA_metadata,
             publisher_wallet=self.wallet,
-            files=[DATA_url_file],
             services=[DATA_compute_service],
-            data_nft_address=erc721_nft.address,
-            deployed_datatokens=[erc20_token],
+            data_nft_address=data_nft.address,
+            deployed_datatokens=[datatoken],
+            datatoken_args=[DatatokenArguments(files=[DATA_url_file])],
         )
         self.logger.info(f"DATA did = '{DATA_asset.did}'")
 
@@ -482,7 +483,7 @@ class OceanConnection(BaseSyncConnection):
             performative=OceanMessage.Performative.DEPLOYMENT_RECIEPT,
             type="d2c",
             did=DATA_asset.did,
-            datatoken_contract_address=erc20_token.address,
+            datatoken_contract_address=datatoken.address,
         )
         msg.sender = envelope.to
         msg.to = envelope.sender
@@ -523,12 +524,12 @@ class OceanConnection(BaseSyncConnection):
 
         # Publish asset with compute service on-chain.
         # The download (access service) is automatically created, but you can explore other options as well
-        ALGO_asset = self.ocean.assets.create(
+        _, _, ALGO_asset = self.ocean.assets.create(
             metadata=ALGO_metadata,
             publisher_wallet=self.wallet,
-            files=[ALGO_url_file],
             data_nft_address=ALGO_nft_token.address,
             deployed_datatokens=[ALGO_datatoken],
+            datatoken_args=[DatatokenArguments(files=[ALGO_url_file])],
         )
 
         self.logger.info(f"ALG did = '{ALGO_asset.did}'")
@@ -545,7 +546,7 @@ class OceanConnection(BaseSyncConnection):
         self.put_envelope(deployment_envelope)
 
     def _ensure_asset_cached_in_aquarius(
-            self, did: str, timeout: float = 600, poll_latency: float = 1
+        self, did: str, timeout: float = 600, poll_latency: float = 1
     ):
         """
         Ensure asset is cached in Aquarius
@@ -568,32 +569,33 @@ class OceanConnection(BaseSyncConnection):
         self.logger.info(f"interacting with ocean to deploy data token ...")
 
         self.logger.info("Create ERC721 data NFT: begin.")
-
-        erc721_nft = self.ocean.create_data_nft(
-            name=envelope.message.data_nft_name,
-            symbol=envelope.message.datatoken_name,
-            from_wallet=self.wallet,
+        data_nft = self.ocean.data_nft_factory.create(
+            DataNFTArguments(
+                name=envelope.message.data_nft_name,
+                symbol=envelope.message.datatoken_name,
+            ),
+            self.wallet,
         )
 
-        erc20_token = erc721_nft.create_datatoken(
-            name=envelope.message.datatoken_name,  # name for ERC20 token
-            symbol=envelope.message.datatoken_name,  # symbol for ERC20 token
-            template_index=1,  # default value
-            minter=self.wallet.address,  # minter address
-            fee_manager=self.wallet.address,  # fee manager for this ERC20 token
-            publish_market_order_fee_address=self.wallet.address,  # publishing Market Address
-            publish_market_order_fee_token=ZERO_ADDRESS,  # publishing Market Fee Token
-            publish_market_order_fee_amount=0,
-            bytess=[b""],
-            transaction_parameters={"from": self.wallet}
+        datatoken = data_nft.create_datatoken(
+            DatatokenArguments(
+                name=envelope.message.datatoken_name,
+                symbol=envelope.message.datatoken_name,
+                template_index=1,
+                minter=self.wallet.address,
+                fee_manager=self.wallet.address,
+                publish_market_order_fee_address=self.wallet.address,
+                publish_market_order_fee_token=ZERO_ADDRESS,
+                publish_market_order_fee_amount=0,
+                bytess=[b""],
+            ),
+            self.wallet,
         )
 
         self.logger.info(f"created the data token.")
 
-        self.logger.info(
-            f"DATA_datatoken.address = '{erc20_token.address}'\n publishing"
-        )
-        return erc721_nft, erc20_token
+        self.logger.info(f"DATA_datatoken.address = '{datatoken.address}'\n publishing")
+        return data_nft, datatoken
 
     def _create_fixed_rate_helper(self, envelope: Envelope) -> bytes:
         """
@@ -608,22 +610,19 @@ class OceanConnection(BaseSyncConnection):
             self.ocean.to_wei(envelope.message.ocean_amt),
             {"from": self.wallet},
         )
-        receipt = datatoken.create_fixed_rate(
-            fixed_price_address=self.ocean.fixed_rate_exchange.address,
-            base_token_address=self.ocean.OCEAN_address,
-            owner=self.wallet.address,
+        exchange, tx = datatoken.create_exchange(
+            rate=self.ocean.to_wei(envelope.message.rate),
+            base_token_addr=self.ocean.OCEAN_address,
+            owner_addr=self.wallet.address,
             publish_market_swap_fee_collector=ZERO_ADDRESS,
+            publish_market_fee=self.ocean.to_wei("0.01"),
+            with_mint=True,
             allowed_swapper=ZERO_ADDRESS,
-            base_token_decimals=self.ocean.OCEAN_token.decimals(),
-            datatoken_decimals=datatoken.decimals(),
-            fixed_rate=self.ocean.to_wei(envelope.message.rate),
-            publish_market_swap_fee_amount=self.ocean.to_wei("0.01"),
-            with_mint=1,
-            transaction_parameters={"from": self.wallet},
+            full_info=True,
+            tx_dict={"from": self.wallet},
         )
-        exchange_id = receipt.events["NewFixedRate"]["exchangeId"]
 
-        return exchange_id
+        return exchange.exchange_id
 
     def _buy_dt_from_fre(self, envelope: Envelope):
         """
@@ -636,7 +635,7 @@ class OceanConnection(BaseSyncConnection):
 
         exchange_details = self.ocean.fixed_rate_exchange.getExchange(exchange_id)
         datatoken = self.ocean.get_datatoken(
-            exchange_details[FixedRateExchangeDetails.DATATOKEN]
+            exchange_details[ExchangeDetails.datatoken]
         )
         OCEAN_token = self.ocean.OCEAN_token
 
@@ -648,7 +647,7 @@ class OceanConnection(BaseSyncConnection):
         OCEAN_token.approve(
             fixed_price_address, self.ocean.to_wei(100), {"from": self.wallet}
         )
-
+        # tx = exchange.buy_DT(datatoken_amt=to_wei(2), tx_dict={"from": bob})
         self.ocean.fixed_rate_exchange.buyDT(
             exchange_id,
             self.ocean.to_wei(envelope.message.datatoken_amt),
@@ -666,8 +665,9 @@ class OceanConnection(BaseSyncConnection):
         """
         network_name = os.environ["OCEAN_NETWORK_NAME"]
         connect_to_network(network_name)
-        if network_name != 'development':
+        if network_name != "development":
             priority_fee(chain.priority_fee)
+
         self.ocean_config = get_config_dict(network_name)
         self.ocean = Ocean(self.ocean_config)
 

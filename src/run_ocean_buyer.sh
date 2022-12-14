@@ -65,7 +65,7 @@ aea add skill eightballer/ocean_buyer:0.1.0
 aea config set vendor.fetchai.connections.ledger.config.ledger_apis.fetchai.address $FETCH_URL
 aea config set vendor.fetchai.connections.ledger.config.ledger_apis.fetchai.denom $FETCH_DENOM
 aea config set vendor.fetchai.connections.ledger.config.ledger_apis.fetchai.chain_id $FETCH_CHAIN_ID
-aea config set vendor.eightballer.connections.ocean.config.ocean_network_url  $RPC_URL
+aea config set vendor.eightballer.connections.ocean.config.ocean_network_name  $OCEAN_NETWORK_NAME
 aea config set vendor.fetchai.connections.ledger.config.ledger_apis.ethereum.address $RPC_URL
 aea config set vendor.eightballer.connections.ocean.config.key_path ethereum_private_key.txt
 

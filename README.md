@@ -48,6 +48,7 @@ export STORJ_ACCESS_KEY="j2wulv3drlgrt5apjr2csc5lmkzyqpqakgzuoc63fn6wedxmnu2ng"
 export STORJ_ACCESS_KEY_ID="jx7bgg74ceog3eznrovaiqcy23sa"
 export TARGET_SKILL="eightballer/storj_file_transfer:0.1.0"
 
+export RPC_URL="http://127.0.0.1:8545" 
 export OCEAN_NETWORK_NAME="development" 
 #export WEB3_INFURA_PROJECT_ID=<your_infura_key> For goerli, use "goerli"
 

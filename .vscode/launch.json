@@ -24,7 +24,7 @@
         "TARGET_SKILL": "eightballer/storj_file_transfer:0.1.0",
         "RPC_URL": "http://127.0.0.1:8545",
         "ADDRESS_FILE": "~/.ocean/ocean-contracts/artifacts/address.json",
-        "OCEAN_NETWORK_URL": "http://127.0.0.1:8545"
+        "OCEAN_NETWORK_NAME": "development"
       }
     },
     {
