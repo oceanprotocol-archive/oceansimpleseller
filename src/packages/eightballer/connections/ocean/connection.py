@@ -496,7 +496,7 @@ class OceanConnection(BaseSyncConnection):
 
         param envelope: the envelope to send.
         """
-        ALGO_nft_token, ALGO_datatoken = self._deploy_datatoken(envelope)
+        ALGO_data_nft, ALGO_datatoken = self._deploy_datatoken(envelope)
 
         ALGO_date_created = envelope.message.date_created
         ALGO_metadata = {
@@ -522,17 +522,27 @@ class OceanConnection(BaseSyncConnection):
 
         ALGO_url_file = UrlFile(url=envelope.message.files_url)
 
+        ALGO_service = Service(
+            service_id="0",
+            service_type="access",
+            service_endpoint=self.ocean_config["PROVIDER_URL"],
+            datatoken=ALGO_datatoken.address,
+            files=[ALGO_url_file],
+            timeout=0,
+        )
+
         # Publish asset with compute service on-chain.
         # The download (access service) is automatically created, but you can explore other options as well
         _, _, ALGO_asset = self.ocean.assets.create(
             metadata=ALGO_metadata,
             publisher_wallet=self.wallet,
-            data_nft_address=ALGO_nft_token.address,
+            services=[ALGO_service],
+            data_nft_address=ALGO_data_nft.address,
             deployed_datatokens=[ALGO_datatoken],
             datatoken_args=[DatatokenArguments(files=[ALGO_url_file])],
         )
 
-        self.logger.info(f"ALG did = '{ALGO_asset.did}'")
+        self.logger.info(f"ALGO did = '{ALGO_asset.did}'")
 
         msg = OceanMessage(
             performative=OceanMessage.Performative.DEPLOYMENT_RECIEPT,
