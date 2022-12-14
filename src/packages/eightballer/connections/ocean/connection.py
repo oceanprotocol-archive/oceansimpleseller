@@ -625,7 +625,7 @@ class OceanConnection(BaseSyncConnection):
             rate=Web3.toWei(envelope.message.rate, "ether"),
             base_token_addr=self.ocean.OCEAN_address,
             owner_addr=self.wallet.address,
-            publish_market_swap_fee_collector=ZERO_ADDRESS,
+            publish_market_fee_collector=ZERO_ADDRESS,
             publish_market_fee=Web3.toWei("0.01", "ether"),
             with_mint=True,
             allowed_swapper=ZERO_ADDRESS,
