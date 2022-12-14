@@ -44,6 +44,7 @@ from ocean_lib.structures.file_objects import UrlFile
 from ocean_lib.web3_internal.constants import ZERO_ADDRESS
 from ocean_lib.web3_internal.utils import connect_to_network
 from web3._utils.threads import Timeout
+from web3.main import Web3
 
 """
 Choose one of the possible implementations:
@@ -617,15 +618,15 @@ class OceanConnection(BaseSyncConnection):
 
         self.ocean.OCEAN_token.approve(
             self.ocean.fixed_rate_exchange.address,
-            self.ocean.to_wei(envelope.message.ocean_amt),
+            Web3.toWei(envelope.message.ocean_amt, "ether"),
             {"from": self.wallet},
         )
         exchange, tx = datatoken.create_exchange(
-            rate=self.ocean.to_wei(envelope.message.rate),
+            rate=Web3.toWei(envelope.message.rate, "ether"),
             base_token_addr=self.ocean.OCEAN_address,
             owner_addr=self.wallet.address,
             publish_market_swap_fee_collector=ZERO_ADDRESS,
-            publish_market_fee=self.ocean.to_wei("0.01"),
+            publish_market_fee=Web3.toWei("0.01", "ether"),
             with_mint=True,
             allowed_swapper=ZERO_ADDRESS,
             full_info=True,
@@ -640,31 +641,30 @@ class OceanConnection(BaseSyncConnection):
 
         param envelope: the envelope to send.
         """
-        fixed_price_address = self.ocean.fixed_rate_exchange.address
         exchange_id = convert_to_bytes_format(envelope.message.exchange_id)
 
         exchange_details = self.ocean.fixed_rate_exchange.getExchange(exchange_id)
         datatoken = self.ocean.get_datatoken(
             exchange_details[ExchangeDetails.datatoken]
         )
+        exchange = list(
+            filter(lambda e: e.exchnage_id == exchange_id, datatoken.get_exchanges())
+        )[0]
         OCEAN_token = self.ocean.OCEAN_token
 
         datatoken.approve(
-            fixed_price_address,
-            self.ocean.to_wei(envelope.message.datatoken_amt),
+            exchange.address,
+            Web3.toWei(envelope.message.datatoken_amt, "ether"),
             {"from": self.wallet},
         )
         OCEAN_token.approve(
-            fixed_price_address, self.ocean.to_wei(100), {"from": self.wallet}
+            exchange.address, Web3.toWei(100, "ether"), {"from": self.wallet}
         )
-        # tx = exchange.buy_DT(datatoken_amt=to_wei(2), tx_dict={"from": bob})
-        self.ocean.fixed_rate_exchange.buyDT(
-            exchange_id,
-            self.ocean.to_wei(envelope.message.datatoken_amt),
-            self.ocean.to_wei(envelope.message.max_cost_ocean),
-            ZERO_ADDRESS,
-            self.ocean.to_wei("0.01"),
-            {"from": self.wallet},
+        exchange.buy_DT(
+            datatoken_amt=Web3.toWei(envelope.message.datatoken_amt, "ether"),
+            tx_dict={"from": self.wallet},
+            max_basetoken_amt=Web3.toWei(envelope.message.max_cost_ocean, "ether"),
+            consume_market_fee=Web3.toWei("0.01", "ether"),
         )
 
     def on_connect(self) -> None:
