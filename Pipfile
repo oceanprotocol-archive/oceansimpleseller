@@ -7,7 +7,7 @@ name = "pypi"
 aea = "==1.2.4"
 aea-ledger-ethereum = "==1.1.1"
 aea-ledger-fetchai = "==1.2.4"
-ocean-lib = "==2.0.0a4"
+ocean-lib = "==2.0.0a6"
 boto3 = "*"
 pipfile = "*"
 
