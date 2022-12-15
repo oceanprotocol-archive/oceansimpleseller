@@ -547,7 +547,7 @@ def test_purchase_datatoken(put_envelope):
 
     ocean2.on_connect()
 
-    datatoken = Datatoken(ocean2.ocean.web3, datatoken_address)
+    datatoken = ocean2.ocean.get_datatoken(datatoken_address)
     OCEAN_token = ocean2.ocean.OCEAN_token
     assert OCEAN_token.balanceOf(seller_wallet.address) > 0
     if OCEAN_token.balanceOf(buyer_wallet.address) == 0:
