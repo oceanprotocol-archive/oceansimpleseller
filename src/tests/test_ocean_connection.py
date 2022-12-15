@@ -10,10 +10,11 @@ from aea.configurations.base import ConnectionConfig
 from packages.eightballer.connections.ocean.connection import OceanConnection
 from packages.eightballer.protocols.ocean.message import OceanMessage
 from mock import patch, Mock
-from ocean_lib.models.datatoken import Datatoken
+from web3.main import Web3
+from brownie.network import accounts
 
+from src.distribute_ocean_tokens import distribute_ocean_tokens
 from src.packages.eightballer.connections.ocean.utils import convert_to_bytes_format
-from src.tests.utils import _seller_wallet, _buyer_wallet
 
 
 @patch.object(OceanConnection, "put_envelope")
@@ -542,21 +543,29 @@ def test_purchase_datatoken(put_envelope):
         assert envelope.message.performative == OceanMessage.Performative.DOWNLOAD_JOB
 
     put_envelope.side_effect = side_effect
-    seller_wallet = _seller_wallet()
-    buyer_wallet = _buyer_wallet()
 
     ocean2.on_connect()
 
     datatoken = ocean2.ocean.get_datatoken(datatoken_address)
     OCEAN_token = ocean2.ocean.OCEAN_token
+
+    seller_wallet = accounts.add(os.environ["SELLER_AEA_KEY_ETHEREUM"])
+    buyer_wallet = accounts.add(os.environ["BUYER_AEA_KEY_ETHEREUM"])
+    amount = Web3.toWei(100, "ether")
+    ocean_deployer_wallet = accounts.add(os.getenv("FACTORY_DEPLOYER_PRIVATE_KEY"))
+    recipients = [seller_wallet.address, buyer_wallet.address]
+    if (
+        OCEAN_token.balanceOf(seller_wallet.address) == 0
+        and OCEAN_token.balanceOf(buyer_wallet.address) == 0
+    ):
+        distribute_ocean_tokens(ocean.ocean, amount, recipients, ocean_deployer_wallet)
+
     assert OCEAN_token.balanceOf(seller_wallet.address) > 0
-    if OCEAN_token.balanceOf(buyer_wallet.address) == 0:
-        OCEAN_token.transfer(
-            buyer_wallet.address, ocean2.ocean.to_wei(50), seller_wallet
-        )
     assert OCEAN_token.balanceOf(buyer_wallet.address) > 0
 
-    datatoken.mint(buyer_wallet.address, ocean2.ocean.to_wei(50), seller_wallet)
+    datatoken.mint(
+        buyer_wallet.address, Web3.toWei(50, "ether"), {"from": seller_wallet}
+    )
     assert datatoken.balanceOf(buyer_wallet.address) > 0
 
     envelope = Envelope(to="test", sender="msg.sender", message=ocean_message)
