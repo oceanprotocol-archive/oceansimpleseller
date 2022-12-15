@@ -553,12 +553,15 @@ def test_purchase_datatoken(put_envelope):
     buyer_wallet = accounts.add(os.environ["BUYER_AEA_KEY_ETHEREUM"])
     amount = Web3.toWei(100, "ether")
     ocean_deployer_wallet = accounts.add(os.getenv("FACTORY_DEPLOYER_PRIVATE_KEY"))
-    recipients = [seller_wallet.address, buyer_wallet.address]
+    if OCEAN_token.balanceOf(seller_wallet.address) == 0:
+        distribute_ocean_tokens(
+            ocean.ocean, amount, [seller_wallet.address], ocean_deployer_wallet
+        )
     if (
-        OCEAN_token.balanceOf(seller_wallet.address) == 0
-        and OCEAN_token.balanceOf(buyer_wallet.address) == 0
+        OCEAN_token.balanceOf(buyer_wallet.address) == 0
+        and OCEAN_token.balanceOf(seller_wallet.address) > 0
     ):
-        distribute_ocean_tokens(ocean.ocean, amount, recipients, ocean_deployer_wallet)
+        OCEAN_token.mint(buyer_wallet.address, amount, {"from": seller_wallet})
 
     assert OCEAN_token.balanceOf(seller_wallet.address) > 0
     assert OCEAN_token.balanceOf(buyer_wallet.address) > 0
