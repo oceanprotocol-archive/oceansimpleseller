@@ -7,6 +7,7 @@ from ocean_lib.example_config import get_config_dict
 from ocean_lib.models.datatoken import Datatoken
 from ocean_lib.ocean.ocean import Ocean
 from ocean_lib.ocean.util import get_ocean_token_address
+from ocean_lib.web3_internal.utils import connect_to_network
 
 
 def distribute_ocean_tokens(
@@ -28,6 +29,8 @@ def distribute_ocean_tokens(
 
 
 if __name__ == "__main__":
+    connect_to_network("development")
+
     config = get_config_dict("development")
     ocean = Ocean(config)
     amount = ocean.web3.toWei(10000, "ether")
