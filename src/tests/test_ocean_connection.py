@@ -561,8 +561,9 @@ def test_purchase_datatoken(put_envelope):
         OCEAN_token.balanceOf(buyer_wallet.address) == 0
         and OCEAN_token.balanceOf(seller_wallet.address) > 0
     ):
-        OCEAN_token.approve(buyer_wallet.address, amount, {"from": seller_wallet})
-        OCEAN_token.mint(buyer_wallet.address, amount, {"from": seller_wallet})
+        distribute_ocean_tokens(
+            ocean.ocean, amount, [buyer_wallet.address], ocean_deployer_wallet
+        )
 
     assert OCEAN_token.balanceOf(seller_wallet.address) > 0
     assert OCEAN_token.balanceOf(buyer_wallet.address) > 0
