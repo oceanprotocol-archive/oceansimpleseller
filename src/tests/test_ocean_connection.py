@@ -561,8 +561,8 @@ def test_purchase_datatoken(put_envelope):
         OCEAN_token.balanceOf(buyer_wallet.address) == 0
         and OCEAN_token.balanceOf(seller_wallet.address) > 0
     ):
-        distribute_ocean_tokens(
-            ocean.ocean, amount, [buyer_wallet.address], ocean_deployer_wallet
+        OCEAN_token.transfer(
+            buyer_wallet.address, Web3.toWei(50, "ether"), {"from": seller_wallet}
         )
 
     assert OCEAN_token.balanceOf(seller_wallet.address) > 0
