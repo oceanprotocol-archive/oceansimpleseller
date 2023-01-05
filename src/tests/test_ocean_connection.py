@@ -580,7 +580,7 @@ def test_purchase_datatoken(put_envelope):
 
 def test_convert_to_bytes_format():
     """Tests convert_to_bytes_format function."""
-    data = "0x//&652898"
+    data = "0x026c072ecb088ee833e8e98776fe31e2779888852c7619ed9aa8ca4942e9608a"
     assert isinstance(data, str)
     new_data = convert_to_bytes_format(Web3, data=data)
     assert isinstance(new_data, bytes)
