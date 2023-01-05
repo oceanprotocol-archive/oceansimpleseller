@@ -35,9 +35,9 @@ from brownie.network import accounts
 from ocean_lib.data_provider.data_service_provider import DataServiceProvider
 from ocean_lib.example_config import get_config_dict
 from ocean_lib.models.compute_input import ComputeInput
-from ocean_lib.models.arguments import DataNFTArguments
-from ocean_lib.models.arguments import DatatokenArguments
-from ocean_lib.models.fixed_rate_exchange import ExchangeDetails
+from ocean_lib.models.data_nft import DataNFTArguments
+from ocean_lib.models.datatoken import DatatokenArguments, TokenFeeInfo
+from ocean_lib.models.fixed_rate_exchange import OneExchange
 from ocean_lib.ocean.ocean import Ocean
 from ocean_lib.services.service import Service
 from ocean_lib.structures.file_objects import UrlFile
@@ -199,7 +199,7 @@ class OceanConnection(BaseSyncConnection):
             consume_market_order_fee_address=self.wallet.address,
             consume_market_order_fee_token=service.datatoken.address,
             consume_market_order_fee_amount=0,
-            wallet=self.wallet,
+            tx_dict={"from": self.wallet},
         )
         self.logger.info(f"order_tx_id = '{order_tx_id}'")
 
@@ -274,7 +274,7 @@ class OceanConnection(BaseSyncConnection):
             datasets=[DATA_compute_input],
             algorithm_data=ALGO_compute_input,
             consume_market_order_fee_address=self.wallet.address,
-            wallet=self.wallet,
+            tx_dict={"from": self.wallet},
             compute_environment=free_c2d_env["id"],
             valid_until=int((datetime.utcnow() + timedelta(days=1)).timestamp()),
             consumer_address=free_c2d_env["consumerAddress"],
@@ -329,7 +329,7 @@ class OceanConnection(BaseSyncConnection):
                 )
                 function_result.append(result)
 
-        assert len(function_result) > 0, f"empty results"
+        assert len(function_result) > 0, "empty results"
         model = [pickle.loads(res) for res in function_result]
         assert len(model) > 0, "unpickle result unsuccessful"
 
@@ -359,7 +359,7 @@ class OceanConnection(BaseSyncConnection):
         compute_service = data_ddo.services[0]
         compute_service.add_publisher_trusted_algorithm(algo_ddo)
 
-        data_ddo = self.ocean.assets.update(data_ddo, self.wallet)
+        data_ddo = self.ocean.assets.update(data_ddo, {"from": self.wallet})
 
         msg = OceanMessage(
             performative=OceanMessage.Performative.DEPLOYMENT_RECIEPT,
@@ -472,7 +472,7 @@ class OceanConnection(BaseSyncConnection):
         # Publish asset with compute service on-chain.
         _, _, DATA_asset = self.ocean.assets.create(
             metadata=DATA_metadata,
-            publisher_wallet=self.wallet,
+            tx_dict={"from": self.wallet},
             services=[DATA_compute_service],
             data_nft_address=data_nft.address,
             deployed_datatokens=[datatoken],
@@ -536,7 +536,7 @@ class OceanConnection(BaseSyncConnection):
         # The download (access service) is automatically created, but you can explore other options as well
         _, _, ALGO_asset = self.ocean.assets.create(
             metadata=ALGO_metadata,
-            publisher_wallet=self.wallet,
+            tx_dict={"from": self.wallet},
             services=[ALGO_service],
             data_nft_address=ALGO_data_nft.address,
             deployed_datatokens=[ALGO_datatoken],
@@ -584,10 +584,13 @@ class OceanConnection(BaseSyncConnection):
             DataNFTArguments(
                 name=envelope.message.data_nft_name,
                 symbol=envelope.message.datatoken_name,
+                transferable=False,
             ),
-            self.wallet,
+            {"from": self.wallet},
         )
-
+        publish_market_order_fees = TokenFeeInfo(
+            address=self.wallet.address, token=ZERO_ADDRESS, amount=0
+        )
         datatoken = data_nft.create_datatoken(
             DatatokenArguments(
                 name=envelope.message.datatoken_name,
@@ -595,12 +598,10 @@ class OceanConnection(BaseSyncConnection):
                 template_index=1,
                 minter=self.wallet.address,
                 fee_manager=self.wallet.address,
-                publish_market_order_fee_address=self.wallet.address,
-                publish_market_order_fee_token=ZERO_ADDRESS,
-                publish_market_order_fee_amount=0,
+                publish_market_order_fees=publish_market_order_fees,
                 bytess=[b""],
             ),
-            self.wallet,
+            {"from": self.wallet},
         )
 
         self.logger.info(f"created the data token.")
@@ -641,15 +642,10 @@ class OceanConnection(BaseSyncConnection):
 
         param envelope: the envelope to send.
         """
-        exchange_id = convert_to_bytes_format(envelope.message.exchange_id)
-
+        exchange_id = convert_to_bytes_format(Web3, envelope.message.exchange_id)
         exchange_details = self.ocean.fixed_rate_exchange.getExchange(exchange_id)
-        datatoken = self.ocean.get_datatoken(
-            exchange_details[ExchangeDetails.datatoken]
-        )
-        exchange = list(
-            filter(lambda e: e.exchnage_id == exchange_id, datatoken.get_exchanges())
-        )[0]
+        datatoken = self.ocean.get_datatoken(exchange_details[1])
+        exchange = OneExchange(self.ocean.fixed_rate_exchange, exchange_id)
         OCEAN_token = self.ocean.OCEAN_token
 
         datatoken.approve(

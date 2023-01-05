@@ -36,8 +36,8 @@ aea add connection fetchai/soef:0.27.5
 # routing
 aea config set --type dict agent.default_routing \
 '{
-  "fetchai/ledger_api:1.1.2": "fetchai/ledger:0.21.4",
-  "fetchai/oef_search:1.1.2": "fetchai/soef:0.27.5"
+  "fetchai/ledger_api:1.1.6": "fetchai/ledger:0.21.4",
+  "fetchai/oef_search:1.1.6": "fetchai/soef:0.27.5"
 }'
 aea config set agent.default_connection fetchai/p2p_libp2p:0.27.4
 # soef setup and configuration for p2p nodes

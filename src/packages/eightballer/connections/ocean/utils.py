@@ -18,15 +18,11 @@
 # ------------------------------------------------------------------------------
 
 
-from _codecs import escape_decode
-
-
-def convert_to_bytes_format(data: str) -> bytes:
+def convert_to_bytes_format(web3, data: str) -> bytes:
     """Converts a bytes string into bytes.
     Used for smart contracts calls."""
 
-    assert data[0:2] in ["b'", 'b"'], "Data has not the bytes literal prefix"
-    bytes_data = escape_decode(data[2:-1])[0]
+    bytes_data = web3.toBytes(hexstr=data)
     assert isinstance(bytes_data, bytes), "Invalid data provided."
 
     return bytes_data
