@@ -19,12 +19,13 @@
 """Scaffold connection and channel."""
 import pickle
 import time
+import requests
 import web3.exceptions
 import os
 import ocean_lib.exceptions
 from datetime import datetime, timedelta
 from typing import Any
-from brownie.network import accounts, chain, priority_fee
+from brownie.network import accounts, chain, priority_fee, web3
 
 from aea.configurations.base import PublicId
 from aea.connections.base import BaseSyncConnection
@@ -199,7 +200,12 @@ class OceanConnection(BaseSyncConnection):
             consume_market_order_fee_address=self.wallet.address,
             consume_market_order_fee_token=service.datatoken.address,
             consume_market_order_fee_amount=0,
-            tx_dict={"from": self.wallet},
+            tx_dict={
+                "from": self.wallet,
+                "priority_fee": chain.priority_fee,
+                "max_fee": 2 * chain.base_fee + chain.priority_fee,
+                "gas_limit": chain.block_gas_limit,
+            },
         )
         self.logger.info(f"order_tx_id = '{order_tx_id}'")
 
@@ -233,19 +239,18 @@ class OceanConnection(BaseSyncConnection):
         try:
             exchange_id = self._create_fixed_rate_helper(envelope=envelope)
             self.logger.info(f"Deployed fixed rate exchange = '{exchange_id}'")
+            msg = OceanMessage(
+                performative=OceanMessage.Performative.EXCHANGE_DEPLOYMENT_RECIEPT,
+                exchange_id=str(exchange_id),
+            )
+            msg.sender = envelope.to
+            msg.to = envelope.sender
+            envelope = Envelope(to=msg.to, sender=msg.sender, message=msg)
+            self.put_envelope(envelope)
+            self.logger.info(f"Fixed rate exchange created! Sending result to handler!")
         except (web3.exceptions.TransactionNotFound, ValueError) as e:
             self.logger.error(f"Failed to deploy fixed rate exchange!")
             self._create_fixed_rate(envelope, retries - 1)
-
-        msg = OceanMessage(
-            performative=OceanMessage.Performative.EXCHANGE_DEPLOYMENT_RECIEPT,
-            exchange_id=str(exchange_id),
-        )
-        msg.sender = envelope.to
-        msg.to = envelope.sender
-        envelope = Envelope(to=msg.to, sender=msg.sender, message=msg)
-        self.put_envelope(envelope)
-        self.logger.info(f"Fixed rate exchange created! Sending result to handler!")
 
     def _create_d2c_job(self, envelope):
         """
@@ -274,7 +279,11 @@ class OceanConnection(BaseSyncConnection):
             datasets=[DATA_compute_input],
             algorithm_data=ALGO_compute_input,
             consume_market_order_fee_address=self.wallet.address,
-            tx_dict={"from": self.wallet},
+            tx_dict={
+                "from": self.wallet,
+                "priority_fee": chain.priority_fee,
+                "max_fee": 2 * chain.base_fee + chain.priority_fee,
+            },
             compute_environment=free_c2d_env["id"],
             valid_until=int((datetime.utcnow() + timedelta(days=1)).timestamp()),
             consumer_address=free_c2d_env["consumerAddress"],
@@ -359,7 +368,15 @@ class OceanConnection(BaseSyncConnection):
         compute_service = data_ddo.services[0]
         compute_service.add_publisher_trusted_algorithm(algo_ddo)
 
-        data_ddo = self.ocean.assets.update(data_ddo, {"from": self.wallet})
+        data_ddo = self.ocean.assets.update(
+            data_ddo,
+            {
+                "from": self.wallet,
+                "priority_fee": chain.priority_fee,
+                "max_fee": 2 * chain.base_fee + chain.priority_fee,
+                "gas_limit": chain.block_gas_limit,
+            },
+        )
 
         msg = OceanMessage(
             performative=OceanMessage.Performative.DEPLOYMENT_RECIEPT,
@@ -401,13 +418,20 @@ class OceanConnection(BaseSyncConnection):
         }
 
         try:
-            DATA_ddo = self.ocean.assets.create(
+            _, _, DATA_ddo = self.ocean.assets.create(
                 metadata=DATA_metadata,
-                publisher_wallet=self.wallet,
+                tx_dict={
+                    "from": self.wallet,
+                    "priority_fee": chain.priority_fee,
+                    "max_fee": 2 * chain.base_fee + chain.priority_fee,
+                    "gas_limit": chain.block_gas_limit,
+                },
                 data_nft_address=data_nft.address,
                 services=[DATA_service],
-                data_token_address=datatoken.address,
+                deployed_datatokens=[datatoken],
+                datatoken_args=[DatatokenArguments(files=DATA_files)],
             )
+
             self.logger.info(f"DATA did = '{DATA_ddo.did}'")
         except ocean_lib.exceptions.AquariusError as error:
             self.logger.error(f"Error with creating asset. {error}")
@@ -472,7 +496,12 @@ class OceanConnection(BaseSyncConnection):
         # Publish asset with compute service on-chain.
         _, _, DATA_asset = self.ocean.assets.create(
             metadata=DATA_metadata,
-            tx_dict={"from": self.wallet},
+            tx_dict={
+                "from": self.wallet,
+                "priority_fee": chain.priority_fee,
+                "max_fee": 2 * chain.base_fee + chain.priority_fee,
+                "gas_limit": chain.block_gas_limit,
+            },
             services=[DATA_compute_service],
             data_nft_address=data_nft.address,
             deployed_datatokens=[datatoken],
@@ -536,7 +565,12 @@ class OceanConnection(BaseSyncConnection):
         # The download (access service) is automatically created, but you can explore other options as well
         _, _, ALGO_asset = self.ocean.assets.create(
             metadata=ALGO_metadata,
-            tx_dict={"from": self.wallet},
+            tx_dict={
+                "from": self.wallet,
+                "priority_fee": chain.priority_fee,
+                "max_fee": 2 * chain.base_fee + chain.priority_fee,
+                "gas_limit": chain.block_gas_limit,
+            },
             services=[ALGO_service],
             data_nft_address=ALGO_data_nft.address,
             deployed_datatokens=[ALGO_datatoken],
@@ -580,13 +614,21 @@ class OceanConnection(BaseSyncConnection):
         self.logger.info(f"interacting with ocean to deploy data token ...")
 
         self.logger.info("Create ERC721 data NFT: begin.")
+        self.logger.info(
+            f"priority fee: {chain.priority_fee}\n gas price: {web3.eth.gas_price}"
+        )
         data_nft = self.ocean.data_nft_factory.create(
             DataNFTArguments(
                 name=envelope.message.data_nft_name,
                 symbol=envelope.message.datatoken_name,
                 transferable=False,
             ),
-            {"from": self.wallet},
+            {
+                "from": self.wallet,
+                "priority_fee": chain.priority_fee,
+                "max_fee": 2 * chain.base_fee + chain.priority_fee,
+                "gas_limit": chain.block_gas_limit,
+            },
         )
         publish_market_order_fees = TokenFeeInfo(
             address=self.wallet.address, token=ZERO_ADDRESS, amount=0
@@ -601,7 +643,12 @@ class OceanConnection(BaseSyncConnection):
                 publish_market_order_fees=publish_market_order_fees,
                 bytess=[b""],
             ),
-            {"from": self.wallet},
+            {
+                "from": self.wallet,
+                "priority_fee": chain.priority_fee,
+                "max_fee": 2 * chain.base_fee + chain.priority_fee,
+                "gas_limit": chain.block_gas_limit,
+            },
         )
 
         self.logger.info(f"created the data token.")
@@ -616,23 +663,38 @@ class OceanConnection(BaseSyncConnection):
         param envelope: the envelope to send.
         """
         datatoken = self.ocean.get_datatoken(envelope.message.datatoken_address)
-
+        self.logger.info(f"Datatoken: {datatoken.address}")
+        self.logger.info(f"Approving ocean tokens to the FRE...")
         self.ocean.OCEAN_token.approve(
             self.ocean.fixed_rate_exchange.address,
             Web3.toWei(envelope.message.ocean_amt, "ether"),
-            {"from": self.wallet},
+            {
+                "from": self.wallet,
+                "priority_fee": chain.priority_fee,
+                "max_fee": 2 * chain.base_fee + chain.priority_fee,
+                "gas_limit": chain.block_gas_limit,
+            },
         )
-        exchange, tx = datatoken.create_exchange(
-            rate=Web3.toWei(envelope.message.rate, "ether"),
-            base_token_addr=self.ocean.OCEAN_address,
-            owner_addr=self.wallet.address,
-            publish_market_fee_collector=ZERO_ADDRESS,
-            publish_market_fee=Web3.toWei("0.01", "ether"),
-            with_mint=True,
-            allowed_swapper=ZERO_ADDRESS,
-            full_info=True,
-            tx_dict={"from": self.wallet},
-        )
+        self.logger.info(f"Approved ocean tokens to the FRE")
+        try:
+            exchange, tx = datatoken.create_exchange(
+                rate=Web3.toWei(envelope.message.rate, "ether"),
+                base_token_addr=self.ocean.OCEAN_address,
+                owner_addr=self.wallet.address,
+                publish_market_fee_collector=ZERO_ADDRESS,
+                publish_market_fee=Web3.toWei("0.01", "ether"),
+                with_mint=True,
+                allowed_swapper=ZERO_ADDRESS,
+                full_info=True,
+                tx_dict={
+                    "from": self.wallet,
+                    "priority_fee": chain.priority_fee,
+                    "max_fee": 2 * chain.base_fee + chain.priority_fee,
+                    "gas_limit": chain.block_gas_limit,
+                },
+            )
+        except Exception as e:
+            self.logger.error(f"Failed to deploy fixed rate exchange in helper! {e}")
 
         return exchange.exchange_id
 
@@ -651,14 +713,31 @@ class OceanConnection(BaseSyncConnection):
         datatoken.approve(
             exchange.address,
             Web3.toWei(envelope.message.datatoken_amt, "ether"),
-            {"from": self.wallet},
+            {
+                "from": self.wallet,
+                "priority_fee": chain.priority_fee,
+                "max_fee": 2 * chain.base_fee + chain.priority_fee,
+                "gas_limit": chain.block_gas_limit,
+            },
         )
         OCEAN_token.approve(
-            exchange.address, Web3.toWei(100, "ether"), {"from": self.wallet}
+            exchange.address,
+            Web3.toWei(100, "ether"),
+            {
+                "from": self.wallet,
+                "priority_fee": chain.priority_fee,
+                "max_fee": 2 * chain.base_fee + chain.priority_fee,
+                "gas_limit": chain.block_gas_limit,
+            },
         )
         exchange.buy_DT(
             datatoken_amt=Web3.toWei(envelope.message.datatoken_amt, "ether"),
-            tx_dict={"from": self.wallet},
+            tx_dict={
+                "from": self.wallet,
+                "priority_fee": chain.priority_fee,
+                "max_fee": 2 * chain.base_fee + chain.priority_fee,
+                "gas_limit": chain.block_gas_limit,
+            },
             max_basetoken_amt=Web3.toWei(envelope.message.max_cost_ocean, "ether"),
             consume_market_fee=Web3.toWei("0.01", "ether"),
         )
