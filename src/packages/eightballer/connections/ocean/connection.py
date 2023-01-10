@@ -464,7 +464,7 @@ class OceanConnection(BaseSyncConnection):
         deployment_envelope = Envelope(to=msg.to, sender=msg.sender, message=msg)
         self.put_envelope(deployment_envelope)
 
-    def _deploy_data_for_d2c(self, envelope: Envelope, retries: int =2):
+    def _deploy_data_for_d2c(self, envelope: Envelope, retries: int = 2):
         """
         Creates data NFT, datatoken & data asset for compute.
 
@@ -533,7 +533,7 @@ class OceanConnection(BaseSyncConnection):
         deployment_envelope = Envelope(to=msg.to, sender=msg.sender, message=msg)
         self.put_envelope(deployment_envelope)
 
-    def _deploy_algorithm(self, envelope: Envelope, retries: int=2):
+    def _deploy_algorithm(self, envelope: Envelope, retries: int = 2):
         """
         Creates data NFT, datatoken & asset for the algorithm for compute.
 
@@ -630,7 +630,9 @@ class OceanConnection(BaseSyncConnection):
             raise ValueError("Failed to deploy data nft and datatoken after retrying.")
 
         try:
-            self.logger.info(f"interacting with Ocean to deploy data NFT and datatoken...")
+            self.logger.info(
+                f"interacting with Ocean to deploy data NFT and datatoken..."
+            )
             self.logger.info("Create data NFT: begin.")
             tx_dict = get_tx_dict(self.ocean_config, self.wallet, chain)
             data_nft = self.ocean.data_nft_factory.create(
@@ -701,7 +703,7 @@ class OceanConnection(BaseSyncConnection):
 
         return exchange.exchange_id
 
-    def _buy_dt_from_fre(self, envelope: Envelope, retries:int = 2):
+    def _buy_dt_from_fre(self, envelope: Envelope, retries: int = 2):
         """
         Helper function for approving tokens from the fixed rate exchange & buying datatokens.
 

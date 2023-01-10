@@ -603,6 +603,10 @@ def test_get_tx_dict():
         ),
         "None",
     )
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(ocean.connect())
+    ocean.on_connect()
+
     seller_wallet = accounts.add(os.environ["SELLER_AEA_KEY_ETHEREUM"])
     tx_dict = get_tx_dict(ocean.ocean.config, seller_wallet, chain)
     assert tx_dict == {"from": seller_wallet}
@@ -617,10 +621,12 @@ def test_get_tx_dict():
         ),
         "None",
     )
+    loop2 = asyncio.get_event_loop()
+    loop2.run_until_complete(ocean2.connect())
+    ocean2.on_connect()
 
     tx_dict = get_tx_dict(ocean2.ocean.config, seller_wallet, chain)
     assert tx_dict["from"] == seller_wallet
-    # assert "gas_price" in tx_dict.keys()
     assert tx_dict["priority_fee"] == chain.priority_fee
     assert tx_dict["max_fee"] == 2 * chain.base_fee + chain.priority_fee
     assert tx_dict["gas_limit"] == chain.block_gas_limit
