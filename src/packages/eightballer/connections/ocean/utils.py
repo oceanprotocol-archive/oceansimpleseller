@@ -26,3 +26,14 @@ def convert_to_bytes_format(web3, data: str) -> bytes:
     assert isinstance(bytes_data, bytes), "Invalid data provided."
 
     return bytes_data
+
+
+def get_tx_dict(ocean_config: dict, wallet, chain) -> dict:
+    if ocean_config["NETWORK_NAME"] != "development":
+        return {
+            "from": wallet,
+            "priority_fee": chain.priority_fee,
+            "max_fee": 2 * chain.base_fee + chain.priority_fee,
+            "gas_limit": chain.block_gas_limit,
+        }
+    return {"from": wallet}

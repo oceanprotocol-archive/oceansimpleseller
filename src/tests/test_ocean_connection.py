@@ -11,10 +11,13 @@ from packages.eightballer.connections.ocean.connection import OceanConnection
 from packages.eightballer.protocols.ocean.message import OceanMessage
 from mock import patch, Mock
 from web3.main import Web3
-from brownie.network import accounts
+from brownie.network import accounts, chain
 
 from src.distribute_ocean_tokens import distribute_ocean_tokens
-from src.packages.eightballer.connections.ocean.utils import convert_to_bytes_format
+from src.packages.eightballer.connections.ocean.utils import (
+    convert_to_bytes_format,
+    get_tx_dict,
+)
 
 
 @patch.object(OceanConnection, "put_envelope")
@@ -585,3 +588,39 @@ def test_convert_to_bytes_format():
     new_data = convert_to_bytes_format(Web3, data=data)
     assert isinstance(new_data, bytes)
     assert len(new_data) == 32
+
+
+def test_get_tx_dict():
+    """Tests get_tx_dict function."""
+
+    ocean = OceanConnection(
+        ConnectionConfig(
+            "ocean",
+            "eightballer",
+            "0.1.0",
+            ocean_network_name="development",
+            key_path=os.environ["SELLER_AEA_KEY_ETHEREUM_PATH"],
+        ),
+        "None",
+    )
+    seller_wallet = accounts.add(os.environ["SELLER_AEA_KEY_ETHEREUM"])
+    tx_dict = get_tx_dict(ocean.ocean.config, seller_wallet, chain)
+    assert tx_dict == {"from": seller_wallet}
+
+    ocean2 = OceanConnection(
+        ConnectionConfig(
+            "ocean",
+            "eightballer",
+            "0.1.0",
+            ocean_network_name="polygon-test",
+            key_path=os.environ["SELLER_AEA_KEY_ETHEREUM_PATH"],
+        ),
+        "None",
+    )
+
+    tx_dict = get_tx_dict(ocean2.ocean.config, seller_wallet, chain)
+    assert tx_dict["from"] == seller_wallet
+    # assert "gas_price" in tx_dict.keys()
+    assert tx_dict["priority_fee"] == chain.priority_fee
+    assert tx_dict["max_fee"] == 2 * chain.base_fee + chain.priority_fee
+    assert tx_dict["gas_limit"] == chain.block_gas_limit

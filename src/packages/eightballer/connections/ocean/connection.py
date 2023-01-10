@@ -19,8 +19,8 @@
 """Scaffold connection and channel."""
 import pickle
 import time
-import requests
 import web3.exceptions
+import brownie.exceptions
 import os
 import ocean_lib.exceptions
 from datetime import datetime, timedelta
@@ -31,7 +31,10 @@ from aea.configurations.base import PublicId
 from aea.connections.base import BaseSyncConnection
 from aea.mail.base import Envelope
 from packages.eightballer.protocols.ocean.message import OceanMessage
-from packages.eightballer.connections.ocean.utils import convert_to_bytes_format
+from packages.eightballer.connections.ocean.utils import (
+    convert_to_bytes_format,
+    get_tx_dict,
+)
 from brownie.network import accounts
 from ocean_lib.data_provider.data_service_provider import DataServiceProvider
 from ocean_lib.example_config import get_config_dict
@@ -173,7 +176,7 @@ class OceanConnection(BaseSyncConnection):
             self.logger.error("Couldn't purchase datatokens")
             self.logger.error(e)
 
-    def _download_asset(self, envelope: Envelope):
+    def _download_asset(self, envelope: Envelope, retries: int = 2):
         """
         Downloads files from the asset.
 
@@ -192,22 +195,25 @@ class OceanConnection(BaseSyncConnection):
 
         asset = self.ocean.assets.resolve(did)
         service = asset.get_service_by_id("0")
-
+        tx_dict = get_tx_dict(self.ocean_config, self.wallet, chain)
+        if retries == 0:
+            raise ValueError("Failed to pay for compute service after retrying.")
         # Agent needs to pay in order to have rights for consume service.
-        order_tx_id = self.ocean.assets.pay_for_access_service(
-            asset=asset,
-            service=service,
-            consume_market_order_fee_address=self.wallet.address,
-            consume_market_order_fee_token=service.datatoken.address,
-            consume_market_order_fee_amount=0,
-            tx_dict={
-                "from": self.wallet,
-                "priority_fee": chain.priority_fee,
-                "max_fee": 2 * chain.base_fee + chain.priority_fee,
-                "gas_limit": chain.block_gas_limit,
-            },
-        )
-        self.logger.info(f"order_tx_id = '{order_tx_id}'")
+        try:
+            order_tx_id = self.ocean.assets.pay_for_access_service(
+                asset=asset,
+                service=service,
+                consume_market_order_fee_address=self.wallet.address,
+                consume_market_order_fee_token=service.datatoken.address,
+                consume_market_order_fee_amount=0,
+                tx_dict=tx_dict,
+            )
+            self.logger.info(f"order_tx_id = '{order_tx_id}'")
+        except (ValueError, brownie.exceptions.VirtualMachineError) as e:
+            self.logger.error(
+                f"Failed to pay for access service with error: {e}\n Retrying..."
+            )
+            self._download_asset(envelope, retries - 1)
 
         # Download has begun for the agent. If the connection breaks, agent can request again by showing order_tx_id.
         file_path = self.ocean.assets.download(
@@ -252,7 +258,7 @@ class OceanConnection(BaseSyncConnection):
             self.logger.error(f"Failed to deploy fixed rate exchange!")
             self._create_fixed_rate(envelope, retries - 1)
 
-    def _create_d2c_job(self, envelope):
+    def _create_d2c_job(self, envelope: Envelope, retries: int = 2):
         """
         Pays for compute service & starts the compute job.
 
@@ -275,19 +281,24 @@ class OceanConnection(BaseSyncConnection):
 
         # Pay for dataset and algo for 1 day
         self.logger.info(f"paying for dataset {DATA_did}")
-        datasets, algorithm = self.ocean.assets.pay_for_compute_service(
-            datasets=[DATA_compute_input],
-            algorithm_data=ALGO_compute_input,
-            consume_market_order_fee_address=self.wallet.address,
-            tx_dict={
-                "from": self.wallet,
-                "priority_fee": chain.priority_fee,
-                "max_fee": 2 * chain.base_fee + chain.priority_fee,
-            },
-            compute_environment=free_c2d_env["id"],
-            valid_until=int((datetime.utcnow() + timedelta(days=1)).timestamp()),
-            consumer_address=free_c2d_env["consumerAddress"],
-        )
+        tx_dict = get_tx_dict(self.ocean_config, self.wallet, chain)
+        if retries == 0:
+            raise ValueError("Failed to pay for compute service after retrying.")
+        try:
+            datasets, algorithm = self.ocean.assets.pay_for_compute_service(
+                datasets=[DATA_compute_input],
+                algorithm_data=ALGO_compute_input,
+                consume_market_order_fee_address=self.wallet.address,
+                tx_dict=tx_dict,
+                compute_environment=free_c2d_env["id"],
+                valid_until=int((datetime.utcnow() + timedelta(days=1)).timestamp()),
+                consumer_address=free_c2d_env["consumerAddress"],
+            )
+        except (ValueError, brownie.exceptions.VirtualMachineError) as e:
+            self.logger.error(
+                f"Failed to pay for compute service with error: {e}\n Retrying..."
+            )
+            self._create_d2c_job(envelope, retries - 1)
 
         self.logger.info(
             f"paid for dataset {DATA_did} receipt: {[dataset.as_dictionary() for dataset in datasets]} with algorithm {algorithm.as_dictionary()}"
@@ -351,7 +362,7 @@ class OceanConnection(BaseSyncConnection):
         self.put_envelope(envelope)
         self.logger.info(f"completed D2C! Sending result to handler!")
 
-    def _permission_dataset(self, envelope: Envelope):
+    def _permission_dataset(self, envelope: Envelope, retries: int = 2):
         """
         Updates the trusted algorithm publishers list in order to start a compute job.
 
@@ -367,16 +378,20 @@ class OceanConnection(BaseSyncConnection):
 
         compute_service = data_ddo.services[0]
         compute_service.add_publisher_trusted_algorithm(algo_ddo)
+        tx_dict = get_tx_dict(self.ocean_config, self.wallet, chain)
 
-        data_ddo = self.ocean.assets.update(
-            data_ddo,
-            {
-                "from": self.wallet,
-                "priority_fee": chain.priority_fee,
-                "max_fee": 2 * chain.base_fee + chain.priority_fee,
-                "gas_limit": chain.block_gas_limit,
-            },
-        )
+        if retries == 0:
+            raise ValueError("Failed to create data asset after retrying.")
+        try:
+            data_ddo = self.ocean.assets.update(
+                data_ddo,
+                tx_dict,
+            )
+        except (ValueError, brownie.exceptions.VirtualMachineError) as e:
+            self.logger.error(
+                f"Failed to update asset permissions with error: {e}\n Retrying..."
+            )
+            self._permission_dataset(envelope, retries - 1)
 
         msg = OceanMessage(
             performative=OceanMessage.Performative.DEPLOYMENT_RECIEPT,
@@ -416,16 +431,11 @@ class OceanConnection(BaseSyncConnection):
             "author": envelope.message.author,
             "license": envelope.message.license,
         }
-
+        tx_dict = get_tx_dict(self.ocean_config, self.wallet, chain)
         try:
             _, _, DATA_ddo = self.ocean.assets.create(
                 metadata=DATA_metadata,
-                tx_dict={
-                    "from": self.wallet,
-                    "priority_fee": chain.priority_fee,
-                    "max_fee": 2 * chain.base_fee + chain.priority_fee,
-                    "gas_limit": chain.block_gas_limit,
-                },
+                tx_dict=tx_dict,
                 data_nft_address=data_nft.address,
                 services=[DATA_service],
                 deployed_datatokens=[datatoken],
@@ -454,7 +464,7 @@ class OceanConnection(BaseSyncConnection):
         deployment_envelope = Envelope(to=msg.to, sender=msg.sender, message=msg)
         self.put_envelope(deployment_envelope)
 
-    def _deploy_data_for_d2c(self, envelope: Envelope):
+    def _deploy_data_for_d2c(self, envelope: Envelope, retries: int =2):
         """
         Creates data NFT, datatoken & data asset for compute.
 
@@ -492,22 +502,25 @@ class OceanConnection(BaseSyncConnection):
             timeout=3600,
             compute_values=DATA_compute_values,
         )
-
+        tx_dict = get_tx_dict(self.ocean_config, self.wallet, chain)
         # Publish asset with compute service on-chain.
-        _, _, DATA_asset = self.ocean.assets.create(
-            metadata=DATA_metadata,
-            tx_dict={
-                "from": self.wallet,
-                "priority_fee": chain.priority_fee,
-                "max_fee": 2 * chain.base_fee + chain.priority_fee,
-                "gas_limit": chain.block_gas_limit,
-            },
-            services=[DATA_compute_service],
-            data_nft_address=data_nft.address,
-            deployed_datatokens=[datatoken],
-            datatoken_args=[DatatokenArguments(files=[DATA_url_file])],
-        )
-        self.logger.info(f"DATA did = '{DATA_asset.did}'")
+        if retries == 0:
+            raise ValueError("Failed to create data asset after retrying.")
+        try:
+            _, _, DATA_asset = self.ocean.assets.create(
+                metadata=DATA_metadata,
+                tx_dict=tx_dict,
+                services=[DATA_compute_service],
+                data_nft_address=data_nft.address,
+                deployed_datatokens=[datatoken],
+                datatoken_args=[DatatokenArguments(files=[DATA_url_file])],
+            )
+            self.logger.info(f"DATA did = '{DATA_asset.did}'")
+        except (ValueError, brownie.exceptions.VirtualMachineError) as e:
+            self.logger.error(
+                f"Failed to deploy a data NFT and a datatoken with error: {e}\n Retrying..."
+            )
+            self._deploy_data_for_d2c(envelope, retries - 1)
 
         msg = OceanMessage(
             performative=OceanMessage.Performative.DEPLOYMENT_RECIEPT,
@@ -520,13 +533,14 @@ class OceanConnection(BaseSyncConnection):
         deployment_envelope = Envelope(to=msg.to, sender=msg.sender, message=msg)
         self.put_envelope(deployment_envelope)
 
-    def _deploy_algorithm(self, envelope: Envelope):
+    def _deploy_algorithm(self, envelope: Envelope, retries: int=2):
         """
         Creates data NFT, datatoken & asset for the algorithm for compute.
 
         param envelope: the envelope to send.
         """
         ALGO_data_nft, ALGO_datatoken = self._deploy_datatoken(envelope)
+        tx_dict = get_tx_dict(self.ocean_config, self.wallet, chain)
 
         ALGO_date_created = envelope.message.date_created
         ALGO_metadata = {
@@ -561,23 +575,24 @@ class OceanConnection(BaseSyncConnection):
             timeout=0,
         )
 
-        # Publish asset with compute service on-chain.
-        # The download (access service) is automatically created, but you can explore other options as well
-        _, _, ALGO_asset = self.ocean.assets.create(
-            metadata=ALGO_metadata,
-            tx_dict={
-                "from": self.wallet,
-                "priority_fee": chain.priority_fee,
-                "max_fee": 2 * chain.base_fee + chain.priority_fee,
-                "gas_limit": chain.block_gas_limit,
-            },
-            services=[ALGO_service],
-            data_nft_address=ALGO_data_nft.address,
-            deployed_datatokens=[ALGO_datatoken],
-            datatoken_args=[DatatokenArguments(files=[ALGO_url_file])],
-        )
+        if retries == 0:
+            raise ValueError("Failed to deploy an algorithm after retrying.")
+        try:
+            _, _, ALGO_asset = self.ocean.assets.create(
+                metadata=ALGO_metadata,
+                tx_dict=tx_dict,
+                services=[ALGO_service],
+                data_nft_address=ALGO_data_nft.address,
+                deployed_datatokens=[ALGO_datatoken],
+                datatoken_args=[DatatokenArguments(files=[ALGO_url_file])],
+            )
 
-        self.logger.info(f"ALGO did = '{ALGO_asset.did}'")
+            self.logger.info(f"ALGO did = '{ALGO_asset.did}'")
+        except (ValueError, brownie.exceptions.VirtualMachineError) as e:
+            self.logger.error(
+                f"Failed to create an ALGO asset with error: {e}\n Retrying..."
+            )
+            self._deploy_algorithm(envelope, retries - 1)
 
         msg = OceanMessage(
             performative=OceanMessage.Performative.DEPLOYMENT_RECIEPT,
@@ -605,56 +620,53 @@ class OceanConnection(BaseSyncConnection):
                     break
                 _timeout.sleep(poll_latency)
 
-    def _deploy_datatoken(self, envelope: Envelope):
+    def _deploy_datatoken(self, envelope: Envelope, retries: int = 2):
         """
         Creates a data NFT & a datatoken.
 
         param envelope: the envelope to send.
         """
-        self.logger.info(f"interacting with ocean to deploy data token ...")
+        if retries == 0:
+            raise ValueError("Failed to deploy data nft and datatoken after retrying.")
 
-        self.logger.info("Create ERC721 data NFT: begin.")
-        self.logger.info(
-            f"priority fee: {chain.priority_fee}\n gas price: {web3.eth.gas_price}"
-        )
-        data_nft = self.ocean.data_nft_factory.create(
-            DataNFTArguments(
-                name=envelope.message.data_nft_name,
-                symbol=envelope.message.datatoken_name,
-                transferable=False,
-            ),
-            {
-                "from": self.wallet,
-                "priority_fee": chain.priority_fee,
-                "max_fee": 2 * chain.base_fee + chain.priority_fee,
-                "gas_limit": chain.block_gas_limit,
-            },
-        )
-        publish_market_order_fees = TokenFeeInfo(
-            address=self.wallet.address, token=ZERO_ADDRESS, amount=0
-        )
-        datatoken = data_nft.create_datatoken(
-            DatatokenArguments(
-                name=envelope.message.datatoken_name,
-                symbol=envelope.message.datatoken_name,
-                template_index=1,
-                minter=self.wallet.address,
-                fee_manager=self.wallet.address,
-                publish_market_order_fees=publish_market_order_fees,
-                bytess=[b""],
-            ),
-            {
-                "from": self.wallet,
-                "priority_fee": chain.priority_fee,
-                "max_fee": 2 * chain.base_fee + chain.priority_fee,
-                "gas_limit": chain.block_gas_limit,
-            },
-        )
+        try:
+            self.logger.info(f"interacting with Ocean to deploy data NFT and datatoken...")
+            self.logger.info("Create data NFT: begin.")
+            tx_dict = get_tx_dict(self.ocean_config, self.wallet, chain)
+            data_nft = self.ocean.data_nft_factory.create(
+                DataNFTArguments(
+                    name=envelope.message.data_nft_name,
+                    symbol=envelope.message.datatoken_name,
+                    transferable=False,
+                ),
+                tx_dict,
+            )
+            publish_market_order_fees = TokenFeeInfo(
+                address=self.wallet.address, token=ZERO_ADDRESS, amount=0
+            )
+            datatoken = data_nft.create_datatoken(
+                DatatokenArguments(
+                    name=envelope.message.datatoken_name,
+                    symbol=envelope.message.datatoken_name,
+                    template_index=1,
+                    minter=self.wallet.address,
+                    fee_manager=self.wallet.address,
+                    publish_market_order_fees=publish_market_order_fees,
+                    bytess=[b""],
+                ),
+                tx_dict,
+            )
+            self.logger.info(f"created the data token.")
 
-        self.logger.info(f"created the data token.")
-
-        self.logger.info(f"DATA_datatoken.address = '{datatoken.address}'\n publishing")
-        return data_nft, datatoken
+            self.logger.info(
+                f"DATA_datatoken.address = '{datatoken.address}'\n publishing"
+            )
+            return data_nft, datatoken
+        except (ValueError, brownie.exceptions.VirtualMachineError) as e:
+            self.logger.error(
+                f"Failed to deploy a data NFT and a datatoken with error: {e}\n Retrying..."
+            )
+            self._deploy_datatoken(envelope, retries - 1)
 
     def _create_fixed_rate_helper(self, envelope: Envelope) -> bytes:
         """
@@ -665,15 +677,11 @@ class OceanConnection(BaseSyncConnection):
         datatoken = self.ocean.get_datatoken(envelope.message.datatoken_address)
         self.logger.info(f"Datatoken: {datatoken.address}")
         self.logger.info(f"Approving ocean tokens to the FRE...")
+        tx_dict = get_tx_dict(self.ocean_config, self.wallet, chain)
         self.ocean.OCEAN_token.approve(
             self.ocean.fixed_rate_exchange.address,
             Web3.toWei(envelope.message.ocean_amt, "ether"),
-            {
-                "from": self.wallet,
-                "priority_fee": chain.priority_fee,
-                "max_fee": 2 * chain.base_fee + chain.priority_fee,
-                "gas_limit": chain.block_gas_limit,
-            },
+            tx_dict,
         )
         self.logger.info(f"Approved ocean tokens to the FRE")
         try:
@@ -686,19 +694,14 @@ class OceanConnection(BaseSyncConnection):
                 with_mint=True,
                 allowed_swapper=ZERO_ADDRESS,
                 full_info=True,
-                tx_dict={
-                    "from": self.wallet,
-                    "priority_fee": chain.priority_fee,
-                    "max_fee": 2 * chain.base_fee + chain.priority_fee,
-                    "gas_limit": chain.block_gas_limit,
-                },
+                tx_dict=tx_dict,
             )
         except Exception as e:
             self.logger.error(f"Failed to deploy fixed rate exchange in helper! {e}")
 
         return exchange.exchange_id
 
-    def _buy_dt_from_fre(self, envelope: Envelope):
+    def _buy_dt_from_fre(self, envelope: Envelope, retries:int = 2):
         """
         Helper function for approving tokens from the fixed rate exchange & buying datatokens.
 
@@ -709,38 +712,27 @@ class OceanConnection(BaseSyncConnection):
         datatoken = self.ocean.get_datatoken(exchange_details[1])
         exchange = OneExchange(self.ocean.fixed_rate_exchange, exchange_id)
         OCEAN_token = self.ocean.OCEAN_token
-
-        datatoken.approve(
-            exchange.address,
-            Web3.toWei(envelope.message.datatoken_amt, "ether"),
-            {
-                "from": self.wallet,
-                "priority_fee": chain.priority_fee,
-                "max_fee": 2 * chain.base_fee + chain.priority_fee,
-                "gas_limit": chain.block_gas_limit,
-            },
-        )
-        OCEAN_token.approve(
-            exchange.address,
-            Web3.toWei(100, "ether"),
-            {
-                "from": self.wallet,
-                "priority_fee": chain.priority_fee,
-                "max_fee": 2 * chain.base_fee + chain.priority_fee,
-                "gas_limit": chain.block_gas_limit,
-            },
-        )
-        exchange.buy_DT(
-            datatoken_amt=Web3.toWei(envelope.message.datatoken_amt, "ether"),
-            tx_dict={
-                "from": self.wallet,
-                "priority_fee": chain.priority_fee,
-                "max_fee": 2 * chain.base_fee + chain.priority_fee,
-                "gas_limit": chain.block_gas_limit,
-            },
-            max_basetoken_amt=Web3.toWei(envelope.message.max_cost_ocean, "ether"),
-            consume_market_fee=Web3.toWei("0.01", "ether"),
-        )
+        tx_dict = get_tx_dict(self.ocean_config, self.wallet, chain)
+        if retries == 0:
+            raise ValueError("Failed to buy datatokens after retrying.")
+        try:
+            datatoken.approve(
+                exchange.address,
+                Web3.toWei(envelope.message.datatoken_amt, "ether"),
+                tx_dict,
+            )
+            OCEAN_token.approve(exchange.address, Web3.toWei(100, "ether"), tx_dict)
+            exchange.buy_DT(
+                datatoken_amt=Web3.toWei(envelope.message.datatoken_amt, "ether"),
+                tx_dict=tx_dict,
+                max_basetoken_amt=Web3.toWei(envelope.message.max_cost_ocean, "ether"),
+                consume_market_fee=Web3.toWei("0.01", "ether"),
+            )
+        except (ValueError, brownie.exceptions.VirtualMachineError) as e:
+            self.logger.error(
+                f"Failed to buy datatokens from FRE with error: {e}\n Retrying..."
+            )
+            self._buy_dt_from_fre(envelope, retries - 1)
 
     def on_connect(self) -> None:
         """
