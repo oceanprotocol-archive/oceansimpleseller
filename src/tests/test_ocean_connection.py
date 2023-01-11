@@ -590,8 +590,8 @@ def test_convert_to_bytes_format():
     assert len(new_data) == 32
 
 
-def test_get_tx_dict():
-    """Tests get_tx_dict function."""
+def test_get_tx_dict_on_ganache():
+    """Tests get_tx_dict function on Ganache."""
 
     ocean = OceanConnection(
         ConnectionConfig(
@@ -611,7 +611,10 @@ def test_get_tx_dict():
     tx_dict = get_tx_dict(ocean.ocean.config, seller_wallet, chain)
     assert tx_dict == {"from": seller_wallet}
 
-    ocean2 = OceanConnection(
+
+def test_get_tx_dict_on_remote():
+    """Tests get_tx_dict function on remote network."""
+    ocean = OceanConnection(
         ConnectionConfig(
             "ocean",
             "eightballer",
@@ -621,11 +624,12 @@ def test_get_tx_dict():
         ),
         "None",
     )
-    loop2 = asyncio.get_event_loop()
-    loop2.run_until_complete(ocean2.connect())
-    ocean2.on_connect()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(ocean.connect())
+    ocean.on_connect()
 
-    tx_dict = get_tx_dict(ocean2.ocean.config, seller_wallet, chain)
+    seller_wallet = accounts.add(os.environ["SELLER_AEA_KEY_ETHEREUM"])
+    tx_dict = get_tx_dict(ocean.ocean.config, seller_wallet, chain)
     assert tx_dict["from"] == seller_wallet
     assert "priority_fee" in tx_dict.keys()
     assert "max_fee" in tx_dict.keys()
