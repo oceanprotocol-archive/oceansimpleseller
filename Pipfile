@@ -21,6 +21,7 @@ pytest-cov = "==2.9.0"
 pytest-custom-exit-code = "==0.3.0"
 pytest-randomly = "==3.4.0"
 pytest-rerunfailures = "==9.0"
+requests = "*"
 
 [requires]
 python_version = "3.8"

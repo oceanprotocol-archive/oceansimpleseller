@@ -16,6 +16,9 @@
 #   limitations under the License.
 #
 # ------------------------------------------------------------------------------
+import requests
+from brownie.network.gas.strategies import GasNowScalingStrategy
+from web3.main import Web3
 
 
 def convert_to_bytes_format(web3, data: str) -> bytes:
@@ -29,11 +32,14 @@ def convert_to_bytes_format(web3, data: str) -> bytes:
 
 
 def get_tx_dict(ocean_config: dict, wallet, chain) -> dict:
-    if ocean_config["NETWORK_NAME"] != "development":
-        return {
-            "from": wallet,
-            "priority_fee": chain.priority_fee,
-            "max_fee": 2 * chain.base_fee + chain.priority_fee,
-            "gas_limit": chain.block_gas_limit,
-        }
+    if "polygon" in ocean_config["NETWORK_NAME"]:
+        gas_strategy = GasNowScalingStrategy("rapid")
+        print(
+            f"estimate gas: {wallet.estimate_gas()} \n priority fee: {chain.priority_fee} \n gas strategy: {gas_strategy.__dict__}"
+        )
+        gas_fees = requests.get("https://gasstation-mainnet.matic.network/v2").json()
+        print(f"gas resp from polygon: {gas_fees}")
+        priority_fee = Web3.toWei(gas_fees["fast"]["maxPriorityFee"], "gwei")
+        max_fee = Web3.toWei(gas_fees["fast"]["maxFee"], "gwei")
+        return {"from": wallet, "priority_fee": priority_fee, "max_fee": max_fee}
     return {"from": wallet}

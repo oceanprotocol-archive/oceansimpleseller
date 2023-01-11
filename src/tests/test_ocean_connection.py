@@ -627,6 +627,5 @@ def test_get_tx_dict():
 
     tx_dict = get_tx_dict(ocean2.ocean.config, seller_wallet, chain)
     assert tx_dict["from"] == seller_wallet
-    assert tx_dict["priority_fee"] == chain.priority_fee
-    assert tx_dict["max_fee"] == 2 * chain.base_fee + chain.priority_fee
-    assert tx_dict["gas_limit"] == chain.block_gas_limit
+    assert "priority_fee" in tx_dict.keys()
+    assert "max_fee" in tx_dict.keys()

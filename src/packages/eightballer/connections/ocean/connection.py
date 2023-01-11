@@ -27,6 +27,7 @@ from datetime import datetime, timedelta
 from typing import Any
 from brownie.network import accounts, chain, priority_fee, web3
 
+
 from aea.configurations.base import PublicId
 from aea.connections.base import BaseSyncConnection
 from aea.mail.base import Envelope
@@ -195,11 +196,11 @@ class OceanConnection(BaseSyncConnection):
 
         asset = self.ocean.assets.resolve(did)
         service = asset.get_service_by_id("0")
-        tx_dict = get_tx_dict(self.ocean_config, self.wallet, chain)
         if retries == 0:
             raise ValueError("Failed to pay for compute service after retrying.")
         # Agent needs to pay in order to have rights for consume service.
         try:
+            tx_dict = get_tx_dict(self.ocean_config, self.wallet, chain)
             order_tx_id = self.ocean.assets.pay_for_access_service(
                 asset=asset,
                 service=service,
@@ -209,7 +210,11 @@ class OceanConnection(BaseSyncConnection):
                 tx_dict=tx_dict,
             )
             self.logger.info(f"order_tx_id = '{order_tx_id}'")
-        except (ValueError, brownie.exceptions.VirtualMachineError) as e:
+        except (
+            ValueError,
+            brownie.exceptions.VirtualMachineError,
+            brownie.exceptions.ContractNotFound,
+        ) as e:
             self.logger.error(
                 f"Failed to pay for access service with error: {e}\n Retrying..."
             )
@@ -281,10 +286,10 @@ class OceanConnection(BaseSyncConnection):
 
         # Pay for dataset and algo for 1 day
         self.logger.info(f"paying for dataset {DATA_did}")
-        tx_dict = get_tx_dict(self.ocean_config, self.wallet, chain)
         if retries == 0:
             raise ValueError("Failed to pay for compute service after retrying.")
         try:
+            tx_dict = get_tx_dict(self.ocean_config, self.wallet, chain)
             datasets, algorithm = self.ocean.assets.pay_for_compute_service(
                 datasets=[DATA_compute_input],
                 algorithm_data=ALGO_compute_input,
@@ -294,7 +299,11 @@ class OceanConnection(BaseSyncConnection):
                 valid_until=int((datetime.utcnow() + timedelta(days=1)).timestamp()),
                 consumer_address=free_c2d_env["consumerAddress"],
             )
-        except (ValueError, brownie.exceptions.VirtualMachineError) as e:
+        except (
+            ValueError,
+            brownie.exceptions.VirtualMachineError,
+            brownie.exceptions.ContractNotFound,
+        ) as e:
             self.logger.error(
                 f"Failed to pay for compute service with error: {e}\n Retrying..."
             )
@@ -378,16 +387,20 @@ class OceanConnection(BaseSyncConnection):
 
         compute_service = data_ddo.services[0]
         compute_service.add_publisher_trusted_algorithm(algo_ddo)
-        tx_dict = get_tx_dict(self.ocean_config, self.wallet, chain)
 
         if retries == 0:
             raise ValueError("Failed to create data asset after retrying.")
         try:
+            tx_dict = get_tx_dict(self.ocean_config, self.wallet, chain)
             data_ddo = self.ocean.assets.update(
                 data_ddo,
                 tx_dict,
             )
-        except (ValueError, brownie.exceptions.VirtualMachineError) as e:
+        except (
+            ValueError,
+            brownie.exceptions.VirtualMachineError,
+            brownie.exceptions.ContractNotFound,
+        ) as e:
             self.logger.error(
                 f"Failed to update asset permissions with error: {e}\n Retrying..."
             )
@@ -431,8 +444,8 @@ class OceanConnection(BaseSyncConnection):
             "author": envelope.message.author,
             "license": envelope.message.license,
         }
-        tx_dict = get_tx_dict(self.ocean_config, self.wallet, chain)
         try:
+            tx_dict = get_tx_dict(self.ocean_config, self.wallet, chain)
             _, _, DATA_ddo = self.ocean.assets.create(
                 metadata=DATA_metadata,
                 tx_dict=tx_dict,
@@ -502,11 +515,11 @@ class OceanConnection(BaseSyncConnection):
             timeout=3600,
             compute_values=DATA_compute_values,
         )
-        tx_dict = get_tx_dict(self.ocean_config, self.wallet, chain)
         # Publish asset with compute service on-chain.
         if retries == 0:
             raise ValueError("Failed to create data asset after retrying.")
         try:
+            tx_dict = get_tx_dict(self.ocean_config, self.wallet, chain)
             _, _, DATA_asset = self.ocean.assets.create(
                 metadata=DATA_metadata,
                 tx_dict=tx_dict,
@@ -516,7 +529,11 @@ class OceanConnection(BaseSyncConnection):
                 datatoken_args=[DatatokenArguments(files=[DATA_url_file])],
             )
             self.logger.info(f"DATA did = '{DATA_asset.did}'")
-        except (ValueError, brownie.exceptions.VirtualMachineError) as e:
+        except (
+            ValueError,
+            brownie.exceptions.VirtualMachineError,
+            brownie.exceptions.ContractNotFound,
+        ) as e:
             self.logger.error(
                 f"Failed to deploy a data NFT and a datatoken with error: {e}\n Retrying..."
             )
@@ -540,7 +557,6 @@ class OceanConnection(BaseSyncConnection):
         param envelope: the envelope to send.
         """
         ALGO_data_nft, ALGO_datatoken = self._deploy_datatoken(envelope)
-        tx_dict = get_tx_dict(self.ocean_config, self.wallet, chain)
 
         ALGO_date_created = envelope.message.date_created
         ALGO_metadata = {
@@ -578,6 +594,7 @@ class OceanConnection(BaseSyncConnection):
         if retries == 0:
             raise ValueError("Failed to deploy an algorithm after retrying.")
         try:
+            tx_dict = get_tx_dict(self.ocean_config, self.wallet, chain)
             _, _, ALGO_asset = self.ocean.assets.create(
                 metadata=ALGO_metadata,
                 tx_dict=tx_dict,
@@ -588,7 +605,11 @@ class OceanConnection(BaseSyncConnection):
             )
 
             self.logger.info(f"ALGO did = '{ALGO_asset.did}'")
-        except (ValueError, brownie.exceptions.VirtualMachineError) as e:
+        except (
+            ValueError,
+            brownie.exceptions.VirtualMachineError,
+            brownie.exceptions.ContractNotFound,
+        ) as e:
             self.logger.error(
                 f"Failed to create an ALGO asset with error: {e}\n Retrying..."
             )
@@ -664,7 +685,11 @@ class OceanConnection(BaseSyncConnection):
                 f"DATA_datatoken.address = '{datatoken.address}'\n publishing"
             )
             return data_nft, datatoken
-        except (ValueError, brownie.exceptions.VirtualMachineError) as e:
+        except (
+            ValueError,
+            brownie.exceptions.VirtualMachineError,
+            brownie.exceptions.ContractNotFound,
+        ) as e:
             self.logger.error(
                 f"Failed to deploy a data NFT and a datatoken with error: {e}\n Retrying..."
             )
@@ -730,7 +755,11 @@ class OceanConnection(BaseSyncConnection):
                 max_basetoken_amt=Web3.toWei(envelope.message.max_cost_ocean, "ether"),
                 consume_market_fee=Web3.toWei("0.01", "ether"),
             )
-        except (ValueError, brownie.exceptions.VirtualMachineError) as e:
+        except (
+            ValueError,
+            brownie.exceptions.VirtualMachineError,
+            brownie.exceptions.ContractNotFound,
+        ) as e:
             self.logger.error(
                 f"Failed to buy datatokens from FRE with error: {e}\n Retrying..."
             )
