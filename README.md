@@ -1,6 +1,19 @@
 # Ocean Simple seller
 
-To setup the project run the following
+To setup the project run the following:
+
+Make sure to have `pipenv` package first.
+
+On Ubuntu:
+
+```bash
+pip3 install pipenv
+```
+
+On Mac:
+```bash
+brew install pipenv
+```
 
 ```bash
 git clone git@github.com:oceanprotocol/oceansimpleseller.git
@@ -12,10 +25,17 @@ make install_env
 `go` is required by the libp2p connection. Install go using the official
 installation docs: https://go.dev/doc/install
 
+In order to install the `protobuf` dependency, JVM needs to be present as well.
+
 `protobuf-compiler` is required for compiling the `.proto` files.
-Install it using the following command:
+Install it using the following command on Ubuntu:
 ```bash
 sudo apt install protobuf-compiler
+```
+For Mac users:
+
+```bash
+brew install protobuf
 ```
 
 If running the project with a local eth network with [Barge](https://github.com/oceanprotocol/barge/branches) use the barge branch `main` and run barge with
@@ -36,11 +56,11 @@ export FETCH_DENOM=atestfet
 export FETCH_CHAIN_ID=dorado-1
 
 # export SELLER_AEA_KEY_ETHEREUM="0x4a7b2cc2d0a9574f9e207fcfb6b13f6daf4e90b9e0f50e389a68f507f9767880" # Goerli
-export SELLER_AEA_KEY_ETHEREUM="0xc594c6e5def4bab63ac29eed19a134c130388f74f019bc74b8f4389df2837a58" # BARGE/GANACHE TEST_PRIVATE_KEY1 from pytest.ini
+export SELLER_AEA_KEY_ETHEREUM="c594c6e5def4bab63ac29eed19a134c130388f74f019bc74b8f4389df2837a58" # BARGE/GANACHE TEST_PRIVATE_KEY1 from pytest.ini
 export SELLER_AEA_KEY_FETCHAI="1437aebfadbb766b810894a7859db3574088e6909f229e484e2e14e00b7c0875"
 
 # export BUYER_AEA_KEY_ETHEREUM="0xef4b441145c1d0f3b4bc6d61d29f5c6e502359481152f869247c7a4244d45209" # Goerli
-export BUYER_AEA_KEY_ETHEREUM="0xef4b441145c1d0f3b4bc6d61d29f5c6e502359481152f869247c7a4244d45209" # BARGE/GANACHE TEST_PRIVATE_KEY2 from pytest.ini
+export BUYER_AEA_KEY_ETHEREUM="ef4b441145c1d0f3b4bc6d61d29f5c6e502359481152f869247c7a4244d45209" # BARGE/GANACHE TEST_PRIVATE_KEY2 from pytest.ini
 export BUYER_AEA_KEY_FETCHAI="670c081eb3f674ae55e28ab714e7393abc74346a6fc738b1bf245140a038a3bb"
 
 export STORJ_ENDPOINT="https://gateway.eu1.storjshare.io"
@@ -59,9 +79,12 @@ export FACTORY_DEPLOYER_PRIVATE_KEY=0xc594c6e5def4bab63ac29eed19a134c130388f74f0
 After the export on the first terminal run:
 
 ```bash
+aea init # if there is the first time running Ocean Simple Seller
 cd src || exit
 ./run_ocean_seller.sh
 ```
+Let the seller sync, until the SOEF messages start to show up in the console,
+then run the buyer.
 
 On the second terminal run:
 
