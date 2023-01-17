@@ -613,7 +613,6 @@ def test_get_tx_dict_on_remote():
     assert tx_dict["from"] == seller_wallet
     assert "priority_fee" in tx_dict.keys()
     assert "max_fee" in tx_dict.keys()
-    loop.close()
 
 
 def test_get_tx_dict_on_ganache():
@@ -637,4 +636,3 @@ def test_get_tx_dict_on_ganache():
     seller_wallet = accounts.add(os.environ["SELLER_AEA_KEY_ETHEREUM"])
     tx_dict = get_tx_dict(ocean.ocean.config, seller_wallet, chain)
     assert tx_dict == {"from": seller_wallet}
-    loop.close()
