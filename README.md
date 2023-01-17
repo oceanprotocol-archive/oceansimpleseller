@@ -1,5 +1,18 @@
 # Ocean Simple seller
 
+## Intro
+
+Ocean Simple Seller is the middleware between Ocean connection and AEA agents.
+AEA agents can be programmed to publish data and use Compute to Data feature
+from Ocean core.
+
+The scenario is composed by a seller and a buyer which are two AEA agents.
+`Seller` publishes data assets and algorithms with Fixed Rate pricing schema &
+`buyer` consumes the data and pays for the algorithm access.
+
+
+## Setup
+
 To setup the project run the following:
 
 Make sure to have `pipenv` package first.
