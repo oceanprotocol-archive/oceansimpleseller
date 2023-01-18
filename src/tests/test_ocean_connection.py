@@ -592,14 +592,14 @@ def test_convert_to_bytes_format():
 
 def test_get_tx_dict_on_remote():
     """Tests get_tx_dict function on remote network."""
-    os.environ["RPC_URL"] = "https://mainnet.aurora.dev"
-    os.environ["OCEAN_NETWORK_NAME"] = "aurora-main"
+    os.environ["RPC_URL"] = "https://mainnet.optimism.io"
+    os.environ["OCEAN_NETWORK_NAME"] = "optimism-main"
     ocean = OceanConnection(
         ConnectionConfig(
             "ocean",
             "eightballer",
             "0.1.0",
-            ocean_network_name="polygon-test",
+            ocean_network_name="optimism-main",
             key_path=os.environ["SELLER_AEA_KEY_ETHEREUM_PATH"],
         ),
         "None",
