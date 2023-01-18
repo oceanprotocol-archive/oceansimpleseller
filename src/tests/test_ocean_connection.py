@@ -592,8 +592,8 @@ def test_convert_to_bytes_format():
 
 def test_get_tx_dict_on_remote():
     """Tests get_tx_dict function on remote network."""
-    os.environ["RPC_URL"] = "https://rpc-mumbai.maticvigil.com"
-    os.environ["OCEAN_NETWORK_NAME"] = "polygon-test"
+    os.environ["RPC_URL"] = "https://mainnet.aurora.dev"
+    os.environ["OCEAN_NETWORK_NAME"] = "aurora-main"
     ocean = OceanConnection(
         ConnectionConfig(
             "ocean",
