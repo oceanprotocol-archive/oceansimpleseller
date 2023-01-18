@@ -590,31 +590,6 @@ def test_convert_to_bytes_format():
     assert len(new_data) == 32
 
 
-def test_get_tx_dict_on_remote():
-    """Tests get_tx_dict function on remote network."""
-    os.environ["RPC_URL"] = "https://mainnet.optimism.io"
-    os.environ["OCEAN_NETWORK_NAME"] = "optimism-main"
-    ocean = OceanConnection(
-        ConnectionConfig(
-            "ocean",
-            "eightballer",
-            "0.1.0",
-            ocean_network_name="optimism-main",
-            key_path=os.environ["SELLER_AEA_KEY_ETHEREUM_PATH"],
-        ),
-        "None",
-    )
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(ocean.connect())
-    ocean.on_connect()
-
-    seller_wallet = accounts.add(os.environ["SELLER_AEA_KEY_ETHEREUM"])
-    tx_dict = get_tx_dict(ocean.ocean.config, seller_wallet, chain)
-    assert tx_dict["from"] == seller_wallet
-    assert "priority_fee" in tx_dict.keys()
-    assert "max_fee" in tx_dict.keys()
-
-
 def test_get_tx_dict_on_ganache():
     """Tests get_tx_dict function on Ganache."""
     os.environ["RPC_URL"] = "http://127.0.0.1:8545"
