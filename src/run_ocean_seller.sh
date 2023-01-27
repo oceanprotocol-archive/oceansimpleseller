@@ -3,7 +3,7 @@
 NAME="ocean_seller"
 
 # distribute_ocean_tokens if using barge and ganache
-if [ $OCEAN_NETWORK_URL == http://127.0.0.1:8545 ]; then
+if [ $OCEAN_NETWORK_NAME == development ]; then
   python distribute_ocean_tokens.py
 fi
 
@@ -22,24 +22,24 @@ aea add-key fetchai fetchai_private_key.txt --connection
 
 # setup fetch libraries
 # generic protocols
-aea add protocol fetchai/acn:1.1.2
-aea add protocol fetchai/contract_api:1.1.2
-aea add protocol fetchai/fipa:1.1.2
-aea add protocol fetchai/ledger_api:1.1.2
-aea add protocol fetchai/oef_search:1.1.2
+aea add protocol fetchai/acn:1.1.6
+aea add protocol fetchai/contract_api:1.1.6
+aea add protocol fetchai/fipa:1.1.6
+aea add protocol fetchai/ledger_api:1.1.6
+aea add protocol fetchai/oef_search:1.1.6
 
 #generic connections
-aea add connection fetchai/ledger:0.21.1
-aea add connection fetchai/p2p_libp2p:0.27.1
-aea add connection fetchai/soef:0.27.2
+aea add connection fetchai/ledger:0.21.4
+aea add connection fetchai/p2p_libp2p:0.27.4
+aea add connection fetchai/soef:0.27.5
 
 # routing
 aea config set --type dict agent.default_routing \
 '{
-  "fetchai/ledger_api:1.1.2": "fetchai/ledger:0.21.1",
-  "fetchai/oef_search:1.1.2": "fetchai/soef:0.27.2"
+  "fetchai/ledger_api:1.1.6": "fetchai/ledger:0.21.4",
+  "fetchai/oef_search:1.1.6": "fetchai/soef:0.27.5"
 }'
-aea config set agent.default_connection fetchai/p2p_libp2p:0.27.1
+aea config set agent.default_connection fetchai/p2p_libp2p:0.27.4
 # soef setup and configuration for p2p nodes
 
 aea config set --type dict vendor.fetchai.connections.p2p_libp2p.config \
@@ -66,7 +66,7 @@ aea add skill eightballer/ocean_seller:0.1.0
 aea config set vendor.fetchai.connections.ledger.config.ledger_apis.fetchai.address $FETCH_URL
 aea config set vendor.fetchai.connections.ledger.config.ledger_apis.fetchai.denom $FETCH_DENOM
 aea config set vendor.fetchai.connections.ledger.config.ledger_apis.fetchai.chain_id $FETCH_CHAIN_ID
-aea config set vendor.eightballer.connections.ocean.config.ocean_network_url $RPC_URL
+aea config set vendor.eightballer.connections.ocean.config.ocean_network_name $OCEAN_NETWORK_NAME
 aea config set vendor.fetchai.connections.ledger.config.ledger_apis.ethereum.address $RPC_URL
 aea config set vendor.eightballer.connections.ocean.config.key_path ethereum_private_key.txt
 aea config set --type dict vendor.eightballer.connections.storj_file_transfer.config.storj_creds \
@@ -93,9 +93,9 @@ aea config set --type dict vendor.eightballer.skills.ocean_seller.strategy.args 
         "version": "0.1",
         "entrypoint": "python $ALGO",
         "image": "oceanprotocol/algo_dockers",
-        "checksum": "44e10daa6637893f4276bb8d7301eb35306ece50f61ca34dcab550",
+        "checksum": "sha256:8221d20c1c16491d7d56b9657ea09082c0ee4a8ab1a6621fa720da58b09580e4",
         "tag": "python-branin",
-        "files_url": "https://raw.githubusercontent.com/trentmc/branin/main/gpr.py",
+        "files_url": "https://raw.githubusercontent.com/oceanprotocol/c2d-examples/main/branin_and_gpr/gpr.py",
         "name": "gpr",
         "description": "gpr",
         "author": "Trent",
@@ -106,13 +106,19 @@ aea config set --type dict vendor.eightballer.skills.ocean_seller.strategy.args 
         "data_nft_name": "data_nft_c2d",
         "datatoken_name": "datatoken_c2d",
         "amount_to_mint": 100,
-        "dataset_url": "https://raw.githubusercontent.com/trentmc/branin/main/branin.arff",
+        "dataset_url": "https://raw.githubusercontent.com/oceanprotocol/c2d-examples/main/branin_and_gpr/branin.arff",
         "name": "example",
-        "description": "example",
+        "description": "Compute service to run GPR algorithm.",
         "author": "Trent",
         "license": "CCO",
         "date_created": "2019-12-28T10:55:11Z"
-        }
+        },
+    "data_exchange_params":{
+        "datatoken_address": "",
+        "datatoken_amt": 50,
+        "ocean_amt": 1,
+        "rate": 1
+    },
 }'
 
 

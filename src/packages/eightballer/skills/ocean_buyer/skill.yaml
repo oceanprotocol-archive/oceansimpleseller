@@ -7,20 +7,20 @@ license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   __init__.py: QmXdYL7HzJQNfXe22szymE6yUvZbPo2ZoWAj5UGg46iySD
-  behaviours.py: QmZnjpVN5NhtDfD4RvvThVz6eWpNYoGAcSyrb3KL455hxP
+  behaviours.py: QmQa57xisyBEUAL4nKL7g2JskYdkFxNe1YVWPwdt6knb2U
   dialogues.py: QmQYEojSSSjq49QaDGhnScXTL1QSu3RtKNjnizRHeGw8Sa
-  handlers.py: QmVUJToD9dk1FTLAZ7ntXreKvEEBDE9uRXj6KgnYD1rmxJ
-  strategy.py: QmRQsXA4m95x7UsD1KREXenXNCkExxkey5FMbEbN9kkr47
+  handlers.py: QmdxiJYHBsHLrz5ig2fUrJr1hMFZQUS8QL3NHckiqh8Rzy
+  strategy.py: QmUHKFRmunHHsrRj1AMb2r5JrupThrRHnC4LfjetdgDXk7
 fingerprint_ignore_patterns: []
 connections:
-- fetchai/ledger:0.21.1
+- fetchai/ledger:0.21.4
 contracts: []
 protocols:
-- fetchai/default:1.1.2
-- fetchai/fipa:1.1.2
-- fetchai/ledger_api:1.1.2
-- fetchai/oef_search:1.1.2
-- fetchai/signing:1.1.2
+- fetchai/default:1.1.6
+- fetchai/fipa:1.1.6
+- fetchai/ledger_api:1.1.6
+- fetchai/oef_search:1.1.6
+- fetchai/signing:1.1.6
 skills: []
 behaviours:
   ocean:
@@ -69,10 +69,12 @@ models:
     class_name: SigningDialogues
   strategy:
     args:
+      datatoken_amt: 2
       is_ledger_tx: true
       location:
         latitude: 51.5194
         longitude: 0.127
+      max_cost_ocean: 5
       max_negotiations: 1
       max_tx_fee: 7500000000000000
       max_unit_price: 20

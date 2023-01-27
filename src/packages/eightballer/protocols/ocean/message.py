@@ -47,6 +47,7 @@ class OceanMessage(Message):
     class Performative(Message.Performative):
         """Performatives for the ocean protocol."""
 
+        CREATE_FIXED_RATE_EXCHANGE = "create_fixed_rate_exchange"
         D2C_JOB = "d2c_job"
         DEPLOY_ALGORITHM = "deploy_algorithm"
         DEPLOY_D2C = "deploy_d2c"
@@ -56,6 +57,7 @@ class OceanMessage(Message):
         END = "end"
         ERROR = "error"
         PERMISSION_DATASET = "permission_dataset"
+        EXCHANGE_DEPLOYMENT_RECIEPT = "exchange_deployment_reciept"
         RESULTS = "results"
 
         def __str__(self) -> str:
@@ -63,14 +65,17 @@ class OceanMessage(Message):
             return str(self.value)
 
     _performatives = {
+        "create_fixed_rate_exchange",
         "d2c_job",
         "deploy_algorithm",
         "deploy_d2c",
         "deploy_data_download",
         "deployment_reciept",
+        "download_job",
         "end",
         "error",
         "permission_dataset",
+        "exchange_deployment_reciept",
         "results",
     }
     __slots__: Tuple[str, ...] = tuple()
@@ -105,6 +110,7 @@ class OceanMessage(Message):
             "description",
             "ocean_amt",
             "performative",
+            "exchange_id",
             "tag",
             "target",
             "token0_name",
@@ -330,6 +336,12 @@ class OceanMessage(Message):
         """Get the 'ocean_amt' content from the message."""
         enforce(self.is_set("ocean_amt"), "'ocean_amt' content is not set.")
         return cast(int, self.get("ocean_amt"))
+
+    @property
+    def exchange_id(self) -> bytes:
+        """Get the 'exchange_id' content from the message."""
+        enforce(self.is_set("exchange_id"), "'exchange_id' content is not set.")
+        return cast(bytes, self.get("exchange_id"))
 
     @property
     def tag(self) -> str:
@@ -623,6 +635,17 @@ class OceanMessage(Message):
                         type(self.license)
                     ),
                 )
+            elif (
+                self.performative
+                == OceanMessage.Performative.EXCHANGE_DEPLOYMENT_RECIEPT
+            ):
+                expected_nb_of_contents = 1
+                enforce(
+                    isinstance(self.exchange_id, str),
+                    "Invalid type for content 'exchange_id'. Expected 'str'. Found '{}'.".format(
+                        type(self.exchange_id)
+                    ),
+                )
             elif self.performative == OceanMessage.Performative.DEPLOYMENT_RECIEPT:
                 expected_nb_of_contents = 3
                 enforce(
@@ -641,6 +664,65 @@ class OceanMessage(Message):
                     isinstance(self.datatoken_contract_address, str),
                     "Invalid type for content 'datatoken_contract_address'. Expected 'str'. Found '{}'.".format(
                         type(self.datatoken_contract_address)
+                    ),
+                )
+            elif (
+                self.performative
+                == OceanMessage.Performative.CREATE_FIXED_RATE_EXCHANGE
+            ):
+                expected_nb_of_contents = 3
+                enforce(
+                    isinstance(self.datatoken_address, str),
+                    "Invalid type for content 'datatoken_address'. Expected 'str'. Found '{}'.".format(
+                        type(self.datatoken_address)
+                    ),
+                )
+                enforce(
+                    type(self.ocean_amt) is int,
+                    "Invalid type for content 'ocean_amt'. Expected 'int'. Found '{}'.".format(
+                        type(self.ocean_amt)
+                    ),
+                )
+                enforce(
+                    type(self.rate) is int,
+                    "Invalid type for content 'rate'. Expected 'int'. Found '{}'.".format(
+                        type(self.rate)
+                    ),
+                )
+            elif self.performative == OceanMessage.Performative.DOWNLOAD_JOB:
+                if self.datatoken_address:
+                    expected_nb_of_contents = 5
+                    enforce(
+                        isinstance(self.datatoken_address, str),
+                        "Invalid type for content 'datatoken_address'. Expected 'str'. Found '{}'.".format(
+                            type(self.datatoken_address)
+                        ),
+                    )
+                else:
+                    expected_nb_of_contents = 4
+
+                enforce(
+                    isinstance(self.datatoken_amt, int),
+                    "Invalid type for content 'datatoken_amt'. Expected 'int'. Found '{}'.".format(
+                        type(self.datatoken_amt)
+                    ),
+                )
+                enforce(
+                    isinstance(self.max_cost_ocean, int),
+                    "Invalid type for content 'max_cost_ocean'. Expected 'int'. Found '{}'.".format(
+                        type(self.max_cost_ocean)
+                    ),
+                )
+                enforce(
+                    isinstance(self.asset_did, str),
+                    "Invalid type for content 'asset_did'. Expected 'str'. Found '{}'.".format(
+                        type(self.asset_did)
+                    ),
+                )
+                enforce(
+                    isinstance(self.exchange_id, str),
+                    "Invalid type for content 'exchange_id'. Expected 'str'. Found '{}'.".format(
+                        type(self.exchange_id)
                     ),
                 )
             elif self.performative == OceanMessage.Performative.PERMISSION_DATASET:

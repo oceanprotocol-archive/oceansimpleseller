@@ -123,6 +123,11 @@ class OceanSerializer(Serializer):
             license = msg.license
             performative.license = license
             ocean_msg.deploy_algorithm.CopyFrom(performative)
+        elif performative_id == OceanMessage.Performative.EXCHANGE_DEPLOYMENT_RECIEPT:
+            performative = ocean_pb2.OceanMessage.Exchange_Deployment_Reciept_Performative()  # type: ignore
+            exchange_id = msg.exchange_id
+            performative.exchange_id = exchange_id
+            ocean_msg.exchange_deployment_reciept.CopyFrom(performative)
         elif performative_id == OceanMessage.Performative.DEPLOYMENT_RECIEPT:
             performative = ocean_pb2.OceanMessage.Deployment_Reciept_Performative()  # type: ignore
             type = msg.type
@@ -132,6 +137,28 @@ class OceanSerializer(Serializer):
             datatoken_contract_address = msg.datatoken_contract_address
             performative.datatoken_contract_address = datatoken_contract_address
             ocean_msg.deployment_reciept.CopyFrom(performative)
+        elif performative_id == OceanMessage.Performative.CREATE_FIXED_RATE_EXCHANGE:
+            performative = ocean_pb2.OceanMessage.Create_Fixed_Rate_Exchange_Performative()  # type: ignore
+            datatoken_address = msg.datatoken_address
+            performative.datatoken_address = datatoken_address
+            datatoken_amt = msg.datatoken_amt
+            performative.datatoken_amt = datatoken_amt
+            ocean_amt = msg.ocean_amt
+            performative.ocean_amt = ocean_amt
+            ocean_msg.create_fixed_rate_exchange.CopyFrom(performative)
+        elif performative_id == OceanMessage.Performative.DOWNLOAD_JOB:
+            performative = ocean_pb2.OceanMessage.Download_Job_Performative()  # type: ignore
+            datatoken_address = msg.datatoken_address
+            performative.datatoken_address = datatoken_address
+            datatoken_amt = msg.datatoken_amt
+            performative.datatoken_amt = datatoken_amt
+            max_cost_ocean = msg.max_cost_ocean
+            performative.max_cost_ocean = max_cost_ocean
+            asset_did = msg.asset_did
+            performative.asset_did = asset_did
+            exchange_id = msg.exchange_id
+            performative.exchange_id = exchange_id
+            ocean_msg.download_job.CopyFrom(performative)
         elif performative_id == OceanMessage.Performative.PERMISSION_DATASET:
             performative = ocean_pb2.OceanMessage.Permission_Dataset_Performative()  # type: ignore
             algo_did = msg.algo_did
@@ -257,6 +284,9 @@ class OceanSerializer(Serializer):
             performative_content["date_created"] = date_created
             license = ocean_pb.deploy_algorithm.license
             performative_content["license"] = license
+        elif performative_id == OceanMessage.Performative.EXCHANGE_DEPLOYMENT_RECIEPT:
+            exchange_id = ocean_pb.exchange_deployment_reciept.exchange_id
+            performative_content["exchange_id"] = exchange_id
         elif performative_id == OceanMessage.Performative.DEPLOYMENT_RECIEPT:
             type = ocean_pb.deployment_reciept.type
             performative_content["type"] = type
@@ -268,6 +298,24 @@ class OceanSerializer(Serializer):
             performative_content[
                 "datatoken_contract_address"
             ] = datatoken_contract_address
+        elif performative_id == OceanMessage.Performative.CREATE_FIXED_RATE_EXCHANGE:
+            datatoken_address = ocean_pb.create_fixed_rate_exchange.datatoken_address
+            performative_content["datatoken_address"] = datatoken_address
+            datatoken_amt = ocean_pb.create_fixed_rate_exchange.datatoken_amt
+            performative_content["datatoken_amt"] = datatoken_amt
+            ocean_amt = ocean_pb.create_fixed_rate_exchange.ocean_amt
+            performative_content["ocean_amt"] = ocean_amt
+        elif performative_id == OceanMessage.Performative.DOWNLOAD_JOB:
+            datatoken_address = ocean_pb.download_job.datatoken_address
+            performative_content["datatoken_address"] = datatoken_address
+            datatoken_amt = ocean_pb.download_job.datatoken_amt
+            performative_content["datatoken_amt"] = datatoken_amt
+            max_cost_ocean = ocean_pb.download_job.max_cost_ocean
+            performative_content["max_cost_ocean"] = max_cost_ocean
+            asset_did = ocean_pb.download_job.asset_did
+            performative_content["asset_did"] = asset_did
+            exchange_id = ocean_pb.download_job.exchange_id
+            performative_content["exchange_id"] = exchange_id
         elif performative_id == OceanMessage.Performative.PERMISSION_DATASET:
             algo_did = ocean_pb.permission_dataset.algo_did
             performative_content["algo_did"] = algo_did

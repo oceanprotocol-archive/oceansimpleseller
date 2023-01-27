@@ -1,6 +1,5 @@
 import json
 import uuid
-from decimal import Decimal
 from typing import Any, Dict, Optional, Tuple
 
 from aea.common import Address
@@ -40,6 +39,8 @@ class GenericStrategy(Model):
 
     _deployments = {}
 
+    _is_fixed_rate_exchange_deployed = False
+
     _is_algorithm_deployed = False
     _is_algorithm_minted = False
     _is_algorithm_published = False
@@ -56,6 +57,8 @@ class GenericStrategy(Model):
 
     _data_to_compute_params = {}
     _algorithm_params = {}
+    _download_params = {}
+    _data_exchange_params = {}
 
     _is_d2c_active = False
     _is_download_active = False
@@ -75,6 +78,14 @@ class GenericStrategy(Model):
     @is_seller_active.setter
     def is_seller_active(self, value):
         self._is_seller_active = value
+
+    @property
+    def is_download_active(self):
+        return self._is_download_active
+
+    @is_download_active.setter
+    def is_download_active(self, value):
+        self._is_download_active = value
 
     @property
     def has_completed_download_job(self):
@@ -165,6 +176,14 @@ class GenericStrategy(Model):
         self._deployments["data_download"] = value
 
     @property
+    def is_fixed_rate_exchange_deployed(self):
+        return self._is_fixed_rate_exchange_deployed
+
+    @is_fixed_rate_exchange_deployed.setter
+    def is_fixed_rate_exchange_deployed(self, value):
+        self._is_fixed_rate_exchange_deployed = value
+
+    @property
     def is_algorithm_deployed(self):
         return self._is_algorithm_deployed
 
@@ -179,6 +198,22 @@ class GenericStrategy(Model):
     @property
     def data_to_compute_params(self):
         return self._data_to_compute_params
+
+    @property
+    def data_exchange_params(self):
+        return self._data_exchange_params
+
+    @data_exchange_params.setter
+    def data_exchange_params(self, value):
+        self._data_exchange_params = value
+
+    @property
+    def download_params(self):
+        return self._download_params
+
+    @download_params.setter
+    def download_params(self, value):
+        self._download_params = value
 
     def __init__(self, **kwargs: Any) -> None:
         """
@@ -235,6 +270,8 @@ class GenericStrategy(Model):
 
         self._data_to_compute_params = kwargs.pop("data_to_compute_params")
         self._algorithm_params = kwargs.pop("algorithm_params")
+        self._download_params = kwargs.pop("download_params")
+        self._data_exchange_params = kwargs.pop("data_exchange_params")
         self._deployments = kwargs.pop("deployments")
 
         self._is_seller_active = False
@@ -435,5 +472,22 @@ class GenericStrategy(Model):
             raise ValueError(
                 "Agent does not have data did! make sure it has been deployed."
             )
-
         return {"algo_did": algo_did, "data_did": data_did}
+
+    def get_create_fixed_rate_exchange_request(self, is_data=True):
+        if is_data:
+            data_did = self.data_to_compute_address.get("datatoken_contract_address", None)
+        else:
+            data_did = self.algorithm_address.get("datatoken_contract_address", None)
+
+        if data_did is None:
+            raise ValueError(
+                "Agent does not have data did! make sure it has been deployed."
+            )
+
+        return {
+            "datatoken_address": data_did,
+            "datatoken_amt": self.data_exchange_params["datatoken_amt"],
+            "ocean_amt": self.data_exchange_params["ocean_amt"],
+            "rate": self.data_exchange_params["rate"]
+        }

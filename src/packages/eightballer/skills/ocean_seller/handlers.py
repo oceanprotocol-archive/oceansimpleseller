@@ -120,10 +120,20 @@ class OceanHandler(Handler):
                 strategy.has_completed_d2c_job = True
 
             if strategy.is_download_active:
-                self.log.info(f"Recieved results down job!")
+                self.log.info(f"Received results down job!")
                 strategy.has_completed_download_job = True
 
             strategy.is_in_flight = False
+        elif message.performative == OceanMessage.Performative.EXCHANGE_DEPLOYMENT_RECIEPT:
+            self.log.info(f"Successfully deployed fixed rate exchange schema for asset!")
+            strategy.is_in_flight = False
+            strategy.is_fixed_rate_exchange_deployed = True
+
+            if not strategy.download_params.get("data_exchange_id", None):
+                strategy.download_params["data_exchange_id"] = message.exchange_id
+            else:
+                strategy.download_params["algo_exchange_id"] = message.exchange_id
+
         else:
             raise ValueError("Unhandled Message!!!")
 
@@ -466,6 +476,10 @@ class GenericLedgerApiHandler(Handler):
             fipa_dialogues.dialogue_stats.add_dialogue_endstate(
                 FipaDialogue.EndState.SUCCESSFUL, fipa_dialogue.is_self_initiated
             )
+
+            strategy = cast(GenericStrategy, self.context.strategy)
+            fipa_dialogue.data_for_sale["data_exchange_id"] = strategy.download_params["data_exchange_id"]
+            fipa_dialogue.data_for_sale["algo_exchange_id"] = strategy.download_params["algo_exchange_id"]
 
             self.context.logger.info(
                 "transaction confirmed, sending data={} to buyer={}.".format(

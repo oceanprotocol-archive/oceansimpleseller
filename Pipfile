@@ -4,11 +4,12 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-aea = "==1.2.1"
-aea-ledger-ethereum = "==1.1.0"
-aea-ledger-fetchai = "==1.2.1"
-ocean-lib = "==1.2.0"
+aea = "==1.2.4"
+aea-ledger-ethereum = "==1.1.1"
+aea-ledger-fetchai = "==1.2.4"
+ocean-lib = "==2.0.1"
 boto3 = "*"
+pipfile = "*"
 
 [dev-packages]
 black = "*"
@@ -20,6 +21,7 @@ pytest-cov = "==2.9.0"
 pytest-custom-exit-code = "==0.3.0"
 pytest-randomly = "==3.4.0"
 pytest-rerunfailures = "==9.0"
+requests = "*"
 
 [requires]
 python_version = "3.8"

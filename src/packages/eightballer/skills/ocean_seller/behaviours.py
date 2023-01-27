@@ -6,8 +6,6 @@ from aea.skills.behaviours import TickerBehaviour
 
 from packages.eightballer.protocols.file_storage.message import \
     FileStorageMessage
-from packages.eightballer.protocols.ocean.dialogues import (OceanDialogue,
-                                                            OceanDialogues)
 from packages.eightballer.protocols.ocean.message import OceanMessage
 from packages.eightballer.skills.ocean_seller import PUBLIC_ID as SENDER_ID
 from packages.eightballer.skills.ocean_seller.dialogues import (
@@ -213,7 +211,7 @@ class OceanC2DBehaviour(OceanBehaviourBase):
             and strategy.is_algorithm_deployed
             and strategy.is_data_to_compute_deployed
         ):
-            self.log.info(f"permissioning the dataset to allow d 2 c !")
+            self.log.info(f"Permission the dataset to allow d 2 c !")
             self.__create_envelope(
                 OceanMessage.Performative.PERMISSION_DATASET,
                 **strategy.get_permission_request(),
@@ -224,6 +222,35 @@ class OceanC2DBehaviour(OceanBehaviourBase):
             strategy.is_data_permissioned
             and strategy.is_algorithm_deployed
             and strategy.is_data_to_compute_deployed
+            and not strategy.download_params.get("data_exchange_id", None)
+        ):
+            self.log.info(f"Creating the data fixed rate exchange schema...")
+            self.__create_envelope(
+                OceanMessage.Performative.CREATE_FIXED_RATE_EXCHANGE,
+                **strategy.get_create_fixed_rate_exchange_request(),
+            )
+
+            return
+        if (
+                strategy.is_data_permissioned
+                and strategy.is_algorithm_deployed
+                and strategy.is_data_to_compute_deployed
+                and strategy.download_params.get("data_exchange_id", None)
+                and not strategy.download_params.get("algo_exchange_id", None)
+        ):
+            self.log.info(f"Creating the algorithm fixed rate exchange schema...")
+            self.__create_envelope(
+                OceanMessage.Performative.CREATE_FIXED_RATE_EXCHANGE,
+                **strategy.get_create_fixed_rate_exchange_request(False),
+            )
+
+            return
+
+        if (
+            strategy.is_data_permissioned
+            and strategy.is_algorithm_deployed
+            and strategy.is_data_to_compute_deployed
+            and strategy.is_fixed_rate_exchange_deployed
         ):
             self.log.info(f"Completed the c2d deployment.")
             strategy.is_d2c_active = False

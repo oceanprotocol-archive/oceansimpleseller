@@ -3,7 +3,7 @@
 NAME="ocean_buyer"
 
 # distribute_ocean_tokens if using barge and ganache
-if [ $OCEAN_NETWORK_URL == http://127.0.0.1:8545 ]; then
+if [ $OCEAN_NETWORK_NAME == developement ]; then
   python distribute_ocean_tokens.py
 fi
 
@@ -22,24 +22,24 @@ aea add-key fetchai fetchai_private_key.txt --connection
 
 # setup fetch libraries
 # generic protocols
-aea add protocol fetchai/acn:1.1.2
-aea add protocol fetchai/contract_api:1.1.2
-aea add protocol fetchai/fipa:1.1.2
-aea add protocol fetchai/ledger_api:1.1.2
-aea add protocol fetchai/oef_search:1.1.2
+aea add protocol fetchai/acn:1.1.6
+aea add protocol fetchai/contract_api:1.1.6
+aea add protocol fetchai/fipa:1.1.6
+aea add protocol fetchai/ledger_api:1.1.6
+aea add protocol fetchai/oef_search:1.1.6
 
 #generic connections
-aea add connection fetchai/ledger:0.21.1
-aea add connection fetchai/p2p_libp2p:0.27.1
-aea add connection fetchai/soef:0.27.2
+aea add connection fetchai/ledger:0.21.4
+aea add connection fetchai/p2p_libp2p:0.27.4
+aea add connection fetchai/soef:0.27.5
 
 # routing
 aea config set --type dict agent.default_routing \
 '{
-  "fetchai/ledger_api:1.1.2": "fetchai/ledger:0.21.1",
-  "fetchai/oef_search:1.1.2": "fetchai/soef:0.27.2"
+  "fetchai/ledger_api:1.1.6": "fetchai/ledger:0.21.4",
+  "fetchai/oef_search:1.1.6": "fetchai/soef:0.27.5"
 }'
-aea config set agent.default_connection fetchai/p2p_libp2p:0.27.1
+aea config set agent.default_connection fetchai/p2p_libp2p:0.27.4
 # soef setup and configuration for p2p nodes
 
 aea config set --type dict vendor.fetchai.connections.p2p_libp2p.config \
@@ -65,7 +65,7 @@ aea add skill eightballer/ocean_buyer:0.1.0
 aea config set vendor.fetchai.connections.ledger.config.ledger_apis.fetchai.address $FETCH_URL
 aea config set vendor.fetchai.connections.ledger.config.ledger_apis.fetchai.denom $FETCH_DENOM
 aea config set vendor.fetchai.connections.ledger.config.ledger_apis.fetchai.chain_id $FETCH_CHAIN_ID
-aea config set vendor.eightballer.connections.ocean.config.ocean_network_url  $RPC_URL
+aea config set vendor.eightballer.connections.ocean.config.ocean_network_name  $OCEAN_NETWORK_NAME
 aea config set vendor.fetchai.connections.ledger.config.ledger_apis.ethereum.address $RPC_URL
 aea config set vendor.eightballer.connections.ocean.config.key_path ethereum_private_key.txt
 

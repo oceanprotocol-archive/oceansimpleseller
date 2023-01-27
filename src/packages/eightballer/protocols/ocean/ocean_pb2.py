@@ -711,6 +711,44 @@ _OCEANMESSAGE_DEPLOY_ALGORITHM_PERFORMATIVE = _descriptor.Descriptor(
     serialized_end=2096,
 )
 
+_OCEANMESSAGE_POOL_DEPLOYMENT_RECIEPT_PERFORMATIVE = _descriptor.Descriptor(
+    name="Pool_Deployment_Reciept_Performative",
+    full_name="aea.eightballer.ocean.v0_1_0.OceanMessage.Pool_Deployment_Reciept_Performative",
+    filename=None,
+    file=DESCRIPTOR,
+    containing_type=None,
+    fields=[
+        _descriptor.FieldDescriptor(
+            name="pool_address",
+            full_name="aea.eightballer.ocean.v0_1_0.OceanMessage.Pool_Deployment_Reciept_Performative.pool_address",
+            index=0,
+            number=1,
+            type=9,
+            cpp_type=9,
+            label=1,
+            has_default_value=False,
+            default_value=_b("").decode("utf-8"),
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+        ),
+    ],
+    extensions=[],
+    nested_types=[],
+    enum_types=[],
+    serialized_options=None,
+    is_extendable=False,
+    syntax="proto3",
+    extension_ranges=[],
+    oneofs=[],
+    serialized_start=2098,
+    serialized_end=2158,
+)
+
 _OCEANMESSAGE_DEPLOYMENT_RECIEPT_PERFORMATIVE = _descriptor.Descriptor(
     name="Deployment_Reciept_Performative",
     full_name="aea.eightballer.ocean.v0_1_0.OceanMessage.Deployment_Reciept_Performative",
@@ -785,6 +823,189 @@ _OCEANMESSAGE_DEPLOYMENT_RECIEPT_PERFORMATIVE = _descriptor.Descriptor(
     serialized_end=2256,
 )
 
+_OCEANMESSAGE_CREATE_POOL_PERFORMATIVE = _descriptor.Descriptor(
+    name="Create_Pool_Performative",
+    full_name="aea.eightballer.ocean.v0_1_0.OceanMessage.Create_Pool_Performative",
+    filename=None,
+    file=DESCRIPTOR,
+    containing_type=None,
+    fields=[
+        _descriptor.FieldDescriptor(
+            name="datatoken_address",
+            full_name="aea.eightballer.ocean.v0_1_0.OceanMessage.Create_Pool_Performative.datatoken_address",
+            index=0,
+            number=1,
+            type=9,
+            cpp_type=9,
+            label=1,
+            has_default_value=False,
+            default_value=_b("").decode("utf-8"),
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+        ),
+        _descriptor.FieldDescriptor(
+            name="datatoken_amt",
+            full_name="aea.eightballer.ocean.v0_1_0.OceanMessage.Create_Pool_Performative.datatoken_amt",
+            index=1,
+            number=2,
+            type=5,
+            cpp_type=1,
+            label=1,
+            has_default_value=False,
+            default_value=0,
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+        ),
+        _descriptor.FieldDescriptor(
+            name="ocean_amt",
+            full_name="aea.eightballer.ocean.v0_1_0.OceanMessage.Create_Pool_Performative.ocean_amt",
+            index=2,
+            number=3,
+            type=5,
+            cpp_type=1,
+            label=1,
+            has_default_value=False,
+            default_value=0,
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+        ),
+    ],
+    extensions=[],
+    nested_types=[],
+    enum_types=[],
+    serialized_options=None,
+    is_extendable=False,
+    syntax="proto3",
+    extension_ranges=[],
+    oneofs=[],
+    serialized_start=2258,
+    serialized_end=2353,
+)
+
+_OCEANMESSAGE_DOWNLOAD_JOB_PERFORMATIVE = _descriptor.Descriptor(
+    name="Download_Job_Performative",
+    full_name="aea.eightballer.ocean.v0_1_0.OceanMessage.Download_Job_Performative",
+    filename=None,
+    file=DESCRIPTOR,
+    containing_type=None,
+    fields=[
+        _descriptor.FieldDescriptor(
+            name="datatoken_address",
+            full_name="aea.eightballer.ocean.v0_1_0.OceanMessage.Download_Job_Performative.datatoken_address",
+            index=0,
+            number=1,
+            type=9,
+            cpp_type=9,
+            label=1,
+            has_default_value=False,
+            default_value=_b("").decode("utf-8"),
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+        ),
+        _descriptor.FieldDescriptor(
+            name="datatoken_amt",
+            full_name="aea.eightballer.ocean.v0_1_0.OceanMessage.Download_Job_Performative.datatoken_amt",
+            index=1,
+            number=2,
+            type=5,
+            cpp_type=1,
+            label=1,
+            has_default_value=False,
+            default_value=0,
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+        ),
+        _descriptor.FieldDescriptor(
+            name="max_cost_ocean",
+            full_name="aea.eightballer.ocean.v0_1_0.OceanMessage.Download_Job_Performative.max_cost_ocean",
+            index=2,
+            number=3,
+            type=5,
+            cpp_type=1,
+            label=1,
+            has_default_value=False,
+            default_value=0,
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+        ),
+        _descriptor.FieldDescriptor(
+            name="asset_did",
+            full_name="aea.eightballer.ocean.v0_1_0.OceanMessage.Download_Job_Performative.asset_did",
+            index=3,
+            number=4,
+            type=9,
+            cpp_type=9,
+            label=1,
+            has_default_value=False,
+            default_value=_b("").decode("utf-8"),
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+        ),
+        _descriptor.FieldDescriptor(
+            name="pool_address",
+            full_name="aea.eightballer.ocean.v0_1_0.OceanMessage.Download_Job_Performative.pool_address",
+            index=4,
+            number=5,
+            type=9,
+            cpp_type=9,
+            label=1,
+            has_default_value=False,
+            default_value=_b("").decode("utf-8"),
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+        ),
+    ],
+    extensions=[],
+    nested_types=[],
+    enum_types=[],
+    serialized_options=None,
+    is_extendable=False,
+    syntax="proto3",
+    extension_ranges=[],
+    oneofs=[],
+    serialized_start=2356,
+    serialized_end=2498,
+)
 
 _OCEANMESSAGE_PERMISSION_DATASET_PERFORMATIVE = _descriptor.Descriptor(
     name="Permission_Dataset_Performative",
@@ -1095,6 +1316,24 @@ _OCEANMESSAGE = _descriptor.Descriptor(
     containing_type=None,
     fields=[
         _descriptor.FieldDescriptor(
+            name="create_pool",
+            full_name="aea.eightballer.ocean.v0_1_0.OceanMessage.create_pool",
+            index=0,
+            number=5,
+            type=11,
+            cpp_type=10,
+            label=1,
+            has_default_value=False,
+            default_value=None,
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+        ),
+        _descriptor.FieldDescriptor(
             name="d2c_job",
             full_name="aea.eightballer.ocean.v0_1_0.OceanMessage.d2c_job",
             index=1,
@@ -1185,6 +1424,24 @@ _OCEANMESSAGE = _descriptor.Descriptor(
             file=DESCRIPTOR,
         ),
         _descriptor.FieldDescriptor(
+            name="download_job",
+            full_name="aea.eightballer.ocean.v0_1_0.OceanMessage.download_job",
+            index=6,
+            number=11,
+            type=11,
+            cpp_type=10,
+            label=1,
+            has_default_value=False,
+            default_value=None,
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+        ),
+        _descriptor.FieldDescriptor(
             name="end",
             full_name="aea.eightballer.ocean.v0_1_0.OceanMessage.end",
             index=7,
@@ -1239,6 +1496,24 @@ _OCEANMESSAGE = _descriptor.Descriptor(
             file=DESCRIPTOR,
         ),
         _descriptor.FieldDescriptor(
+            name="pool_deployment_reciept",
+            full_name="aea.eightballer.ocean.v0_1_0.OceanMessage.pool_deployment_reciept",
+            index=10,
+            number=15,
+            type=11,
+            cpp_type=10,
+            label=1,
+            has_default_value=False,
+            default_value=None,
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+        ),
+        _descriptor.FieldDescriptor(
             name="results",
             full_name="aea.eightballer.ocean.v0_1_0.OceanMessage.results",
             index=11,
@@ -1263,7 +1538,10 @@ _OCEANMESSAGE = _descriptor.Descriptor(
         _OCEANMESSAGE_DEPLOY_DATA_DOWNLOAD_PERFORMATIVE,
         _OCEANMESSAGE_DEPLOY_D2C_PERFORMATIVE,
         _OCEANMESSAGE_DEPLOY_ALGORITHM_PERFORMATIVE,
+        _OCEANMESSAGE_POOL_DEPLOYMENT_RECIEPT_PERFORMATIVE,
         _OCEANMESSAGE_DEPLOYMENT_RECIEPT_PERFORMATIVE,
+        _OCEANMESSAGE_CREATE_POOL_PERFORMATIVE,
+        _OCEANMESSAGE_DOWNLOAD_JOB_PERFORMATIVE,
         _OCEANMESSAGE_PERMISSION_DATASET_PERFORMATIVE,
         _OCEANMESSAGE_D2C_JOB_PERFORMATIVE,
         _OCEANMESSAGE_RESULTS_PERFORMATIVE,
@@ -1296,7 +1574,10 @@ _OCEANMESSAGE_ERRORCODE_ERRORCODEENUM.containing_type = _OCEANMESSAGE_ERRORCODE
 _OCEANMESSAGE_DEPLOY_DATA_DOWNLOAD_PERFORMATIVE.containing_type = _OCEANMESSAGE
 _OCEANMESSAGE_DEPLOY_D2C_PERFORMATIVE.containing_type = _OCEANMESSAGE
 _OCEANMESSAGE_DEPLOY_ALGORITHM_PERFORMATIVE.containing_type = _OCEANMESSAGE
+_OCEANMESSAGE_POOL_DEPLOYMENT_RECIEPT_PERFORMATIVE.containing_type = _OCEANMESSAGE
 _OCEANMESSAGE_DEPLOYMENT_RECIEPT_PERFORMATIVE.containing_type = _OCEANMESSAGE
+_OCEANMESSAGE_CREATE_POOL_PERFORMATIVE.containing_type = _OCEANMESSAGE
+_OCEANMESSAGE_DOWNLOAD_JOB_PERFORMATIVE.containing_type = _OCEANMESSAGE
 _OCEANMESSAGE_PERMISSION_DATASET_PERFORMATIVE.containing_type = _OCEANMESSAGE
 _OCEANMESSAGE_D2C_JOB_PERFORMATIVE.containing_type = _OCEANMESSAGE
 _OCEANMESSAGE_RESULTS_PERFORMATIVE.containing_type = _OCEANMESSAGE
@@ -1312,6 +1593,9 @@ _OCEANMESSAGE_ERROR_PERFORMATIVE.fields_by_name[
 _OCEANMESSAGE_ERROR_PERFORMATIVE.containing_type = _OCEANMESSAGE
 _OCEANMESSAGE_END_PERFORMATIVE.containing_type = _OCEANMESSAGE
 _OCEANMESSAGE.fields_by_name[
+    "create_pool"
+].message_type = _OCEANMESSAGE_CREATE_POOL_PERFORMATIVE
+_OCEANMESSAGE.fields_by_name[
     "d2c_job"
 ].message_type = _OCEANMESSAGE_D2C_JOB_PERFORMATIVE
 _OCEANMESSAGE.fields_by_name[
@@ -1326,14 +1610,26 @@ _OCEANMESSAGE.fields_by_name[
 _OCEANMESSAGE.fields_by_name[
     "deployment_reciept"
 ].message_type = _OCEANMESSAGE_DEPLOYMENT_RECIEPT_PERFORMATIVE
+_OCEANMESSAGE.fields_by_name[
+    "download_job"
+].message_type = _OCEANMESSAGE_DOWNLOAD_JOB_PERFORMATIVE
 _OCEANMESSAGE.fields_by_name["end"].message_type = _OCEANMESSAGE_END_PERFORMATIVE
 _OCEANMESSAGE.fields_by_name["error"].message_type = _OCEANMESSAGE_ERROR_PERFORMATIVE
 _OCEANMESSAGE.fields_by_name[
     "permission_dataset"
 ].message_type = _OCEANMESSAGE_PERMISSION_DATASET_PERFORMATIVE
 _OCEANMESSAGE.fields_by_name[
+    "pool_deployment_reciept"
+].message_type = _OCEANMESSAGE_POOL_DEPLOYMENT_RECIEPT_PERFORMATIVE
+_OCEANMESSAGE.fields_by_name[
     "results"
 ].message_type = _OCEANMESSAGE_RESULTS_PERFORMATIVE
+_OCEANMESSAGE.oneofs_by_name["performative"].fields.append(
+    _OCEANMESSAGE.fields_by_name["create_pool"]
+)
+_OCEANMESSAGE.fields_by_name[
+    "create_pool"
+].containing_oneof = _OCEANMESSAGE.oneofs_by_name["performative"]
 _OCEANMESSAGE.oneofs_by_name["performative"].fields.append(
     _OCEANMESSAGE.fields_by_name["d2c_job"]
 )
@@ -1365,6 +1661,12 @@ _OCEANMESSAGE.fields_by_name[
     "deployment_reciept"
 ].containing_oneof = _OCEANMESSAGE.oneofs_by_name["performative"]
 _OCEANMESSAGE.oneofs_by_name["performative"].fields.append(
+    _OCEANMESSAGE.fields_by_name["download_job"]
+)
+_OCEANMESSAGE.fields_by_name[
+    "download_job"
+].containing_oneof = _OCEANMESSAGE.oneofs_by_name["performative"]
+_OCEANMESSAGE.oneofs_by_name["performative"].fields.append(
     _OCEANMESSAGE.fields_by_name["end"]
 )
 _OCEANMESSAGE.fields_by_name["end"].containing_oneof = _OCEANMESSAGE.oneofs_by_name[
@@ -1381,6 +1683,12 @@ _OCEANMESSAGE.oneofs_by_name["performative"].fields.append(
 )
 _OCEANMESSAGE.fields_by_name[
     "permission_dataset"
+].containing_oneof = _OCEANMESSAGE.oneofs_by_name["performative"]
+_OCEANMESSAGE.oneofs_by_name["performative"].fields.append(
+    _OCEANMESSAGE.fields_by_name["pool_deployment_reciept"]
+)
+_OCEANMESSAGE.fields_by_name[
+    "pool_deployment_reciept"
 ].containing_oneof = _OCEANMESSAGE.oneofs_by_name["performative"]
 _OCEANMESSAGE.oneofs_by_name["performative"].fields.append(
     _OCEANMESSAGE.fields_by_name["results"]
@@ -1431,6 +1739,15 @@ OceanMessage = _reflection.GeneratedProtocolMessageType(
                 # @@protoc_insertion_point(class_scope:aea.eightballer.ocean.v0_1_0.OceanMessage.Deploy_Algorithm_Performative)
             ),
         ),
+        Pool_Deployment_Reciept_Performative=_reflection.GeneratedProtocolMessageType(
+            "Pool_Deployment_Reciept_Performative",
+            (_message.Message,),
+            dict(
+                DESCRIPTOR=_OCEANMESSAGE_POOL_DEPLOYMENT_RECIEPT_PERFORMATIVE,
+                __module__="ocean_pb2"
+                # @@protoc_insertion_point(class_scope:aea.eightballer.ocean.v0_1_0.OceanMessage.Pool_Deployment_Reciept_Performative)
+            ),
+        ),
         Deployment_Reciept_Performative=_reflection.GeneratedProtocolMessageType(
             "Deployment_Reciept_Performative",
             (_message.Message,),
@@ -1438,6 +1755,24 @@ OceanMessage = _reflection.GeneratedProtocolMessageType(
                 DESCRIPTOR=_OCEANMESSAGE_DEPLOYMENT_RECIEPT_PERFORMATIVE,
                 __module__="ocean_pb2"
                 # @@protoc_insertion_point(class_scope:aea.eightballer.ocean.v0_1_0.OceanMessage.Deployment_Reciept_Performative)
+            ),
+        ),
+        Create_Pool_Performative=_reflection.GeneratedProtocolMessageType(
+            "Create_Pool_Performative",
+            (_message.Message,),
+            dict(
+                DESCRIPTOR=_OCEANMESSAGE_CREATE_POOL_PERFORMATIVE,
+                __module__="ocean_pb2"
+                # @@protoc_insertion_point(class_scope:aea.eightballer.ocean.v0_1_0.OceanMessage.Create_Pool_Performative)
+            ),
+        ),
+        Download_Job_Performative=_reflection.GeneratedProtocolMessageType(
+            "Download_Job_Performative",
+            (_message.Message,),
+            dict(
+                DESCRIPTOR=_OCEANMESSAGE_DOWNLOAD_JOB_PERFORMATIVE,
+                __module__="ocean_pb2"
+                # @@protoc_insertion_point(class_scope:aea.eightballer.ocean.v0_1_0.OceanMessage.Download_Job_Performative)
             ),
         ),
         Permission_Dataset_Performative=_reflection.GeneratedProtocolMessageType(
@@ -1504,7 +1839,10 @@ _sym_db.RegisterMessage(OceanMessage.ErrorCode)
 _sym_db.RegisterMessage(OceanMessage.Deploy_Data_Download_Performative)
 _sym_db.RegisterMessage(OceanMessage.Deploy_D2C_Performative)
 _sym_db.RegisterMessage(OceanMessage.Deploy_Algorithm_Performative)
+_sym_db.RegisterMessage(OceanMessage.Pool_Deployment_Reciept_Performative)
 _sym_db.RegisterMessage(OceanMessage.Deployment_Reciept_Performative)
+_sym_db.RegisterMessage(OceanMessage.Create_Pool_Performative)
+_sym_db.RegisterMessage(OceanMessage.Download_Job_Performative)
 _sym_db.RegisterMessage(OceanMessage.Permission_Dataset_Performative)
 _sym_db.RegisterMessage(OceanMessage.D2C_Job_Performative)
 _sym_db.RegisterMessage(OceanMessage.Results_Performative)

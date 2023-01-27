@@ -2,38 +2,40 @@
 
 import os
 from typing import List
-from ocean_lib.example_config import ExampleConfig
+from brownie.network import accounts
+from web3.main import Web3
+from ocean_lib.example_config import get_config_dict
 from ocean_lib.models.datatoken import Datatoken
 from ocean_lib.ocean.ocean import Ocean
-from ocean_lib.web3_internal.wallet import Wallet
+from ocean_lib.ocean.util import get_ocean_token_address
+from ocean_lib.web3_internal.utils import connect_to_network
 
 
 def distribute_ocean_tokens(
     ocean: Ocean,
     amount: int,
     recipients: List[str],
-    ocean_deployer_wallet: Wallet,
+    ocean_deployer_wallet,
 ) -> None:
     """
     Mint OCEAN tokens to seller and buyer
     """
-    OCEAN_token = Datatoken(ocean.web3, address=ocean.OCEAN_address)
+    OCEAN_token = Datatoken(
+        ocean.config_dict, address=get_ocean_token_address(ocean.config_dict)
+    )
 
     for recipient in recipients:
         if OCEAN_token.balanceOf(recipient) < amount:
-            OCEAN_token.transfer(recipient, amount, from_wallet=ocean_deployer_wallet)
+            OCEAN_token.mint(recipient, amount, {"from": ocean_deployer_wallet})
 
 
 if __name__ == "__main__":
-    config = ExampleConfig.get_config()
+    connect_to_network("development")
+
+    config = get_config_dict("development")
     ocean = Ocean(config)
-    amount = ocean.web3.toWei(10000, "ether")
-    ocean_deployer_wallet = Wallet(
-        ocean.web3,
-        private_key=os.getenv("FACTORY_DEPLOYER_PRIVATE_KEY"),
-        block_confirmations=config.block_confirmations,
-        transaction_timeout=config.transaction_timeout,
-    )
+    amount = Web3.toWei(10000, "ether")
+    ocean_deployer_wallet = accounts.add(os.getenv("FACTORY_DEPLOYER_PRIVATE_KEY"))
 
     recipients = []
     for private_key_envvar in ["SELLER_AEA_KEY_ETHEREUM", "BUYER_AEA_KEY_ETHEREUM"]:
@@ -41,13 +43,7 @@ if __name__ == "__main__":
         if not private_key:
             continue
 
-        w = Wallet(
-            ocean.web3,
-            private_key=private_key,
-            block_confirmations=config.block_confirmations,
-            transaction_timeout=config.transaction_timeout,
-        )
-
+        w = accounts.add(private_key)
         recipients.append(w.address)
 
     distribute_ocean_tokens(ocean, amount, recipients, ocean_deployer_wallet)
