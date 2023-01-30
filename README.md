@@ -3,12 +3,12 @@
 ## Intro
 
 Ocean Simple Seller is the middleware between Ocean connection and AEA agents.
-AEA agents can be programmed to publish data and use Compute to Data feature
+AEA agents can be programmed to publish/consume data and use Compute to Data feature
 from Ocean core.
 
 The scenario is composed by a seller and a buyer which are two AEA agents.
-`Seller` publishes data assets and algorithms with Fixed Rate pricing schema &
-`buyer` consumes the data and pays for the algorithm access.
+The `seller` publishes data assets and algorithms with Fixed Rate pricing schema &
+the `buyer` consumes the data and pays for the algorithm access.
 
 
 ## Setup
@@ -37,8 +37,6 @@ make install_env
 
 `go` is required by the libp2p connection. Install go using the official
 installation docs: https://go.dev/doc/install
-
-In order to install the `protobuf` dependency, JVM needs to be present as well.
 
 `protobuf-compiler` is required for compiling the `.proto` files.
 Install it using the following command on Ubuntu:
@@ -106,35 +104,7 @@ cd src || exit
 ./run_ocean_buyer.sh
 ```
 
-# Components
-
-- gitlab ci
-
-  - The ci contains the basic configuration required to launch a launch a gitlab ci
-
-- Dockerfile
-
-  - Basic Dockerfile which installs deps and launchs the app
-
-- makefile
-  - lints
-    - isort
-    - black
-    - code clean
-- pre-commit hooks for the build process
-
-- scripts
-
-  - app.py launcher for debugging and launching docker process
-
-- Pipfile
-
-- gitignore
-- docker ignore
-- .env file
-- docs
-
-# Example running docs
+## Running docs
 
 1. clone repo
 2. setup a new environment
@@ -148,23 +118,3 @@ cd src || exit
 ```
 
 Visit http://127.0.0.1:8000/
-
-# dev tools
-
-setup pre-commit hooks
-
-```console
-make install_hooks
-```
-
-lint, format, and sense check code
-
-```console
-make lint
-```
-
-run tests
-
-```console
-make tests
-```
