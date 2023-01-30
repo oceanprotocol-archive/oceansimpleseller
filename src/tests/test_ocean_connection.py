@@ -15,7 +15,6 @@ from brownie.network import accounts, chain
 
 from src.distribute_ocean_tokens import distribute_ocean_tokens
 from src.packages.eightballer.connections.ocean.utils import (
-    convert_to_bytes_format,
     get_tx_dict,
 )
 
