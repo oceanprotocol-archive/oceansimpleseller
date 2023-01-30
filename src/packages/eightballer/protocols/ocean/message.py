@@ -641,8 +641,8 @@ class OceanMessage(Message):
             ):
                 expected_nb_of_contents = 1
                 enforce(
-                    isinstance(self.exchange_id, str),
-                    "Invalid type for content 'exchange_id'. Expected 'str'. Found '{}'.".format(
+                    isinstance(self.exchange_id, bytes),
+                    "Invalid type for content 'exchange_id'. Expected 'bytes'. Found '{}'.".format(
                         type(self.exchange_id)
                     ),
                 )
@@ -720,8 +720,8 @@ class OceanMessage(Message):
                     ),
                 )
                 enforce(
-                    isinstance(self.exchange_id, str),
-                    "Invalid type for content 'exchange_id'. Expected 'str'. Found '{}'.".format(
+                    isinstance(self.exchange_id, bytes),
+                    "Invalid type for content 'exchange_id'. Expected 'bytes'. Found '{}'.".format(
                         type(self.exchange_id)
                     ),
                 )

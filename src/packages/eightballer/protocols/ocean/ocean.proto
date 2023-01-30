@@ -58,7 +58,7 @@ message OceanMessage{
   }
 
   message Exchange_Deployment_Reciept_Performative{
-    string exchange_id = 1;
+    bytes exchange_id = 1;
   }
 
   message Deployment_Reciept_Performative{
@@ -78,7 +78,7 @@ message OceanMessage{
     int32 datatoken_amt = 2;
     int32 max_cost_ocean = 3;
     string asset_did = 4;
-    string exchange_id = 5;
+    bytes exchange_id = 5;
   }
 
   message Permission_Dataset_Performative{

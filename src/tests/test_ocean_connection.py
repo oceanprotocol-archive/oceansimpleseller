@@ -15,7 +15,6 @@ from brownie.network import accounts, chain
 
 from src.distribute_ocean_tokens import distribute_ocean_tokens
 from src.packages.eightballer.connections.ocean.utils import (
-    convert_to_bytes_format,
     get_tx_dict,
 )
 
@@ -579,15 +578,6 @@ def test_purchase_datatoken(put_envelope):
     envelope = Envelope(to="test", sender="msg.sender", message=ocean_message)
 
     ocean2.on_send(envelope)
-
-
-def test_convert_to_bytes_format():
-    """Tests convert_to_bytes_format function."""
-    data = "0x026c072ecb088ee833e8e98776fe31e2779888852c7619ed9aa8ca4942e9608a"
-    assert isinstance(data, str)
-    new_data = convert_to_bytes_format(Web3, data=data)
-    assert isinstance(new_data, bytes)
-    assert len(new_data) == 32
 
 
 def test_get_tx_dict_on_ganache():

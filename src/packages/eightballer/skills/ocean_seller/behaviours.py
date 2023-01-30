@@ -4,15 +4,13 @@ from aea.helpers.search.models import Description
 from aea.skills.base import Behaviour, Envelope
 from aea.skills.behaviours import TickerBehaviour
 
-from packages.eightballer.protocols.file_storage.message import \
-    FileStorageMessage
+from packages.eightballer.protocols.file_storage.message import FileStorageMessage
 from packages.eightballer.protocols.ocean.message import OceanMessage
 from packages.eightballer.skills.ocean_seller import PUBLIC_ID as SENDER_ID
 from packages.eightballer.skills.ocean_seller.dialogues import (
     LedgerApiDialogues, OefSearchDialogues)
 from packages.eightballer.skills.ocean_seller.strategy import GenericStrategy
-from packages.fetchai.connections.ledger.base import \
-    CONNECTION_ID as LEDGER_CONNECTION_PUBLIC_ID
+from packages.fetchai.connections.ledger.base import CONNECTION_ID as LEDGER_CONNECTION_PUBLIC_ID
 from packages.fetchai.protocols.ledger_api.message import LedgerApiMessage
 from packages.fetchai.protocols.oef_search.message import OefSearchMessage
 
