@@ -10,9 +10,9 @@ fingerprint:
   __init__.py: QmcdGhFu2JokEmrrw1WPf6VN2N776ntSFwKTueanPqRc7D
   custom_types.py: QmZ1roPfCHpiWdfkpKsHXWZTcRyLUBoB68JtSchqU8irmQ
   dialogues.py: QmdohSndZCjm6FhvoCGSR5B4sApgfkeho8RqccDpfQRfd5
-  message.py: QmTtJHi6o96KX1xKgPNsSHEHGT1Gcn721bpZbBZg1C4h13
-  ocean.proto: QmRud6XyHn3UYCdMxLmFJ1XpMN8G5JsmNoEyNsTQswpiVb
-  ocean_pb2.py: QmS3kcGTjUrGuUU7PxEsDAsseZiq6PgaMHqowRekLrANy1
+  message.py: QmSUPdhH3ekdLgnVUBeDjMqNj5EUavdZRyjMVRmLoGJe5W
+  ocean.proto: QmXvdMAgPVnpr9f86qeXsPipLuAtuXrC2sHqBm5eutUDod
+  ocean_pb2.py: QmNoJB2PHwSWwwgfZu9tGabKqUVbF8bJv6brVF4ZVqQw23
   serialization.py: QmSkbYC7Ctjh6ggHkWfzPE9zJZzRavr2Cmn9idWnnbP4sA
 fingerprint_ignore_patterns: []
 dependencies:

@@ -17,29 +17,30 @@
 #
 # ------------------------------------------------------------------------------
 import requests
-from brownie.network.gas.strategies import GasNowScalingStrategy
 from web3.main import Web3
 
 
-def convert_to_bytes_format(web3, data: str) -> bytes:
-    """Converts a bytes string into bytes.
-    Used for smart contracts calls."""
-
-    bytes_data = web3.toBytes(hexstr=data)
-    assert isinstance(bytes_data, bytes), "Invalid data provided."
-
-    return bytes_data
-
-
 def get_tx_dict(ocean_config: dict, wallet, chain) -> dict:
-    if "polygon" in ocean_config["NETWORK_NAME"]:
-        gas_strategy = GasNowScalingStrategy("rapid")
-        print(
-            f"estimate gas: {wallet.estimate_gas()} \n priority fee: {chain.priority_fee} \n gas strategy: {gas_strategy.__dict__}"
-        )
-        gas_fees = requests.get("https://gasstation-mainnet.matic.network/v2").json()
-        print(f"gas resp from polygon: {gas_fees}")
-        priority_fee = Web3.toWei(gas_fees["fast"]["maxPriorityFee"], "gwei")
-        max_fee = Web3.toWei(gas_fees["fast"]["maxFee"], "gwei")
-        return {"from": wallet, "priority_fee": priority_fee, "max_fee": max_fee}
+    if ocean_config["NETWORK_NAME"] != "development":
+        gas_resp = requests.get("https://gasstation-mainnet.matic.network/v2")
+
+        if not gas_resp or gas_resp.status_code != 200:
+            print(
+                f"Invalid response from Polygon gas station. Retry with brownie values..."
+            )
+
+            return {
+                "from": wallet,
+                "priority_fee": chain.priority_fee,
+                "max_fee": chain.base_fee + 2 * chain.priority_fee,
+            }
+
+        return {
+            "from": wallet,
+            "priority_fee": Web3.toWei(
+                gas_resp.json()["fast"]["maxPriorityFee"], "gwei"
+            ),
+            "max_fee": Web3.toWei(gas_resp.json()["fast"]["maxFee"], "gwei"),
+        }
+
     return {"from": wallet}
