@@ -8,10 +8,10 @@ license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   __init__.py: QmeRVgNCPPftthrxLRAD5T8zPioqYUWbUTctXZuXGz92ib
-  behaviours.py: QmXafChNwXWrQhTjA3txNV8aiDe12i6ppuiFmY2qE4LH5J
+  behaviours.py: QmXJpPHJ2WdGEshLW7ky8tnhUE2sv94ivP62S1KFtENLfM
   dialogues.py: QmWxj5PGgc7AhXyG8mReJ41LYP6eRZ8mUQtWwFrwCZjMKg
   handlers.py: QmYtETVrSBKHRqksZE7FGfFSQEG4qWUvCqqRbSD6HBYAdq
-  strategy.py: QmcvofxYAJusNJQqRZakmNPbGNCvKQBFH9WxEkLNZUBwPV
+  strategy.py: QmQcznrTMiHNqGzbSb7LE3JJpMgRVLwGD59dKEwfRxzxwa
 fingerprint_ignore_patterns: []
 connections:
 - fetchai/ledger:0.21.5
@@ -64,6 +64,11 @@ models:
     class_name: OefSearchDialogues
   strategy:
     args:
+      algo_exchange_params:
+        datatoken_address: ''
+        datatoken_amt: 50
+        ocean_amt: 1
+        rate: 1
       algorithm_params:
         token0_name: DATA1
         token1_name: DATA1
@@ -83,6 +88,7 @@ models:
         data_nft_name: algo_nft_c2d
         datatoken_name: algo_token
         description: gpr
+        has_pricing_schema: true
       data_exchange_params:
         datatoken_address: ''
         datatoken_amt: 50
@@ -102,6 +108,7 @@ models:
         license: CCO
         date_created: '2019-12-28T10:55:11Z'
         description: Compute service to run GPR algorithm.
+        has_pricing_schema: true
       deployments:
         data_to_compute: {}
         data_download: {}

@@ -186,39 +186,58 @@ class OceanC2DBehaviour(Behaviour):
             return
 
         if strategy.purchased_data is not None and not strategy.has_purchased_datatoken:
-            self.log.info("purchasing data from the data fixed rate exchange")
+            self.log.info("purchasing data...")
 
-            self.__create_envelope(
-                OceanMessage.Performative.DOWNLOAD_JOB, **{
-                    "datatoken_address": "",
-                    "datatoken_amt": strategy.datatoken_amt,
-                    "max_cost_ocean": strategy.max_cost_ocean,
-                    "asset_did": strategy.purchased_data["data_did"],
-                    "exchange_id": strategy.purchased_data["data_exchange_id"],
-                }
-            )
+            if not strategy.purchased_data.get("data_exchange_id"):
+                self.__create_envelope(
+                    OceanMessage.Performative.DOWNLOAD_JOB, **{
+                        "datatoken_address": "",
+                        "datatoken_amt": strategy.datatoken_amt,
+                        "asset_did": strategy.purchased_data["data_did"],
+                        "order_tx_id": strategy.purchased_data["order_tx_id"],
+                    }
+                )
+            else:
+                self.__create_envelope(
+                    OceanMessage.Performative.DOWNLOAD_JOB, **{
+                        "datatoken_address": "",
+                        "datatoken_amt": strategy.datatoken_amt,
+                        "max_cost_ocean": strategy.max_cost_ocean,
+                        "asset_did": strategy.purchased_data["data_did"],
+                        "exchange_id": strategy.purchased_data["data_exchange_id"],
+                    }
+                )
 
             return
 
         if strategy.purchased_data is not None and strategy.has_purchased_datatoken and not strategy.has_purchased_algtoken:
-            self.log.info("purchasing data from the algorithm fixed rate exchange")
+            self.log.info("purchasing data from the algorithm...")
 
-            self.__create_envelope(
-                OceanMessage.Performative.DOWNLOAD_JOB, **{
-                    "datatoken_address": "",
-                    "datatoken_amt": strategy.datatoken_amt,
-                    "max_cost_ocean": strategy.max_cost_ocean,
-                    "asset_did": strategy.purchased_data["algo_did"],
-                    "exchange_id": strategy.purchased_data["algo_exchange_id"],
-                }
-            )
+            if not strategy.purchased_data.get("algo_exchange_id"):
+                self.__create_envelope(
+                    OceanMessage.Performative.DOWNLOAD_JOB, **{
+                        "datatoken_address": "",
+                        "datatoken_amt": strategy.datatoken_amt
+                    }
+                )
+            else:
+                self.__create_envelope(
+                    OceanMessage.Performative.DOWNLOAD_JOB, **{
+                        "datatoken_address": "",
+                        "datatoken_amt": strategy.datatoken_amt,
+                        "max_cost_ocean": strategy.max_cost_ocean,
+                        "asset_did": strategy.purchased_data["algo_did"],
+                        "exchange_id": strategy.purchased_data["algo_exchange_id"],
+                    }
+                )
 
             return
 
         if strategy.purchased_data is not None and not strategy.has_completed_d2c_job:
             self.log.info(f"submitting the compute 2 data job!")
-            strategy.purchased_data.pop("algo_exchange_id")
-            strategy.purchased_data.pop("data_exchange_id")
+            if strategy.purchased_data.get("algo_exchange_id") and strategy.purchased_data.get("data_exchange_id"):
+                strategy.purchased_data.pop("algo_exchange_id")
+                strategy.purchased_data.pop("data_exchange_id")
             self.__create_envelope(
                 OceanMessage.Performative.D2C_JOB, **strategy.purchased_data
             )

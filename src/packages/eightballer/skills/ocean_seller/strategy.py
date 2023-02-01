@@ -5,11 +5,13 @@ from typing import Any, Dict, Optional, Tuple
 from aea.common import Address
 from aea.crypto.ledger_apis import LedgerApis
 from aea.exceptions import enforce
-from aea.helpers.search.generic import (AGENT_LOCATION_MODEL,
-                                        AGENT_PERSONALITY_MODEL,
-                                        AGENT_REMOVE_SERVICE_MODEL,
-                                        AGENT_SET_SERVICE_MODEL,
-                                        SIMPLE_SERVICE_MODEL)
+from aea.helpers.search.generic import (
+    AGENT_LOCATION_MODEL,
+    AGENT_PERSONALITY_MODEL,
+    AGENT_REMOVE_SERVICE_MODEL,
+    AGENT_SET_SERVICE_MODEL,
+    SIMPLE_SERVICE_MODEL,
+)
 from aea.helpers.search.models import Description, Location, Query
 from aea.helpers.transaction.base import Terms
 from aea.skills.base import Model
@@ -59,6 +61,7 @@ class GenericStrategy(Model):
     _algorithm_params = {}
     _download_params = {}
     _data_exchange_params = {}
+    _algo_exchange_params = {}
 
     _is_d2c_active = False
     _is_download_active = False
@@ -208,6 +211,14 @@ class GenericStrategy(Model):
         self._data_exchange_params = value
 
     @property
+    def algo_exchange_params(self):
+        return self._algo_exchange_params
+
+    @algo_exchange_params.setter
+    def algo_exchange_params(self, value):
+        self._algo_exchange_params = value
+
+    @property
     def download_params(self):
         return self._download_params
 
@@ -272,6 +283,7 @@ class GenericStrategy(Model):
         self._algorithm_params = kwargs.pop("algorithm_params")
         self._download_params = kwargs.pop("download_params")
         self._data_exchange_params = kwargs.pop("data_exchange_params")
+        self._algo_exchange_params = kwargs.pop("algo_exchange_params")
         self._deployments = kwargs.pop("deployments")
 
         self._is_seller_active = False
@@ -474,20 +486,31 @@ class GenericStrategy(Model):
             )
         return {"algo_did": algo_did, "data_did": data_did}
 
-    def get_create_fixed_rate_exchange_request(self, is_data=True):
-        if is_data:
-            data_did = self.data_to_compute_address.get("datatoken_contract_address", None)
+    def get_create_fixed_rate_exchange_request(self, is_data_asset=True):
+        if is_data_asset:
+            datatoken_address = self.data_to_compute_address.get(
+                "datatoken_contract_address", None
+            )
+            request = {
+                "datatoken_amt": self.data_exchange_params["datatoken_amt"],
+                "ocean_amt": self.data_exchange_params["ocean_amt"],
+                "rate": self.data_exchange_params["rate"],
+            }
         else:
-            data_did = self.algorithm_address.get("datatoken_contract_address", None)
-
-        if data_did is None:
-            raise ValueError(
-                "Agent does not have data did! make sure it has been deployed."
+            datatoken_address = self.algorithm_address.get(
+                "datatoken_contract_address", None
             )
 
-        return {
-            "datatoken_address": data_did,
-            "datatoken_amt": self.data_exchange_params["datatoken_amt"],
-            "ocean_amt": self.data_exchange_params["ocean_amt"],
-            "rate": self.data_exchange_params["rate"]
-        }
+            request = {
+                "datatoken_amt": self.algo_exchange_params["datatoken_amt"],
+                "ocean_amt": self.algo_exchange_params["ocean_amt"],
+                "rate": self.algo_exchange_params["rate"],
+            }
+
+        if datatoken_address is None:
+            raise ValueError(
+                "Agent does not have datatoken address! Make sure it has been deployed."
+            )
+        request["datatoken_address"] = datatoken_address
+
+        return request
