@@ -127,6 +127,7 @@ class OceanMessage(Message):
             "rate",
             "order_tx_id",
             "has_pricing_schema",
+            "dispenser_status",
         )
 
     def __init__(
