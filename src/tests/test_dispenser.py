@@ -15,8 +15,6 @@ from packages.eightballer.protocols.ocean.message import OceanMessage
 from web3.main import Web3
 from brownie.network import accounts, chain
 
-from src.distribute_ocean_tokens import distribute_ocean_tokens
-
 
 @patch.object(OceanConnection, "put_envelope")
 def test_create_dispenser(put_envelope):
@@ -190,7 +188,7 @@ def test_purchase_datatoken(put_envelope):
     loop.run_until_complete(ocean.connect())
 
     ocean_message = OceanMessage(
-        OceanMessage.Performative.DEPLOY_D2C,
+        OceanMessage.Performative.DEPLOY_DATA_DOWNLOAD,
         _body={
             "data_nft_name": "data_nft_c2d",
             "datatoken_name": "datatoken_c2d",
@@ -200,6 +198,7 @@ def test_purchase_datatoken(put_envelope):
             "description": "example",
             "author": "Trent",
             "license": "CCO",
+            "has_pricing_schema": False,
         },
     )
 
@@ -250,6 +249,7 @@ def test_purchase_datatoken(put_envelope):
             "author": "Trent",
             "license": "CCO",
             "date_created": "2019-12-28T10:55:11Z",
+            "has_pricing_schema": False,
         },
     )
 
@@ -342,30 +342,6 @@ def test_purchase_datatoken(put_envelope):
             "order_tx_id": tx.txid,
         },
     )
-
-    # seller_wallet = accounts.add(os.environ["SELLER_AEA_KEY_ETHEREUM"])
-    # buyer_wallet = accounts.add(os.environ["BUYER_AEA_KEY_ETHEREUM"])
-    # amount = Web3.toWei(100, "ether")
-    # ocean_deployer_wallet = accounts.add(os.getenv("FACTORY_DEPLOYER_PRIVATE_KEY"))
-    # if OCEAN_token.balanceOf(seller_wallet.address) == 0:
-    #     distribute_ocean_tokens(
-    #         ocean.ocean, amount, [seller_wallet.address], ocean_deployer_wallet
-    #     )
-    # if (
-    #     OCEAN_token.balanceOf(buyer_wallet.address) == 0
-    #     and OCEAN_token.balanceOf(seller_wallet.address) > 0
-    # ):
-    #     OCEAN_token.transfer(
-    #         buyer_wallet.address, Web3.toWei(50, "ether"), {"from": seller_wallet}
-    #     )
-    #
-    # assert OCEAN_token.balanceOf(seller_wallet.address) > 0
-    # assert OCEAN_token.balanceOf(buyer_wallet.address) > 0
-    #
-    # datatoken.mint(
-    #     buyer_wallet.address, Web3.toWei(50, "ether"), {"from": seller_wallet}
-    # )
-    # assert datatoken.balanceOf(buyer_wallet.address) > 0
 
     envelope = Envelope(to="test", sender="msg.sender", message=ocean_message)
 
