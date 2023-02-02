@@ -46,7 +46,7 @@ def test_datatoken_creation(put_envelope):
     loop.run_until_complete(ocean.connect())
 
     ocean_message = OceanMessage(
-        OceanMessage.Performative.DEPLOY_D2C,
+        OceanMessage.Performative.DEPLOY_DATA_DOWNLOAD,
         _body={
             "data_nft_name": "data_nft_c2d",
             "datatoken_name": "datatoken_c2d",
@@ -56,6 +56,7 @@ def test_datatoken_creation(put_envelope):
             "description": "example",
             "author": "Trent",
             "license": "CCO",
+            "has_pricing_schema": True,
         },
     )
 
@@ -109,6 +110,7 @@ def test_deploy_algorithm(put_envelope):
             "author": "Trent",
             "license": "CCO",
             "date_created": "2019-12-28T10:55:11Z",
+            "has_pricing_schema": True,
         },
     )
 
@@ -148,7 +150,7 @@ def test_permission_dataset(put_envelope):
     loop.run_until_complete(ocean.connect())
 
     ocean_message = OceanMessage(
-        OceanMessage.Performative.DEPLOY_D2C,
+        OceanMessage.Performative.DEPLOY_DATA_DOWNLOAD,
         _body={
             "data_nft_name": "data_nft_c2d",
             "datatoken_name": "datatoken_c2d",
@@ -158,6 +160,7 @@ def test_permission_dataset(put_envelope):
             "description": "example",
             "author": "Trent",
             "license": "CCO",
+            "has_pricing_schema": True,
         },
     )
 
@@ -208,6 +211,7 @@ def test_permission_dataset(put_envelope):
             "author": "Trent",
             "license": "CCO",
             "date_created": "2019-12-28T10:55:11Z",
+            "has_pricing_schema": True,
         },
     )
 
@@ -265,7 +269,7 @@ def test_create_fixed_rate(put_envelope):
     loop.run_until_complete(ocean.connect())
 
     ocean_message = OceanMessage(
-        OceanMessage.Performative.DEPLOY_D2C,
+        OceanMessage.Performative.DEPLOY_DATA_DOWNLOAD,
         _body={
             "data_nft_name": "data_nft_c2d",
             "datatoken_name": "datatoken_c2d",
@@ -325,6 +329,7 @@ def test_create_fixed_rate(put_envelope):
             "author": "Trent",
             "license": "CCO",
             "date_created": "2019-12-28T10:55:11Z",
+            "has_pricing_schema": True,
         },
     )
 
@@ -406,7 +411,7 @@ def test_purchase_datatoken(put_envelope):
     loop.run_until_complete(ocean.connect())
 
     ocean_message = OceanMessage(
-        OceanMessage.Performative.DEPLOY_D2C,
+        OceanMessage.Performative.DEPLOY_DATA_DOWNLOAD,
         _body={
             "data_nft_name": "data_nft_c2d",
             "datatoken_name": "datatoken_c2d",
@@ -416,6 +421,7 @@ def test_purchase_datatoken(put_envelope):
             "description": "example",
             "author": "Trent",
             "license": "CCO",
+            "has_pricing_schema": True,
         },
     )
 
@@ -466,6 +472,7 @@ def test_purchase_datatoken(put_envelope):
             "author": "Trent",
             "license": "CCO",
             "date_created": "2019-12-28T10:55:11Z",
+            "has_pricing_schema": True,
         },
     )
 
