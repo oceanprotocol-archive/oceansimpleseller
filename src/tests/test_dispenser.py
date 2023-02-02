@@ -47,7 +47,7 @@ def test_create_dispenser(put_envelope):
     loop.run_until_complete(ocean.connect())
 
     ocean_message = OceanMessage(
-        OceanMessage.Performative.DEPLOY_DATA_DOWNLOAD,
+        OceanMessage.Performative.DEPLOY_D2C,
         _body={
             "data_nft_name": "data_nft_c2d",
             "datatoken_name": "datatoken_c2d",
@@ -188,7 +188,7 @@ def test_purchase_datatoken(put_envelope):
     loop.run_until_complete(ocean.connect())
 
     ocean_message = OceanMessage(
-        OceanMessage.Performative.DEPLOY_DATA_DOWNLOAD,
+        OceanMessage.Performative.DEPLOY_D2C,
         _body={
             "data_nft_name": "data_nft_c2d",
             "datatoken_name": "datatoken_c2d",

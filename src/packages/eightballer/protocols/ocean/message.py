@@ -572,6 +572,12 @@ class OceanMessage(Message):
                         type(self.amount_to_mint)
                     ),
                 )
+                enforce(
+                    type(self.has_pricing_schema) is bool,
+                    "Invalid type for content 'has_pricing_schema'. Expected 'bool'. Found '{}'.".format(
+                        type(self.has_pricing_schema)
+                    ),
+                )
             elif self.performative == OceanMessage.Performative.DEPLOY_ALGORITHM:
                 expected_nb_of_contents = 15
                 enforce(
