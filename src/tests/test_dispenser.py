@@ -324,12 +324,11 @@ def test_purchase_datatoken(put_envelope):
 
     ocean2.on_connect()
 
-    # seller_wallet = accounts.add(os.environ["SELLER_AEA_KEY_ETHEREUM"])
     buyer_wallet = accounts.add(os.environ["BUYER_AEA_KEY_ETHEREUM"])
 
     datatoken = ocean2.ocean.get_datatoken(datatoken_address)
     tx = datatoken.dispense(
-        amount=Web3.toWei(envelope.message.datatoken_amt, "ether"),
+        amount=Web3.toWei(2, "ether"),
         tx_dict={"from": buyer_wallet},
     )
 
