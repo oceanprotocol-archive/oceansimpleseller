@@ -21,7 +21,7 @@ from web3.main import Web3
 
 
 def get_tx_dict(ocean_config: dict, wallet, chain) -> dict:
-    if ocean_config["NETWORK_NAME"] != "development":
+    if "polygon" in ocean_config["NETWORK_NAME"]:
         gas_resp = requests.get("https://gasstation-mainnet.matic.network/v2")
 
         if not gas_resp or gas_resp.status_code != 200:
@@ -33,6 +33,7 @@ def get_tx_dict(ocean_config: dict, wallet, chain) -> dict:
                 "from": wallet,
                 "priority_fee": chain.priority_fee,
                 "max_fee": chain.base_fee + 2 * chain.priority_fee,
+                "required_confs": 3,
             }
 
         return {
@@ -41,6 +42,7 @@ def get_tx_dict(ocean_config: dict, wallet, chain) -> dict:
                 gas_resp.json()["fast"]["maxPriorityFee"], "gwei"
             ),
             "max_fee": Web3.toWei(gas_resp.json()["fast"]["maxFee"], "gwei"),
+            "required_confs": 3,
         }
 
     return {"from": wallet}
