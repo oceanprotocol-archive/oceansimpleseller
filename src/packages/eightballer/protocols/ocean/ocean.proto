@@ -27,6 +27,7 @@ message OceanMessage{
     string date_created = 6;
     string license = 7;
     int32 amount_to_mint = 8;
+    bool has_pricing_schema = 9;
   }
 
   message Deploy_D2C_Performative{
@@ -55,16 +56,23 @@ message OceanMessage{
     string author = 12;
     string date_created = 13;
     string license = 14;
+    bool has_pricing_schema = 15;
   }
 
   message Exchange_Deployment_Reciept_Performative{
     bytes exchange_id = 1;
   }
 
+  message Dispenser_Deployment_Reciept_Performative {
+    string datatoken_address = 1;
+    bool dispenser_status = 2;
+  }
+
   message Deployment_Reciept_Performative{
     string type = 1;
     string did = 2;
     string datatoken_contract_address = 3;
+    bool has_pricing_schema = 15;
   }
 
   message Create_Fixed_Rate_Exchange_Performative{
@@ -73,12 +81,17 @@ message OceanMessage{
     int32 ocean_amt = 3;
   }
 
+  message Create_Dispenser_Performative {
+    string datatoken_address = 1;
+  }
+
   message Download_Job_Performative{
     string datatoken_address = 1;
     int32 datatoken_amt = 2;
     int32 max_cost_ocean = 3;
     string asset_did = 4;
     bytes exchange_id = 5;
+    string order_tx_id = 6;
   }
 
   message Permission_Dataset_Performative{
@@ -106,6 +119,7 @@ message OceanMessage{
 
 
   oneof performative{
+    Create_Dispenser_Performative create_dispenser = 4;
     Create_Fixed_Rate_Exchange_Performative create_fixed_rate_exchange = 5;
     D2C_Job_Performative d2c_job = 6;
     Deploy_Algorithm_Performative deploy_algorithm = 7;
@@ -116,7 +130,8 @@ message OceanMessage{
     End_Performative end = 12;
     Error_Performative error = 13;
     Permission_Dataset_Performative permission_dataset = 14;
-    Exchange_Deployment_Reciept_Performative exchange_deployment_reciept = 15;
-    Results_Performative results = 16;
+    Dispenser_Deployment_Reciept_Performative dispenser_deployment_reciept = 15;
+    Exchange_Deployment_Reciept_Performative exchange_deployment_reciept = 16;
+    Results_Performative results = 17;
   }
 }

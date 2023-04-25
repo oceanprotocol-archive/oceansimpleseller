@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='aea.eightballer.ocean.v0_1_0',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=_b('\n\x0bocean.proto\x12\x1c\x61\x65\x61.eightballer.ocean.v0_1_0\"\xa3\x17\n\x0cOceanMessage\x12x\n\x1a\x63reate_fixed_rate_exchange\x18\x05 \x01(\x0b\x32R.aea.eightballer.ocean.v0_1_0.OceanMessage.Create_Fixed_Rate_Exchange_PerformativeH\x00\x12R\n\x07\x64\x32\x63_job\x18\x06 \x01(\x0b\x32?.aea.eightballer.ocean.v0_1_0.OceanMessage.D2C_Job_PerformativeH\x00\x12\x64\n\x10\x64\x65ploy_algorithm\x18\x07 \x01(\x0b\x32H.aea.eightballer.ocean.v0_1_0.OceanMessage.Deploy_Algorithm_PerformativeH\x00\x12X\n\ndeploy_d2c\x18\x08 \x01(\x0b\x32\x42.aea.eightballer.ocean.v0_1_0.OceanMessage.Deploy_D2C_PerformativeH\x00\x12l\n\x14\x64\x65ploy_data_download\x18\t \x01(\x0b\x32L.aea.eightballer.ocean.v0_1_0.OceanMessage.Deploy_Data_Download_PerformativeH\x00\x12h\n\x12\x64\x65ployment_reciept\x18\n \x01(\x0b\x32J.aea.eightballer.ocean.v0_1_0.OceanMessage.Deployment_Reciept_PerformativeH\x00\x12\\\n\x0c\x64ownload_job\x18\x0b \x01(\x0b\x32\x44.aea.eightballer.ocean.v0_1_0.OceanMessage.Download_Job_PerformativeH\x00\x12J\n\x03\x65nd\x18\x0c \x01(\x0b\x32;.aea.eightballer.ocean.v0_1_0.OceanMessage.End_PerformativeH\x00\x12N\n\x05\x65rror\x18\r \x01(\x0b\x32=.aea.eightballer.ocean.v0_1_0.OceanMessage.Error_PerformativeH\x00\x12h\n\x12permission_dataset\x18\x0e \x01(\x0b\x32J.aea.eightballer.ocean.v0_1_0.OceanMessage.Permission_Dataset_PerformativeH\x00\x12z\n\x1b\x65xchange_deployment_reciept\x18\x0f \x01(\x0b\x32S.aea.eightballer.ocean.v0_1_0.OceanMessage.Exchange_Deployment_Reciept_PerformativeH\x00\x12R\n\x07results\x18\x10 \x01(\x0b\x32?.aea.eightballer.ocean.v0_1_0.OceanMessage.Results_PerformativeH\x00\x1a\xe4\x01\n\tErrorCode\x12V\n\nerror_code\x18\x01 \x01(\x0e\x32\x42.aea.eightballer.ocean.v0_1_0.OceanMessage.ErrorCode.ErrorCodeEnum\"\x7f\n\rErrorCodeEnum\x12\x18\n\x14UNSUPPORTED_PROTOCOL\x10\x00\x12\x12\n\x0e\x44\x45\x43ODING_ERROR\x10\x01\x12\x13\n\x0fINVALID_MESSAGE\x10\x02\x12\x15\n\x11UNSUPPORTED_SKILL\x10\x03\x12\x14\n\x10INVALID_DIALOGUE\x10\x04\x1a\xbf\x01\n!Deploy_Data_Download_Performative\x12\x13\n\x0btoken0_name\x18\x01 \x01(\t\x12\x13\n\x0btoken1_name\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x61taset_url\x18\x03 \x01(\t\x12\x0c\n\x04name\x18\x04 \x01(\t\x12\x0e\n\x06\x61uthor\x18\x05 \x01(\t\x12\x14\n\x0c\x64\x61te_created\x18\x06 \x01(\t\x12\x0f\n\x07license\x18\x07 \x01(\t\x12\x16\n\x0e\x61mount_to_mint\x18\x08 \x01(\x05\x1a\xb5\x01\n\x17\x44\x65ploy_D2C_Performative\x12\x13\n\x0btoken0_name\x18\x01 \x01(\t\x12\x13\n\x0btoken1_name\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x61taset_url\x18\x03 \x01(\t\x12\x0c\n\x04name\x18\x04 \x01(\t\x12\x0e\n\x06\x61uthor\x18\x05 \x01(\t\x12\x14\n\x0c\x64\x61te_created\x18\x06 \x01(\t\x12\x0f\n\x07license\x18\x07 \x01(\t\x12\x16\n\x0e\x61mount_to_mint\x18\x08 \x01(\x05\x1a\x9c\x02\n\x1d\x44\x65ploy_Algorithm_Performative\x12\x13\n\x0btoken0_name\x18\x01 \x01(\t\x12\x13\n\x0btoken1_name\x18\x02 \x01(\t\x12\x16\n\x0e\x61mount_to_mint\x18\x03 \x01(\x05\x12\x10\n\x08language\x18\x04 \x01(\t\x12\x0e\n\x06\x66ormat\x18\x05 \x01(\t\x12\x0f\n\x07version\x18\x06 \x01(\t\x12\x12\n\nentrypoint\x18\x07 \x01(\t\x12\r\n\x05image\x18\x08 \x01(\t\x12\x0b\n\x03tag\x18\t \x01(\t\x12\x11\n\tfiles_url\x18\n \x01(\t\x12\x0c\n\x04name\x18\x0b \x01(\t\x12\x0e\n\x06\x61uthor\x18\x0c \x01(\t\x12\x14\n\x0c\x64\x61te_created\x18\r \x01(\t\x12\x0f\n\x07license\x18\x0e \x01(\t\x1a?\n(Exchange_Deployment_Reciept_Performative\x12\x13\n\x0b\x65xchange_id\x18\x01 \x01(\x0c\x1a`\n\x1f\x44\x65ployment_Reciept_Performative\x12\x0c\n\x04type\x18\x01 \x01(\t\x12\x0b\n\x03\x64id\x18\x02 \x01(\t\x12\"\n\x1a\x64\x61tatoken_contract_address\x18\x03 \x01(\t\x1an\n\'Create_Fixed_Rate_Exchange_Performative\x12\x19\n\x11\x64\x61tatoken_address\x18\x01 \x01(\t\x12\x15\n\rdatatoken_amt\x18\x02 \x01(\x05\x12\x11\n\tocean_amt\x18\x03 \x01(\x05\x1a\x8d\x01\n\x19\x44ownload_Job_Performative\x12\x19\n\x11\x64\x61tatoken_address\x18\x01 \x01(\t\x12\x15\n\rdatatoken_amt\x18\x02 \x01(\x05\x12\x16\n\x0emax_cost_ocean\x18\x03 \x01(\x05\x12\x11\n\tasset_did\x18\x04 \x01(\t\x12\x13\n\x0b\x65xchange_id\x18\x05 \x01(\x0c\x1a\x45\n\x1fPermission_Dataset_Performative\x12\x10\n\x08\x61lgo_did\x18\x01 \x01(\t\x12\x10\n\x08\x64\x61ta_did\x18\x02 \x01(\t\x1a:\n\x14\x44\x32\x43_Job_Performative\x12\x10\n\x08\x64\x61ta_did\x18\x01 \x01(\t\x12\x10\n\x08\x61lgo_did\x18\x02 \x01(\t\x1a\'\n\x14Results_Performative\x12\x0f\n\x07\x63ontent\x18\x01 \x01(\x0c\x1a\x85\x02\n\x12\x45rror_Performative\x12H\n\nerror_code\x18\x01 \x01(\x0b\x32\x34.aea.eightballer.ocean.v0_1_0.OceanMessage.ErrorCode\x12\x11\n\terror_msg\x18\x02 \x01(\t\x12`\n\nerror_data\x18\x03 \x03(\x0b\x32L.aea.eightballer.ocean.v0_1_0.OceanMessage.Error_Performative.ErrorDataEntry\x1a\x30\n\x0e\x45rrorDataEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x0c:\x02\x38\x01\x1a\x12\n\x10\x45nd_PerformativeB\x0e\n\x0cperformativeb\x06proto3')
+  serialized_pb=_b('\n\x0bocean.proto\x12\x1c\x61\x65\x61.eightballer.ocean.v0_1_0\"\x8e\x1b\n\x0cOceanMessage\x12\x64\n\x10\x63reate_dispenser\x18\x04 \x01(\x0b\x32H.aea.eightballer.ocean.v0_1_0.OceanMessage.Create_Dispenser_PerformativeH\x00\x12x\n\x1a\x63reate_fixed_rate_exchange\x18\x05 \x01(\x0b\x32R.aea.eightballer.ocean.v0_1_0.OceanMessage.Create_Fixed_Rate_Exchange_PerformativeH\x00\x12R\n\x07\x64\x32\x63_job\x18\x06 \x01(\x0b\x32?.aea.eightballer.ocean.v0_1_0.OceanMessage.D2C_Job_PerformativeH\x00\x12\x64\n\x10\x64\x65ploy_algorithm\x18\x07 \x01(\x0b\x32H.aea.eightballer.ocean.v0_1_0.OceanMessage.Deploy_Algorithm_PerformativeH\x00\x12X\n\ndeploy_d2c\x18\x08 \x01(\x0b\x32\x42.aea.eightballer.ocean.v0_1_0.OceanMessage.Deploy_D2C_PerformativeH\x00\x12l\n\x14\x64\x65ploy_data_download\x18\t \x01(\x0b\x32L.aea.eightballer.ocean.v0_1_0.OceanMessage.Deploy_Data_Download_PerformativeH\x00\x12h\n\x12\x64\x65ployment_reciept\x18\n \x01(\x0b\x32J.aea.eightballer.ocean.v0_1_0.OceanMessage.Deployment_Reciept_PerformativeH\x00\x12\\\n\x0c\x64ownload_job\x18\x0b \x01(\x0b\x32\x44.aea.eightballer.ocean.v0_1_0.OceanMessage.Download_Job_PerformativeH\x00\x12J\n\x03\x65nd\x18\x0c \x01(\x0b\x32;.aea.eightballer.ocean.v0_1_0.OceanMessage.End_PerformativeH\x00\x12N\n\x05\x65rror\x18\r \x01(\x0b\x32=.aea.eightballer.ocean.v0_1_0.OceanMessage.Error_PerformativeH\x00\x12h\n\x12permission_dataset\x18\x0e \x01(\x0b\x32J.aea.eightballer.ocean.v0_1_0.OceanMessage.Permission_Dataset_PerformativeH\x00\x12|\n\x1c\x64ispenser_deployment_reciept\x18\x0f \x01(\x0b\x32T.aea.eightballer.ocean.v0_1_0.OceanMessage.Dispenser_Deployment_Reciept_PerformativeH\x00\x12z\n\x1b\x65xchange_deployment_reciept\x18\x10 \x01(\x0b\x32S.aea.eightballer.ocean.v0_1_0.OceanMessage.Exchange_Deployment_Reciept_PerformativeH\x00\x12R\n\x07results\x18\x11 \x01(\x0b\x32?.aea.eightballer.ocean.v0_1_0.OceanMessage.Results_PerformativeH\x00\x1a\xe4\x01\n\tErrorCode\x12V\n\nerror_code\x18\x01 \x01(\x0e\x32\x42.aea.eightballer.ocean.v0_1_0.OceanMessage.ErrorCode.ErrorCodeEnum\"\x7f\n\rErrorCodeEnum\x12\x18\n\x14UNSUPPORTED_PROTOCOL\x10\x00\x12\x12\n\x0e\x44\x45\x43ODING_ERROR\x10\x01\x12\x13\n\x0fINVALID_MESSAGE\x10\x02\x12\x15\n\x11UNSUPPORTED_SKILL\x10\x03\x12\x14\n\x10INVALID_DIALOGUE\x10\x04\x1a\xdb\x01\n!Deploy_Data_Download_Performative\x12\x13\n\x0btoken0_name\x18\x01 \x01(\t\x12\x13\n\x0btoken1_name\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x61taset_url\x18\x03 \x01(\t\x12\x0c\n\x04name\x18\x04 \x01(\t\x12\x0e\n\x06\x61uthor\x18\x05 \x01(\t\x12\x14\n\x0c\x64\x61te_created\x18\x06 \x01(\t\x12\x0f\n\x07license\x18\x07 \x01(\t\x12\x16\n\x0e\x61mount_to_mint\x18\x08 \x01(\x05\x12\x1a\n\x12has_pricing_schema\x18\t \x01(\x08\x1a\xb5\x01\n\x17\x44\x65ploy_D2C_Performative\x12\x13\n\x0btoken0_name\x18\x01 \x01(\t\x12\x13\n\x0btoken1_name\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x61taset_url\x18\x03 \x01(\t\x12\x0c\n\x04name\x18\x04 \x01(\t\x12\x0e\n\x06\x61uthor\x18\x05 \x01(\t\x12\x14\n\x0c\x64\x61te_created\x18\x06 \x01(\t\x12\x0f\n\x07license\x18\x07 \x01(\t\x12\x16\n\x0e\x61mount_to_mint\x18\x08 \x01(\x05\x1a\xb8\x02\n\x1d\x44\x65ploy_Algorithm_Performative\x12\x13\n\x0btoken0_name\x18\x01 \x01(\t\x12\x13\n\x0btoken1_name\x18\x02 \x01(\t\x12\x16\n\x0e\x61mount_to_mint\x18\x03 \x01(\x05\x12\x10\n\x08language\x18\x04 \x01(\t\x12\x0e\n\x06\x66ormat\x18\x05 \x01(\t\x12\x0f\n\x07version\x18\x06 \x01(\t\x12\x12\n\nentrypoint\x18\x07 \x01(\t\x12\r\n\x05image\x18\x08 \x01(\t\x12\x0b\n\x03tag\x18\t \x01(\t\x12\x11\n\tfiles_url\x18\n \x01(\t\x12\x0c\n\x04name\x18\x0b \x01(\t\x12\x0e\n\x06\x61uthor\x18\x0c \x01(\t\x12\x14\n\x0c\x64\x61te_created\x18\r \x01(\t\x12\x0f\n\x07license\x18\x0e \x01(\t\x12\x1a\n\x12has_pricing_schema\x18\x0f \x01(\x08\x1a?\n(Exchange_Deployment_Reciept_Performative\x12\x13\n\x0b\x65xchange_id\x18\x01 \x01(\x0c\x1a`\n)Dispenser_Deployment_Reciept_Performative\x12\x19\n\x11\x64\x61tatoken_address\x18\x01 \x01(\t\x12\x18\n\x10\x64ispenser_status\x18\x02 \x01(\x08\x1a|\n\x1f\x44\x65ployment_Reciept_Performative\x12\x0c\n\x04type\x18\x01 \x01(\t\x12\x0b\n\x03\x64id\x18\x02 \x01(\t\x12\"\n\x1a\x64\x61tatoken_contract_address\x18\x03 \x01(\t\x12\x1a\n\x12has_pricing_schema\x18\x0f \x01(\x08\x1an\n\'Create_Fixed_Rate_Exchange_Performative\x12\x19\n\x11\x64\x61tatoken_address\x18\x01 \x01(\t\x12\x15\n\rdatatoken_amt\x18\x02 \x01(\x05\x12\x11\n\tocean_amt\x18\x03 \x01(\x05\x1a:\n\x1d\x43reate_Dispenser_Performative\x12\x19\n\x11\x64\x61tatoken_address\x18\x01 \x01(\t\x1a\xa2\x01\n\x19\x44ownload_Job_Performative\x12\x19\n\x11\x64\x61tatoken_address\x18\x01 \x01(\t\x12\x15\n\rdatatoken_amt\x18\x02 \x01(\x05\x12\x16\n\x0emax_cost_ocean\x18\x03 \x01(\x05\x12\x11\n\tasset_did\x18\x04 \x01(\t\x12\x13\n\x0b\x65xchange_id\x18\x05 \x01(\x0c\x12\x13\n\x0border_tx_id\x18\x06 \x01(\t\x1a\x45\n\x1fPermission_Dataset_Performative\x12\x10\n\x08\x61lgo_did\x18\x01 \x01(\t\x12\x10\n\x08\x64\x61ta_did\x18\x02 \x01(\t\x1a:\n\x14\x44\x32\x43_Job_Performative\x12\x10\n\x08\x64\x61ta_did\x18\x01 \x01(\t\x12\x10\n\x08\x61lgo_did\x18\x02 \x01(\t\x1a\'\n\x14Results_Performative\x12\x0f\n\x07\x63ontent\x18\x01 \x01(\x0c\x1a\x85\x02\n\x12\x45rror_Performative\x12H\n\nerror_code\x18\x01 \x01(\x0b\x32\x34.aea.eightballer.ocean.v0_1_0.OceanMessage.ErrorCode\x12\x11\n\terror_msg\x18\x02 \x01(\t\x12`\n\nerror_data\x18\x03 \x03(\x0b\x32L.aea.eightballer.ocean.v0_1_0.OceanMessage.Error_Performative.ErrorDataEntry\x1a\x30\n\x0e\x45rrorDataEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x0c:\x02\x38\x01\x1a\x12\n\x10\x45nd_PerformativeB\x0e\n\x0cperformativeb\x06proto3')
 )
 
 
@@ -53,8 +53,8 @@ _OCEANMESSAGE_ERRORCODE_ERRORCODEENUM = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=1342,
-  serialized_end=1469,
+  serialized_start=1570,
+  serialized_end=1697,
 )
 _sym_db.RegisterEnumDescriptor(_OCEANMESSAGE_ERRORCODE_ERRORCODEENUM)
 
@@ -86,8 +86,8 @@ _OCEANMESSAGE_ERRORCODE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1241,
-  serialized_end=1469,
+  serialized_start=1469,
+  serialized_end=1697,
 )
 
 _OCEANMESSAGE_DEPLOY_DATA_DOWNLOAD_PERFORMATIVE = _descriptor.Descriptor(
@@ -153,6 +153,13 @@ _OCEANMESSAGE_DEPLOY_DATA_DOWNLOAD_PERFORMATIVE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='has_pricing_schema', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.Deploy_Data_Download_Performative.has_pricing_schema', index=8,
+      number=9, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -165,8 +172,8 @@ _OCEANMESSAGE_DEPLOY_DATA_DOWNLOAD_PERFORMATIVE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1472,
-  serialized_end=1663,
+  serialized_start=1700,
+  serialized_end=1919,
 )
 
 _OCEANMESSAGE_DEPLOY_D2C_PERFORMATIVE = _descriptor.Descriptor(
@@ -244,8 +251,8 @@ _OCEANMESSAGE_DEPLOY_D2C_PERFORMATIVE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1666,
-  serialized_end=1847,
+  serialized_start=1922,
+  serialized_end=2103,
 )
 
 _OCEANMESSAGE_DEPLOY_ALGORITHM_PERFORMATIVE = _descriptor.Descriptor(
@@ -353,6 +360,13 @@ _OCEANMESSAGE_DEPLOY_ALGORITHM_PERFORMATIVE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='has_pricing_schema', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.Deploy_Algorithm_Performative.has_pricing_schema', index=14,
+      number=15, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -365,8 +379,8 @@ _OCEANMESSAGE_DEPLOY_ALGORITHM_PERFORMATIVE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1850,
-  serialized_end=2134,
+  serialized_start=2106,
+  serialized_end=2418,
 )
 
 _OCEANMESSAGE_EXCHANGE_DEPLOYMENT_RECIEPT_PERFORMATIVE = _descriptor.Descriptor(
@@ -395,8 +409,45 @@ _OCEANMESSAGE_EXCHANGE_DEPLOYMENT_RECIEPT_PERFORMATIVE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2136,
-  serialized_end=2199,
+  serialized_start=2420,
+  serialized_end=2483,
+)
+
+_OCEANMESSAGE_DISPENSER_DEPLOYMENT_RECIEPT_PERFORMATIVE = _descriptor.Descriptor(
+  name='Dispenser_Deployment_Reciept_Performative',
+  full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.Dispenser_Deployment_Reciept_Performative',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='datatoken_address', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.Dispenser_Deployment_Reciept_Performative.datatoken_address', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='dispenser_status', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.Dispenser_Deployment_Reciept_Performative.dispenser_status', index=1,
+      number=2, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2485,
+  serialized_end=2581,
 )
 
 _OCEANMESSAGE_DEPLOYMENT_RECIEPT_PERFORMATIVE = _descriptor.Descriptor(
@@ -427,6 +478,13 @@ _OCEANMESSAGE_DEPLOYMENT_RECIEPT_PERFORMATIVE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='has_pricing_schema', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.Deployment_Reciept_Performative.has_pricing_schema', index=3,
+      number=15, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -439,8 +497,8 @@ _OCEANMESSAGE_DEPLOYMENT_RECIEPT_PERFORMATIVE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2201,
-  serialized_end=2297,
+  serialized_start=2583,
+  serialized_end=2707,
 )
 
 _OCEANMESSAGE_CREATE_FIXED_RATE_EXCHANGE_PERFORMATIVE = _descriptor.Descriptor(
@@ -483,8 +541,38 @@ _OCEANMESSAGE_CREATE_FIXED_RATE_EXCHANGE_PERFORMATIVE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2299,
-  serialized_end=2409,
+  serialized_start=2709,
+  serialized_end=2819,
+)
+
+_OCEANMESSAGE_CREATE_DISPENSER_PERFORMATIVE = _descriptor.Descriptor(
+  name='Create_Dispenser_Performative',
+  full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.Create_Dispenser_Performative',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='datatoken_address', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.Create_Dispenser_Performative.datatoken_address', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2821,
+  serialized_end=2879,
 )
 
 _OCEANMESSAGE_DOWNLOAD_JOB_PERFORMATIVE = _descriptor.Descriptor(
@@ -529,6 +617,13 @@ _OCEANMESSAGE_DOWNLOAD_JOB_PERFORMATIVE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='order_tx_id', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.Download_Job_Performative.order_tx_id', index=5,
+      number=6, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -541,8 +636,8 @@ _OCEANMESSAGE_DOWNLOAD_JOB_PERFORMATIVE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2412,
-  serialized_end=2553,
+  serialized_start=2882,
+  serialized_end=3044,
 )
 
 _OCEANMESSAGE_PERMISSION_DATASET_PERFORMATIVE = _descriptor.Descriptor(
@@ -578,8 +673,8 @@ _OCEANMESSAGE_PERMISSION_DATASET_PERFORMATIVE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2555,
-  serialized_end=2624,
+  serialized_start=3046,
+  serialized_end=3115,
 )
 
 _OCEANMESSAGE_D2C_JOB_PERFORMATIVE = _descriptor.Descriptor(
@@ -615,8 +710,8 @@ _OCEANMESSAGE_D2C_JOB_PERFORMATIVE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2626,
-  serialized_end=2684,
+  serialized_start=3117,
+  serialized_end=3175,
 )
 
 _OCEANMESSAGE_RESULTS_PERFORMATIVE = _descriptor.Descriptor(
@@ -645,8 +740,8 @@ _OCEANMESSAGE_RESULTS_PERFORMATIVE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2686,
-  serialized_end=2725,
+  serialized_start=3177,
+  serialized_end=3216,
 )
 
 _OCEANMESSAGE_ERROR_PERFORMATIVE_ERRORDATAENTRY = _descriptor.Descriptor(
@@ -682,8 +777,8 @@ _OCEANMESSAGE_ERROR_PERFORMATIVE_ERRORDATAENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2941,
-  serialized_end=2989,
+  serialized_start=3432,
+  serialized_end=3480,
 )
 
 _OCEANMESSAGE_ERROR_PERFORMATIVE = _descriptor.Descriptor(
@@ -726,8 +821,8 @@ _OCEANMESSAGE_ERROR_PERFORMATIVE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2728,
-  serialized_end=2989,
+  serialized_start=3219,
+  serialized_end=3480,
 )
 
 _OCEANMESSAGE_END_PERFORMATIVE = _descriptor.Descriptor(
@@ -749,8 +844,8 @@ _OCEANMESSAGE_END_PERFORMATIVE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2991,
-  serialized_end=3009,
+  serialized_start=3482,
+  serialized_end=3500,
 )
 
 _OCEANMESSAGE = _descriptor.Descriptor(
@@ -761,85 +856,99 @@ _OCEANMESSAGE = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='create_fixed_rate_exchange', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.create_fixed_rate_exchange', index=0,
+      name='create_dispenser', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.create_dispenser', index=0,
+      number=4, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='create_fixed_rate_exchange', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.create_fixed_rate_exchange', index=1,
       number=5, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='d2c_job', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.d2c_job', index=1,
+      name='d2c_job', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.d2c_job', index=2,
       number=6, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='deploy_algorithm', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.deploy_algorithm', index=2,
+      name='deploy_algorithm', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.deploy_algorithm', index=3,
       number=7, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='deploy_d2c', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.deploy_d2c', index=3,
+      name='deploy_d2c', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.deploy_d2c', index=4,
       number=8, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='deploy_data_download', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.deploy_data_download', index=4,
+      name='deploy_data_download', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.deploy_data_download', index=5,
       number=9, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='deployment_reciept', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.deployment_reciept', index=5,
+      name='deployment_reciept', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.deployment_reciept', index=6,
       number=10, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='download_job', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.download_job', index=6,
+      name='download_job', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.download_job', index=7,
       number=11, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='end', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.end', index=7,
+      name='end', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.end', index=8,
       number=12, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='error', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.error', index=8,
+      name='error', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.error', index=9,
       number=13, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='permission_dataset', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.permission_dataset', index=9,
+      name='permission_dataset', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.permission_dataset', index=10,
       number=14, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='exchange_deployment_reciept', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.exchange_deployment_reciept', index=10,
+      name='dispenser_deployment_reciept', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.dispenser_deployment_reciept', index=11,
       number=15, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='results', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.results', index=11,
+      name='exchange_deployment_reciept', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.exchange_deployment_reciept', index=12,
       number=16, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='results', full_name='aea.eightballer.ocean.v0_1_0.OceanMessage.results', index=13,
+      number=17, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -847,7 +956,7 @@ _OCEANMESSAGE = _descriptor.Descriptor(
   ],
   extensions=[
   ],
-  nested_types=[_OCEANMESSAGE_ERRORCODE, _OCEANMESSAGE_DEPLOY_DATA_DOWNLOAD_PERFORMATIVE, _OCEANMESSAGE_DEPLOY_D2C_PERFORMATIVE, _OCEANMESSAGE_DEPLOY_ALGORITHM_PERFORMATIVE, _OCEANMESSAGE_EXCHANGE_DEPLOYMENT_RECIEPT_PERFORMATIVE, _OCEANMESSAGE_DEPLOYMENT_RECIEPT_PERFORMATIVE, _OCEANMESSAGE_CREATE_FIXED_RATE_EXCHANGE_PERFORMATIVE, _OCEANMESSAGE_DOWNLOAD_JOB_PERFORMATIVE, _OCEANMESSAGE_PERMISSION_DATASET_PERFORMATIVE, _OCEANMESSAGE_D2C_JOB_PERFORMATIVE, _OCEANMESSAGE_RESULTS_PERFORMATIVE, _OCEANMESSAGE_ERROR_PERFORMATIVE, _OCEANMESSAGE_END_PERFORMATIVE, ],
+  nested_types=[_OCEANMESSAGE_ERRORCODE, _OCEANMESSAGE_DEPLOY_DATA_DOWNLOAD_PERFORMATIVE, _OCEANMESSAGE_DEPLOY_D2C_PERFORMATIVE, _OCEANMESSAGE_DEPLOY_ALGORITHM_PERFORMATIVE, _OCEANMESSAGE_EXCHANGE_DEPLOYMENT_RECIEPT_PERFORMATIVE, _OCEANMESSAGE_DISPENSER_DEPLOYMENT_RECIEPT_PERFORMATIVE, _OCEANMESSAGE_DEPLOYMENT_RECIEPT_PERFORMATIVE, _OCEANMESSAGE_CREATE_FIXED_RATE_EXCHANGE_PERFORMATIVE, _OCEANMESSAGE_CREATE_DISPENSER_PERFORMATIVE, _OCEANMESSAGE_DOWNLOAD_JOB_PERFORMATIVE, _OCEANMESSAGE_PERMISSION_DATASET_PERFORMATIVE, _OCEANMESSAGE_D2C_JOB_PERFORMATIVE, _OCEANMESSAGE_RESULTS_PERFORMATIVE, _OCEANMESSAGE_ERROR_PERFORMATIVE, _OCEANMESSAGE_END_PERFORMATIVE, ],
   enum_types=[
   ],
   serialized_options=None,
@@ -860,7 +969,7 @@ _OCEANMESSAGE = _descriptor.Descriptor(
       index=0, containing_type=None, fields=[]),
   ],
   serialized_start=46,
-  serialized_end=3025,
+  serialized_end=3516,
 )
 
 _OCEANMESSAGE_ERRORCODE.fields_by_name['error_code'].enum_type = _OCEANMESSAGE_ERRORCODE_ERRORCODEENUM
@@ -870,8 +979,10 @@ _OCEANMESSAGE_DEPLOY_DATA_DOWNLOAD_PERFORMATIVE.containing_type = _OCEANMESSAGE
 _OCEANMESSAGE_DEPLOY_D2C_PERFORMATIVE.containing_type = _OCEANMESSAGE
 _OCEANMESSAGE_DEPLOY_ALGORITHM_PERFORMATIVE.containing_type = _OCEANMESSAGE
 _OCEANMESSAGE_EXCHANGE_DEPLOYMENT_RECIEPT_PERFORMATIVE.containing_type = _OCEANMESSAGE
+_OCEANMESSAGE_DISPENSER_DEPLOYMENT_RECIEPT_PERFORMATIVE.containing_type = _OCEANMESSAGE
 _OCEANMESSAGE_DEPLOYMENT_RECIEPT_PERFORMATIVE.containing_type = _OCEANMESSAGE
 _OCEANMESSAGE_CREATE_FIXED_RATE_EXCHANGE_PERFORMATIVE.containing_type = _OCEANMESSAGE
+_OCEANMESSAGE_CREATE_DISPENSER_PERFORMATIVE.containing_type = _OCEANMESSAGE
 _OCEANMESSAGE_DOWNLOAD_JOB_PERFORMATIVE.containing_type = _OCEANMESSAGE
 _OCEANMESSAGE_PERMISSION_DATASET_PERFORMATIVE.containing_type = _OCEANMESSAGE
 _OCEANMESSAGE_D2C_JOB_PERFORMATIVE.containing_type = _OCEANMESSAGE
@@ -881,6 +992,7 @@ _OCEANMESSAGE_ERROR_PERFORMATIVE.fields_by_name['error_code'].message_type = _OC
 _OCEANMESSAGE_ERROR_PERFORMATIVE.fields_by_name['error_data'].message_type = _OCEANMESSAGE_ERROR_PERFORMATIVE_ERRORDATAENTRY
 _OCEANMESSAGE_ERROR_PERFORMATIVE.containing_type = _OCEANMESSAGE
 _OCEANMESSAGE_END_PERFORMATIVE.containing_type = _OCEANMESSAGE
+_OCEANMESSAGE.fields_by_name['create_dispenser'].message_type = _OCEANMESSAGE_CREATE_DISPENSER_PERFORMATIVE
 _OCEANMESSAGE.fields_by_name['create_fixed_rate_exchange'].message_type = _OCEANMESSAGE_CREATE_FIXED_RATE_EXCHANGE_PERFORMATIVE
 _OCEANMESSAGE.fields_by_name['d2c_job'].message_type = _OCEANMESSAGE_D2C_JOB_PERFORMATIVE
 _OCEANMESSAGE.fields_by_name['deploy_algorithm'].message_type = _OCEANMESSAGE_DEPLOY_ALGORITHM_PERFORMATIVE
@@ -891,8 +1003,12 @@ _OCEANMESSAGE.fields_by_name['download_job'].message_type = _OCEANMESSAGE_DOWNLO
 _OCEANMESSAGE.fields_by_name['end'].message_type = _OCEANMESSAGE_END_PERFORMATIVE
 _OCEANMESSAGE.fields_by_name['error'].message_type = _OCEANMESSAGE_ERROR_PERFORMATIVE
 _OCEANMESSAGE.fields_by_name['permission_dataset'].message_type = _OCEANMESSAGE_PERMISSION_DATASET_PERFORMATIVE
+_OCEANMESSAGE.fields_by_name['dispenser_deployment_reciept'].message_type = _OCEANMESSAGE_DISPENSER_DEPLOYMENT_RECIEPT_PERFORMATIVE
 _OCEANMESSAGE.fields_by_name['exchange_deployment_reciept'].message_type = _OCEANMESSAGE_EXCHANGE_DEPLOYMENT_RECIEPT_PERFORMATIVE
 _OCEANMESSAGE.fields_by_name['results'].message_type = _OCEANMESSAGE_RESULTS_PERFORMATIVE
+_OCEANMESSAGE.oneofs_by_name['performative'].fields.append(
+  _OCEANMESSAGE.fields_by_name['create_dispenser'])
+_OCEANMESSAGE.fields_by_name['create_dispenser'].containing_oneof = _OCEANMESSAGE.oneofs_by_name['performative']
 _OCEANMESSAGE.oneofs_by_name['performative'].fields.append(
   _OCEANMESSAGE.fields_by_name['create_fixed_rate_exchange'])
 _OCEANMESSAGE.fields_by_name['create_fixed_rate_exchange'].containing_oneof = _OCEANMESSAGE.oneofs_by_name['performative']
@@ -923,6 +1039,9 @@ _OCEANMESSAGE.fields_by_name['error'].containing_oneof = _OCEANMESSAGE.oneofs_by
 _OCEANMESSAGE.oneofs_by_name['performative'].fields.append(
   _OCEANMESSAGE.fields_by_name['permission_dataset'])
 _OCEANMESSAGE.fields_by_name['permission_dataset'].containing_oneof = _OCEANMESSAGE.oneofs_by_name['performative']
+_OCEANMESSAGE.oneofs_by_name['performative'].fields.append(
+  _OCEANMESSAGE.fields_by_name['dispenser_deployment_reciept'])
+_OCEANMESSAGE.fields_by_name['dispenser_deployment_reciept'].containing_oneof = _OCEANMESSAGE.oneofs_by_name['performative']
 _OCEANMESSAGE.oneofs_by_name['performative'].fields.append(
   _OCEANMESSAGE.fields_by_name['exchange_deployment_reciept'])
 _OCEANMESSAGE.fields_by_name['exchange_deployment_reciept'].containing_oneof = _OCEANMESSAGE.oneofs_by_name['performative']
@@ -969,6 +1088,13 @@ OceanMessage = _reflection.GeneratedProtocolMessageType('OceanMessage', (_messag
     ))
   ,
 
+  Dispenser_Deployment_Reciept_Performative = _reflection.GeneratedProtocolMessageType('Dispenser_Deployment_Reciept_Performative', (_message.Message,), dict(
+    DESCRIPTOR = _OCEANMESSAGE_DISPENSER_DEPLOYMENT_RECIEPT_PERFORMATIVE,
+    __module__ = 'ocean_pb2'
+    # @@protoc_insertion_point(class_scope:aea.eightballer.ocean.v0_1_0.OceanMessage.Dispenser_Deployment_Reciept_Performative)
+    ))
+  ,
+
   Deployment_Reciept_Performative = _reflection.GeneratedProtocolMessageType('Deployment_Reciept_Performative', (_message.Message,), dict(
     DESCRIPTOR = _OCEANMESSAGE_DEPLOYMENT_RECIEPT_PERFORMATIVE,
     __module__ = 'ocean_pb2'
@@ -980,6 +1106,13 @@ OceanMessage = _reflection.GeneratedProtocolMessageType('OceanMessage', (_messag
     DESCRIPTOR = _OCEANMESSAGE_CREATE_FIXED_RATE_EXCHANGE_PERFORMATIVE,
     __module__ = 'ocean_pb2'
     # @@protoc_insertion_point(class_scope:aea.eightballer.ocean.v0_1_0.OceanMessage.Create_Fixed_Rate_Exchange_Performative)
+    ))
+  ,
+
+  Create_Dispenser_Performative = _reflection.GeneratedProtocolMessageType('Create_Dispenser_Performative', (_message.Message,), dict(
+    DESCRIPTOR = _OCEANMESSAGE_CREATE_DISPENSER_PERFORMATIVE,
+    __module__ = 'ocean_pb2'
+    # @@protoc_insertion_point(class_scope:aea.eightballer.ocean.v0_1_0.OceanMessage.Create_Dispenser_Performative)
     ))
   ,
 
@@ -1041,8 +1174,10 @@ _sym_db.RegisterMessage(OceanMessage.Deploy_Data_Download_Performative)
 _sym_db.RegisterMessage(OceanMessage.Deploy_D2C_Performative)
 _sym_db.RegisterMessage(OceanMessage.Deploy_Algorithm_Performative)
 _sym_db.RegisterMessage(OceanMessage.Exchange_Deployment_Reciept_Performative)
+_sym_db.RegisterMessage(OceanMessage.Dispenser_Deployment_Reciept_Performative)
 _sym_db.RegisterMessage(OceanMessage.Deployment_Reciept_Performative)
 _sym_db.RegisterMessage(OceanMessage.Create_Fixed_Rate_Exchange_Performative)
+_sym_db.RegisterMessage(OceanMessage.Create_Dispenser_Performative)
 _sym_db.RegisterMessage(OceanMessage.Download_Job_Performative)
 _sym_db.RegisterMessage(OceanMessage.Permission_Dataset_Performative)
 _sym_db.RegisterMessage(OceanMessage.D2C_Job_Performative)

@@ -8,9 +8,13 @@ from packages.eightballer.protocols.file_storage.message import FileStorageMessa
 from packages.eightballer.protocols.ocean.message import OceanMessage
 from packages.eightballer.skills.ocean_seller import PUBLIC_ID as SENDER_ID
 from packages.eightballer.skills.ocean_seller.dialogues import (
-    LedgerApiDialogues, OefSearchDialogues)
+    LedgerApiDialogues,
+    OefSearchDialogues,
+)
 from packages.eightballer.skills.ocean_seller.strategy import GenericStrategy
-from packages.fetchai.connections.ledger.base import CONNECTION_ID as LEDGER_CONNECTION_PUBLIC_ID
+from packages.fetchai.connections.ledger.base import (
+    CONNECTION_ID as LEDGER_CONNECTION_PUBLIC_ID,
+)
 from packages.fetchai.protocols.ledger_api.message import LedgerApiMessage
 from packages.fetchai.protocols.oef_search.message import OefSearchMessage
 
@@ -216,11 +220,20 @@ class OceanC2DBehaviour(OceanBehaviourBase):
             )
             return
 
+        valid, message = self.__validate_pricing_schema(
+            params=strategy.data_to_compute_params,
+            exchange_params=strategy.data_exchange_params,
+        )
+        if not valid:
+            raise ValueError(message)
+
         if (
             strategy.is_data_permissioned
             and strategy.is_algorithm_deployed
             and strategy.is_data_to_compute_deployed
             and not strategy.download_params.get("data_exchange_id", None)
+            and strategy.data_to_compute_params["has_pricing_schema"]
+            and strategy.data_exchange_params
         ):
             self.log.info(f"Creating the data fixed rate exchange schema...")
             self.__create_envelope(
@@ -229,12 +242,21 @@ class OceanC2DBehaviour(OceanBehaviourBase):
             )
 
             return
+
+        valid, message = self.__validate_pricing_schema(
+            params=strategy.algorithm_params,
+            exchange_params=strategy.algo_exchange_params,
+        )
+        if not valid:
+            raise ValueError(message)
         if (
-                strategy.is_data_permissioned
-                and strategy.is_algorithm_deployed
-                and strategy.is_data_to_compute_deployed
-                and strategy.download_params.get("data_exchange_id", None)
-                and not strategy.download_params.get("algo_exchange_id", None)
+            strategy.is_data_permissioned
+            and strategy.is_algorithm_deployed
+            and strategy.is_data_to_compute_deployed
+            and strategy.download_params.get("data_exchange_id", None)
+            and not strategy.download_params.get("algo_exchange_id", None)
+            and strategy.algorithm_params["has_pricing_schema"]
+            and strategy.algo_exchange_params
         ):
             self.log.info(f"Creating the algorithm fixed rate exchange schema...")
             self.__create_envelope(
@@ -268,6 +290,25 @@ class OceanC2DBehaviour(OceanBehaviourBase):
         )
         self.context.outbox.put(file_upload_envolope)
         strategy.is_in_flight = True
+
+    def __validate_pricing_schema(self, params: dict, exchange_params: dict) -> tuple:
+
+        if "has_pricing_schema" not in params.keys():
+            return False, "Pricing schema not detected for this agent!"
+        if params["has_pricing_schema"] and not exchange_params:
+            return (
+                False,
+                "Parameters for fixed rate exchange are missing from the configuration!",
+            )
+
+        if not params["has_pricing_schema"] and exchange_params:
+
+            return (
+                False,
+                "Exchange parameters are not accepted if the asset does not have a pricing schema!",
+            )
+
+        return True, ""
 
 
 class OceanSellerBehaviour(Behaviour):

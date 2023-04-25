@@ -1,6 +1,6 @@
 #! /bin/bash
 
-NAME="ocean_seller"
+NAME="ocean_seller_dispenser"
 
 # distribute_ocean_tokens if using barge and ganache
 if [ $OCEAN_NETWORK_NAME == development ]; then
@@ -113,20 +113,8 @@ aea config set --type dict vendor.eightballer.skills.ocean_seller.strategy.args 
         "author": "Trent",
         "license": "CCO",
         "date_created": "2019-12-28T10:55:11Z",
-        "has_pricing_schema": True
+        "has_pricing_schema": False
         },
-    "data_exchange_params":{
-        "datatoken_address": "",
-        "datatoken_amt": 50,
-        "ocean_amt": 1,
-        "rate": 1
-    },
-    "algo_exchange_params":{
-        "datatoken_address": "",
-        "datatoken_amt": 50,
-        "ocean_amt": 1,
-        "rate": 1
-    },
 }'
 
 
