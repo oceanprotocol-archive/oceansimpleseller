@@ -279,6 +279,7 @@ def test_create_fixed_rate(put_envelope):
             "description": "example",
             "author": "Trent",
             "license": "CCO",
+            "has_pricing_schema": True,
         },
     )
 
