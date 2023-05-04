@@ -18,6 +18,19 @@
 # ------------------------------------------------------------------------------
 import requests
 from web3.main import Web3
+from _codecs import escape_decode
+
+CHAIN_ID_PER_NETWORK = {
+    "mainnet": 1,
+    "goerli": 5,
+    "bsc": 56,
+    "polygon-main": 137,
+    "energyweb": 246,
+    "moonriver": 1285,
+    "moonbase": 1287,
+    "development": 8996,
+    "polygon-test": 80001,
+}
 
 
 def get_tx_dict(ocean_config: dict, wallet, chain) -> dict:
@@ -52,7 +65,15 @@ def convert_to_bytes_format(web3, data: str) -> bytes:
     """Converts a bytes string into bytes.
     Used for smart contracts calls."""
 
-    bytes_data = web3.toBytes(hexstr=data)
+    if data[0:2] == "b'":
+        bytes_data = escape_decode(data[2:-1])[0]
+    else:
+        bytes_data = escape_decode(data)[0]
     assert isinstance(bytes_data, bytes), "Invalid data provided."
 
     return bytes_data
+
+
+def get_chain_id_from_network_name(network_name: str) -> int:
+    """Retrieves the chain ID for the required network name."""
+    return CHAIN_ID_PER_NETWORK[network_name]

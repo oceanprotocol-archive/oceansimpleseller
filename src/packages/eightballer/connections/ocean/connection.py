@@ -35,6 +35,7 @@ from packages.eightballer.protocols.ocean.message import OceanMessage
 from packages.eightballer.connections.ocean.utils import (
     convert_to_bytes_format,
     get_tx_dict,
+    get_chain_id_from_network_name,
 )
 from brownie.network import accounts
 from ocean_lib.data_provider.data_service_provider import DataServiceProvider
@@ -166,9 +167,7 @@ class OceanConnection(BaseSyncConnection):
                         "datatoken_amt": envelope.message.datatoken_amt,
                         "max_cost_ocean": envelope.message.max_cost_ocean,
                         "asset_did": envelope.message.asset_did,
-                        "exchange_id": convert_to_bytes_format(
-                            Web3, str(envelope.message.exchange_id)
-                        ),
+                        "exchange_id": envelope.message.exchange_id,
                         "has_pricing_schema": True,
                     },
                 )
@@ -281,6 +280,7 @@ class OceanConnection(BaseSyncConnection):
                 performative=OceanMessage.Performative.DISPENSER_DEPLOYMENT_RECIEPT,
                 datatoken_address=datatoken.address,
                 dispenser_status=dispenser_status,
+                has_pricing_schema=False,
             )
             msg.sender = envelope.to
             msg.to = envelope.sender
@@ -305,7 +305,8 @@ class OceanConnection(BaseSyncConnection):
             self.logger.info(f"Deployed fixed rate exchange = '{exchange_id}'")
             msg = OceanMessage(
                 performative=OceanMessage.Performative.EXCHANGE_DEPLOYMENT_RECIEPT,
-                exchange_id=convert_to_bytes_format(Web3, str(exchange_id)),
+                exchange_id=exchange_id,
+                has_pricing_schema=True,
             )
             msg.sender = envelope.to
             msg.to = envelope.sender
@@ -331,7 +332,8 @@ class OceanConnection(BaseSyncConnection):
         algo_service = ALG_DDO.services[0]
 
         free_c2d_env = self.ocean.compute.get_free_c2d_environment(
-            compute_service.service_endpoint
+            service_endpoint=compute_service.service_endpoint,
+            chain_id=get_chain_id_from_network_name(self.ocean.config["NETWORK_NAME"]),
         )
 
         DATA_compute_input = ComputeInput(DATA_DDO, compute_service)
@@ -598,6 +600,7 @@ class OceanConnection(BaseSyncConnection):
             type="d2c",
             did=DATA_asset.did,
             datatoken_contract_address=datatoken.address,
+            has_pricing_schema=envelope.message.has_pricing_schema,
         )
         msg.sender = envelope.to
         msg.to = envelope.sender
@@ -674,6 +677,7 @@ class OceanConnection(BaseSyncConnection):
             type="algorithm",
             did=ALGO_asset.did,
             datatoken_contract_address=ALGO_datatoken.address,
+            has_pricing_schema=envelope.message.has_pricing_schema,
         )
         msg.sender = envelope.to
         msg.to = envelope.sender
@@ -815,7 +819,7 @@ class OceanConnection(BaseSyncConnection):
                 tx_dict=tx_dict,
             )
 
-            return exchange.exchange_id
+            return convert_to_bytes_format(Web3, str(exchange.exchange_id))
         except Exception as e:
             self.logger.error(f"Failed to deploy fixed rate exchange in helper! {e}")
 
@@ -825,7 +829,7 @@ class OceanConnection(BaseSyncConnection):
 
         param envelope: the envelope to send.
         """
-        exchange_id = convert_to_bytes_format(Web3, str(envelope.message.exchange_id))
+        exchange_id = eval(envelope.message.exchange_id)
         exchange_details = self.ocean.fixed_rate_exchange.getExchange(exchange_id)
         datatoken = self.ocean.get_datatoken(exchange_details[1])
         exchange = OneExchange(self.ocean.fixed_rate_exchange, exchange_id)

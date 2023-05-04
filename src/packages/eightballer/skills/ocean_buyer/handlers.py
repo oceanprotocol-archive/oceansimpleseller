@@ -1,5 +1,6 @@
 import json
 import pprint
+from _codecs import escape_decode
 from typing import Optional, cast
 
 from aea.configurations.base import PublicId
@@ -241,16 +242,18 @@ class GenericFipaHandler(Handler):
         )
         if len(fipa_msg.info.keys()) >= 1:
             data = fipa_msg.info
-            data_string = pprint.pformat(data)[:1000]
-            self.context.logger.info(f"received the following data={data_string}")
+            # data_string = pprint.pformat(data)[:1000]
+            self.context.logger.info(f"received the following data={data}")
             fipa_dialogues.dialogue_stats.add_dialogue_endstate(
                 FipaDialogue.EndState.SUCCESSFUL, fipa_dialogue.is_self_initiated
             )
             strategy = cast(GenericStrategy, self.context.strategy)
             strategy.successful_trade_with_counterparty(fipa_msg.sender, data)
             strategy.purchased_data = json.loads(data['data'])
-            exchange_dict = {"data_exchange_id": data["data_exchange_id"],
-                             "algo_exchange_id": data["algo_exchange_id"]}
+            exchange_dict = {"data_exchange_id": escape_decode(data["data_exchange_id"])[0],
+                             "algo_exchange_id": escape_decode(data["algo_exchange_id"])[0],
+                             "has_pricing_schema": True
+                             }
             strategy.purchased_data.update(exchange_dict)
             strategy.is_c2d_active = True
         else:

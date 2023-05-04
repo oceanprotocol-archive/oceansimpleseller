@@ -195,6 +195,7 @@ class OceanC2DBehaviour(Behaviour):
                         "datatoken_amt": strategy.datatoken_amt,
                         "asset_did": strategy.purchased_data["data_did"],
                         "order_tx_id": strategy.purchased_data["order_tx_id"],
+                        "has_pricing_schema": False
                     }
                 )
             else:
@@ -205,6 +206,7 @@ class OceanC2DBehaviour(Behaviour):
                         "max_cost_ocean": strategy.max_cost_ocean,
                         "asset_did": strategy.purchased_data["data_did"],
                         "exchange_id": strategy.purchased_data["data_exchange_id"],
+                        "has_pricing_schema": True
                     }
                 )
 
@@ -217,7 +219,9 @@ class OceanC2DBehaviour(Behaviour):
                 self.__create_envelope(
                     OceanMessage.Performative.DOWNLOAD_JOB, **{
                         "datatoken_address": "",
-                        "datatoken_amt": strategy.datatoken_amt
+                        "datatoken_amt": strategy.datatoken_amt,
+                        "order_tx_id": strategy.purchased_data["order_tx_id"],
+                        "has_pricing_schema": False
                     }
                 )
             else:
@@ -228,6 +232,7 @@ class OceanC2DBehaviour(Behaviour):
                         "max_cost_ocean": strategy.max_cost_ocean,
                         "asset_did": strategy.purchased_data["algo_did"],
                         "exchange_id": strategy.purchased_data["algo_exchange_id"],
+                        "has_pricing_schema": True
                     }
                 )
 

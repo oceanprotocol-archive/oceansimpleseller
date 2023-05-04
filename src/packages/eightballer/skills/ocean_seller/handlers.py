@@ -480,6 +480,8 @@ class GenericLedgerApiHandler(Handler):
             strategy = cast(GenericStrategy, self.context.strategy)
             fipa_dialogue.data_for_sale["data_exchange_id"] = strategy.download_params["data_exchange_id"]
             fipa_dialogue.data_for_sale["algo_exchange_id"] = strategy.download_params["algo_exchange_id"]
+            # self.context.logger.info(f'strategy.download_params: {strategy.download_params}')
+            # fipa_dialogue.data_for_sale["has_pricing_schema"] = strategy.download_params["has_pricing_schema"]
 
             self.context.logger.info(
                 "transaction confirmed, sending data={} to buyer={}.".format(
