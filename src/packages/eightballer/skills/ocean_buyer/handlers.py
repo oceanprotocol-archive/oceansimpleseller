@@ -250,8 +250,8 @@ class GenericFipaHandler(Handler):
             strategy = cast(GenericStrategy, self.context.strategy)
             strategy.successful_trade_with_counterparty(fipa_msg.sender, data)
             strategy.purchased_data = json.loads(data['data'])
-            exchange_dict = {"data_exchange_id": escape_decode(data["data_exchange_id"])[0],
-                             "algo_exchange_id": escape_decode(data["algo_exchange_id"])[0],
+            exchange_dict = {"data_exchange_id": data["data_exchange_id"],
+                             "algo_exchange_id": data["algo_exchange_id"],
                              "has_pricing_schema": True
                              }
             strategy.purchased_data.update(exchange_dict)

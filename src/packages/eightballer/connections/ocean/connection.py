@@ -167,7 +167,7 @@ class OceanConnection(BaseSyncConnection):
                         "datatoken_amt": envelope.message.datatoken_amt,
                         "max_cost_ocean": envelope.message.max_cost_ocean,
                         "asset_did": envelope.message.asset_did,
-                        "exchange_id": envelope.message.exchange_id,
+                        "exchange_id": str(envelope.message.exchange_id),
                         "has_pricing_schema": True,
                     },
                 )
@@ -305,7 +305,7 @@ class OceanConnection(BaseSyncConnection):
             self.logger.info(f"Deployed fixed rate exchange = '{exchange_id}'")
             msg = OceanMessage(
                 performative=OceanMessage.Performative.EXCHANGE_DEPLOYMENT_RECIEPT,
-                exchange_id=exchange_id,
+                exchange_id=str(exchange_id),
                 has_pricing_schema=True,
             )
             msg.sender = envelope.to
@@ -819,7 +819,7 @@ class OceanConnection(BaseSyncConnection):
                 tx_dict=tx_dict,
             )
 
-            return convert_to_bytes_format(Web3, str(exchange.exchange_id))
+            return exchange.exchange_id
         except Exception as e:
             self.logger.error(f"Failed to deploy fixed rate exchange in helper! {e}")
 
@@ -829,7 +829,7 @@ class OceanConnection(BaseSyncConnection):
 
         param envelope: the envelope to send.
         """
-        exchange_id = eval(envelope.message.exchange_id)
+        exchange_id = convert_to_bytes_format(web3, str(envelope.message.exchange_id))
         exchange_details = self.ocean.fixed_rate_exchange.getExchange(exchange_id)
         datatoken = self.ocean.get_datatoken(exchange_details[1])
         exchange = OneExchange(self.ocean.fixed_rate_exchange, exchange_id)

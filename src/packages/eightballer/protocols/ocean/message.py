@@ -351,10 +351,10 @@ class OceanMessage(Message):
         return cast(int, self.get("ocean_amt"))
 
     @property
-    def exchange_id(self) -> bytes:
+    def exchange_id(self) -> str:
         """Get the 'exchange_id' content from the message."""
         enforce(self.is_set("exchange_id"), "'exchange_id' content is not set.")
-        return cast(bytes, self.get("exchange_id"))
+        return cast(str, self.get("exchange_id"))
 
     @property
     def has_pricing_schema(self) -> bool:
@@ -689,8 +689,8 @@ class OceanMessage(Message):
             ):
                 expected_nb_of_contents = 1
                 enforce(
-                    isinstance(self.exchange_id, bytes),
-                    "Invalid type for content 'exchange_id'. Expected 'bytes'. Found '{}'.".format(
+                    isinstance(self.exchange_id, str),
+                    "Invalid type for content 'exchange_id'. Expected 'str'. Found '{}'.".format(
                         type(self.exchange_id)
                     ),
                 )
@@ -799,8 +799,8 @@ class OceanMessage(Message):
                     ),
                 )
                 enforce(
-                    isinstance(self.exchange_id, bytes),
-                    "Invalid type for content 'exchange_id'. Expected 'bytes'. Found '{}'.".format(
+                    isinstance(self.exchange_id, str),
+                    "Invalid type for content 'exchange_id'. Expected 'str'. Found '{}'.".format(
                         type(self.exchange_id)
                     ),
                 )
