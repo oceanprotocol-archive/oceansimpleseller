@@ -279,6 +279,7 @@ def test_create_fixed_rate(put_envelope):
             "description": "example",
             "author": "Trent",
             "license": "CCO",
+            "has_pricing_schema": True,
         },
     )
 
@@ -556,26 +557,9 @@ def test_purchase_datatoken(put_envelope):
     ocean2.on_connect()
 
     datatoken = ocean2.ocean.get_datatoken(datatoken_address)
-    OCEAN_token = ocean2.ocean.OCEAN_token
 
     seller_wallet = accounts.add(os.environ["SELLER_AEA_KEY_ETHEREUM"])
     buyer_wallet = accounts.add(os.environ["BUYER_AEA_KEY_ETHEREUM"])
-    amount = Web3.toWei(100, "ether")
-    ocean_deployer_wallet = accounts.add(os.getenv("FACTORY_DEPLOYER_PRIVATE_KEY"))
-    if OCEAN_token.balanceOf(seller_wallet.address) == 0:
-        distribute_ocean_tokens(
-            ocean.ocean, amount, [seller_wallet.address], ocean_deployer_wallet
-        )
-    if (
-        OCEAN_token.balanceOf(buyer_wallet.address) == 0
-        and OCEAN_token.balanceOf(seller_wallet.address) > 0
-    ):
-        OCEAN_token.transfer(
-            buyer_wallet.address, Web3.toWei(50, "ether"), {"from": seller_wallet}
-        )
-
-    assert OCEAN_token.balanceOf(seller_wallet.address) > 0
-    assert OCEAN_token.balanceOf(buyer_wallet.address) > 0
 
     datatoken.mint(
         buyer_wallet.address, Web3.toWei(50, "ether"), {"from": seller_wallet}

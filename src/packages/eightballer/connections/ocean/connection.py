@@ -33,14 +33,15 @@ from aea.connections.base import BaseSyncConnection
 from aea.mail.base import Envelope
 from packages.eightballer.protocols.ocean.message import OceanMessage
 from packages.eightballer.connections.ocean.utils import (
+    convert_to_bytes_format,
     get_tx_dict,
+    get_chain_id_from_network_name,
 )
 from brownie.network import accounts
 from ocean_lib.data_provider.data_service_provider import DataServiceProvider
 from ocean_lib.example_config import get_config_dict
 from ocean_lib.models.compute_input import ComputeInput
-from ocean_lib.models.data_nft import DataNFTArguments
-from ocean_lib.models.datatoken import DatatokenArguments, TokenFeeInfo
+from ocean_lib.models.datatoken_base import DatatokenArguments, TokenFeeInfo
 from ocean_lib.models.fixed_rate_exchange import OneExchange
 from ocean_lib.ocean.ocean import Ocean
 from ocean_lib.services.service import Service
@@ -166,7 +167,8 @@ class OceanConnection(BaseSyncConnection):
                         "datatoken_amt": envelope.message.datatoken_amt,
                         "max_cost_ocean": envelope.message.max_cost_ocean,
                         "asset_did": envelope.message.asset_did,
-                        "exchange_id": envelope.message.exchange_id,
+                        "exchange_id": str(envelope.message.exchange_id),
+                        "has_pricing_schema": True,
                     },
                 )
             else:
@@ -179,6 +181,7 @@ class OceanConnection(BaseSyncConnection):
                         "datatoken_amt": envelope.message.datatoken_amt,
                         "asset_did": envelope.message.asset_did,
                         "order_tx_id": tx.txid,
+                        "has_pricing_schema": False,
                     },
                 )
 
@@ -277,6 +280,7 @@ class OceanConnection(BaseSyncConnection):
                 performative=OceanMessage.Performative.DISPENSER_DEPLOYMENT_RECIEPT,
                 datatoken_address=datatoken.address,
                 dispenser_status=dispenser_status,
+                has_pricing_schema=False,
             )
             msg.sender = envelope.to
             msg.to = envelope.sender
@@ -301,7 +305,8 @@ class OceanConnection(BaseSyncConnection):
             self.logger.info(f"Deployed fixed rate exchange = '{exchange_id}'")
             msg = OceanMessage(
                 performative=OceanMessage.Performative.EXCHANGE_DEPLOYMENT_RECIEPT,
-                exchange_id=exchange_id,
+                exchange_id=str(exchange_id),
+                has_pricing_schema=True,
             )
             msg.sender = envelope.to
             msg.to = envelope.sender
@@ -327,7 +332,8 @@ class OceanConnection(BaseSyncConnection):
         algo_service = ALG_DDO.services[0]
 
         free_c2d_env = self.ocean.compute.get_free_c2d_environment(
-            compute_service.service_endpoint
+            service_endpoint=compute_service.service_endpoint,
+            chain_id=get_chain_id_from_network_name(self.ocean.config["NETWORK_NAME"]),
         )
 
         DATA_compute_input = ComputeInput(DATA_DDO, compute_service)
@@ -594,6 +600,7 @@ class OceanConnection(BaseSyncConnection):
             type="d2c",
             did=DATA_asset.did,
             datatoken_contract_address=datatoken.address,
+            has_pricing_schema=envelope.message.has_pricing_schema,
         )
         msg.sender = envelope.to
         msg.to = envelope.sender
@@ -670,6 +677,7 @@ class OceanConnection(BaseSyncConnection):
             type="algorithm",
             did=ALGO_asset.did,
             datatoken_contract_address=ALGO_datatoken.address,
+            has_pricing_schema=envelope.message.has_pricing_schema,
         )
         msg.sender = envelope.to
         msg.to = envelope.sender
@@ -707,27 +715,22 @@ class OceanConnection(BaseSyncConnection):
             self.logger.info("Create data NFT: begin.")
             tx_dict = get_tx_dict(self.ocean_config, self.wallet, chain)
             data_nft = self.ocean.data_nft_factory.create(
-                DataNFTArguments(
-                    name=envelope.message.data_nft_name,
-                    symbol=envelope.message.datatoken_name,
-                    transferable=False,
-                ),
-                tx_dict,
+                tx_dict=tx_dict,
+                name=envelope.message.data_nft_name,
+                symbol=envelope.message.datatoken_name,
             )
             publish_market_order_fees = TokenFeeInfo(
                 address=self.wallet.address, token=ZERO_ADDRESS, amount=0
             )
             datatoken = data_nft.create_datatoken(
-                DatatokenArguments(
-                    name=envelope.message.datatoken_name,
-                    symbol=envelope.message.datatoken_name,
-                    template_index=1,
-                    minter=self.wallet.address,
-                    fee_manager=self.wallet.address,
-                    publish_market_order_fees=publish_market_order_fees,
-                    bytess=[b""],
-                ),
-                tx_dict,
+                tx_dict=tx_dict,
+                name=envelope.message.datatoken_name,
+                symbol=envelope.message.datatoken_name,
+                template_index=1,
+                minter=self.wallet.address,
+                fee_manager=self.wallet.address,
+                publish_market_order_fees=publish_market_order_fees,
+                bytess=[b""],
             )
             self.logger.info(f"created the data token.")
 
@@ -826,7 +829,7 @@ class OceanConnection(BaseSyncConnection):
 
         param envelope: the envelope to send.
         """
-        exchange_id = envelope.message.exchange_id
+        exchange_id = convert_to_bytes_format(web3, str(envelope.message.exchange_id))
         exchange_details = self.ocean.fixed_rate_exchange.getExchange(exchange_id)
         datatoken = self.ocean.get_datatoken(exchange_details[1])
         exchange = OneExchange(self.ocean.fixed_rate_exchange, exchange_id)

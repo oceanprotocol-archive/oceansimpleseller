@@ -16,8 +16,23 @@
 #   limitations under the License.
 #
 # ------------------------------------------------------------------------------
+import logging
+
 import requests
 from web3.main import Web3
+from _codecs import escape_decode
+
+CHAIN_ID_PER_NETWORK = {
+    "mainnet": 1,
+    "goerli": 5,
+    "bsc": 56,
+    "polygon-main": 137,
+    "energyweb": 246,
+    "moonriver": 1285,
+    "moonbase": 1287,
+    "development": 8996,
+    "polygon-test": 80001,
+}
 
 
 def get_tx_dict(ocean_config: dict, wallet, chain) -> dict:
@@ -46,3 +61,27 @@ def get_tx_dict(ocean_config: dict, wallet, chain) -> dict:
         }
 
     return {"from": wallet}
+
+
+def convert_to_bytes_format(web3, data: str) -> bytes:
+    """Converts a bytes string into bytes.
+    Used for smart contracts calls."""
+    # if data[0:2] == "b'" or data[0:2] == 'b"':
+    #     data = data[2:-1]
+    #
+    # data = data.encode('utf-8').hex().rstrip("0")
+    # if len(data) % 2 != 0:
+    #     data = data + '0'
+    # bytes_data = bytes.fromhex(data).decode('utf8')
+    #
+    # bytes_data = escape_decode(bytes_data)[0]
+    # assert isinstance(bytes_data, bytes), "Invalid data provided."
+    bytes_data = web3.toBytes(hexstr=data)
+    assert isinstance(bytes_data, bytes), "Invalid data provided."
+
+    return bytes_data
+
+
+def get_chain_id_from_network_name(network_name: str) -> int:
+    """Retrieves the chain ID for the required network name."""
+    return CHAIN_ID_PER_NETWORK[network_name]
