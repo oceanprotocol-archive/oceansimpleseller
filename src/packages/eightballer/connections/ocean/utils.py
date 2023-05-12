@@ -66,16 +66,7 @@ def get_tx_dict(ocean_config: dict, wallet, chain) -> dict:
 def convert_to_bytes_format(web3, data: str) -> bytes:
     """Converts a bytes string into bytes.
     Used for smart contracts calls."""
-    # if data[0:2] == "b'" or data[0:2] == 'b"':
-    #     data = data[2:-1]
-    #
-    # data = data.encode('utf-8').hex().rstrip("0")
-    # if len(data) % 2 != 0:
-    #     data = data + '0'
-    # bytes_data = bytes.fromhex(data).decode('utf8')
-    #
-    # bytes_data = escape_decode(bytes_data)[0]
-    # assert isinstance(bytes_data, bytes), "Invalid data provided."
+
     bytes_data = web3.toBytes(hexstr=data)
     assert isinstance(bytes_data, bytes), "Invalid data provided."
 

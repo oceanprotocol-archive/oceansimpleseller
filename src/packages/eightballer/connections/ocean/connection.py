@@ -23,7 +23,7 @@ import web3.exceptions
 import brownie.exceptions
 import os
 import ocean_lib.exceptions
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any
 from brownie.network import accounts, chain, priority_fee, web3
 
@@ -329,12 +329,16 @@ class OceanConnection(BaseSyncConnection):
         ALG_DDO = self.ocean.assets.resolve(ALG_did)
 
         compute_service = DATA_DDO.services[0]
+        self.logger.info(f"compute service: {compute_service.__dict__}")
         algo_service = ALG_DDO.services[0]
-
-        free_c2d_env = self.ocean.compute.get_free_c2d_environment(
+        self.logger.info(
+            f'chain id: {get_chain_id_from_network_name(self.ocean.config["NETWORK_NAME"])}'
+        )
+        free_c2d_env = self.ocean.compute.get_free_c2d_environments(
             service_endpoint=compute_service.service_endpoint,
             chain_id=get_chain_id_from_network_name(self.ocean.config["NETWORK_NAME"]),
         )
+        self.logger.info(f"free c2d env: {free_c2d_env}")
 
         DATA_compute_input = ComputeInput(DATA_DDO, compute_service)
         ALGO_compute_input = ComputeInput(ALG_DDO, algo_service)
@@ -345,15 +349,19 @@ class OceanConnection(BaseSyncConnection):
             raise ValueError("Failed to pay for compute service after retrying.")
         try:
             tx_dict = get_tx_dict(self.ocean_config, self.wallet, chain)
+            self.logger.info(f"paying for compute service {datetime.now()}")
             datasets, algorithm = self.ocean.assets.pay_for_compute_service(
                 datasets=[DATA_compute_input],
                 algorithm_data=ALGO_compute_input,
-                consume_market_order_fee_address=self.wallet.address,
-                tx_dict=tx_dict,
                 compute_environment=free_c2d_env["id"],
-                valid_until=int((datetime.utcnow() + timedelta(days=1)).timestamp()),
+                valid_until=int(
+                    (datetime.now(timezone.utc) + timedelta(days=1)).timestamp()
+                ),
+                consume_market_order_fee_address=compute_service.datatoken,
+                tx_dict=tx_dict,
                 consumer_address=free_c2d_env["consumerAddress"],
             )
+            self.logger.info(f"finishing paying for compute service {datetime.now()}")
         except (
             ValueError,
             brownie.exceptions.VirtualMachineError,
