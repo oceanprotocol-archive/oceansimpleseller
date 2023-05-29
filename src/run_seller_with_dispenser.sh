@@ -101,7 +101,7 @@ aea config set --type dict vendor.eightballer.skills.ocean_seller.strategy.args 
         "author": "Trent",
         "license": "CCO",
         "date_created": "2019-12-28T10:55:11Z",
-        "has_pricing_schema": True
+        "has_pricing_schema": false
         },
     "data_to_compute_params":{
         "data_nft_name": "data_nft_c2d",
@@ -113,9 +113,10 @@ aea config set --type dict vendor.eightballer.skills.ocean_seller.strategy.args 
         "author": "Trent",
         "license": "CCO",
         "date_created": "2019-12-28T10:55:11Z",
-        "has_pricing_schema": False
+        "has_pricing_schema": false
         },
 }'
+
 
 
 

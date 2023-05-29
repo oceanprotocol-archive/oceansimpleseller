@@ -37,28 +37,34 @@ CHAIN_ID_PER_NETWORK = {
 
 def get_tx_dict(ocean_config: dict, wallet, chain) -> dict:
     if "polygon" in ocean_config["NETWORK_NAME"]:
-        gas_resp = requests.get("https://gasstation-mainnet.matic.network/v2")
-
-        if not gas_resp or gas_resp.status_code != 200:
-            print(
-                f"Invalid response from Polygon gas station. Retry with brownie values..."
-            )
-
-            return {
-                "from": wallet,
-                "priority_fee": chain.priority_fee,
-                "max_fee": chain.base_fee + 2 * chain.priority_fee,
-                "required_confs": 3,
-            }
-
         return {
             "from": wallet,
-            "priority_fee": Web3.toWei(
-                gas_resp.json()["fast"]["maxPriorityFee"], "gwei"
-            ),
-            "max_fee": Web3.toWei(gas_resp.json()["fast"]["maxFee"], "gwei"),
-            "required_confs": 3,
+            "priority_fee": chain.priority_fee,
+            "max_fee": chain.base_fee + 2 * chain.priority_fee,
+            # "required_confs": 3,
         }
+        # gas_resp = requests.get("https://gasstation-mainnet.matic.network/v2")
+        #
+        # if not gas_resp or gas_resp.status_code != 200:
+        #     print(
+        #         f"Invalid response from Polygon gas station. Retry with brownie values..."
+        #     )
+        #
+        #     return {
+        #         "from": wallet,
+        #         "priority_fee": chain.priority_fee,
+        #         "max_fee": chain.base_fee + 2 * chain.priority_fee,
+        #         "required_confs": 3,
+        #     }
+        #
+        # return {
+        #     "from": wallet,
+        #     "priority_fee": Web3.toWei(
+        #         gas_resp.json()["fast"]["maxPriorityFee"], "gwei"
+        #     ),
+        #     "max_fee": Web3.toWei(gas_resp.json()["fast"]["maxFee"], "gwei"),
+        #     "required_confs": 3,
+        # }
 
     return {"from": wallet}
 
@@ -66,16 +72,7 @@ def get_tx_dict(ocean_config: dict, wallet, chain) -> dict:
 def convert_to_bytes_format(web3, data: str) -> bytes:
     """Converts a bytes string into bytes.
     Used for smart contracts calls."""
-    # if data[0:2] == "b'" or data[0:2] == 'b"':
-    #     data = data[2:-1]
-    #
-    # data = data.encode('utf-8').hex().rstrip("0")
-    # if len(data) % 2 != 0:
-    #     data = data + '0'
-    # bytes_data = bytes.fromhex(data).decode('utf8')
-    #
-    # bytes_data = escape_decode(bytes_data)[0]
-    # assert isinstance(bytes_data, bytes), "Invalid data provided."
+
     bytes_data = web3.toBytes(hexstr=data)
     assert isinstance(bytes_data, bytes), "Invalid data provided."
 

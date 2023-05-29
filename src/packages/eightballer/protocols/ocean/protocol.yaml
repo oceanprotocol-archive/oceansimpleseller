@@ -12,7 +12,7 @@ fingerprint:
   dialogues.py: QmdohSndZCjm6FhvoCGSR5B4sApgfkeho8RqccDpfQRfd5
   message.py: Qma4mRduDN1WVAwAsfxufxZkSzKYGsPJpY27dVkgEkeMXP
   ocean.proto: QmS9yuTPy4fqe4nf1twqEEogguJRdYLEkhmWEgzrCF4ume
-  ocean_pb2.py: QmeWUZ7oiAMdJRbJd5u2B7LoPP3jUCahpHKr6mt5e6JpQU
+  ocean_pb2.py: Qmei6WszQp5x3H2TvxiZG8sbe6UkSMsefijcAfaMV8nMvu
   serialization.py: QmSkbYC7Ctjh6ggHkWfzPE9zJZzRavr2Cmn9idWnnbP4sA
 fingerprint_ignore_patterns: []
 dependencies:

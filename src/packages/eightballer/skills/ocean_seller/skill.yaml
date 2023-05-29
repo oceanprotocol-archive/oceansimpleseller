@@ -66,7 +66,7 @@ models:
     args:
       algo_exchange_params:
         datatoken_address: ''
-        datatoken_amt: 50
+        datatoken_amt: 10
         ocean_amt: 1
         rate: 1
       algorithm_params:
@@ -91,7 +91,7 @@ models:
         has_pricing_schema: true
       data_exchange_params:
         datatoken_address: ''
-        datatoken_amt: 50
+        datatoken_amt: 10
         ocean_amt: 1
         rate: 1
       data_for_sale:
