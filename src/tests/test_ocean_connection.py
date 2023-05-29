@@ -13,7 +13,6 @@ from mock import patch, Mock
 from web3.main import Web3
 from brownie.network import accounts, chain
 
-from src.distribute_ocean_tokens import distribute_ocean_tokens
 from src.packages.eightballer.connections.ocean.utils import (
     get_tx_dict,
 )

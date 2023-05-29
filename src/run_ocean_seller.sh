@@ -117,14 +117,14 @@ aea config set --type dict vendor.eightballer.skills.ocean_seller.strategy.args 
         },
     "data_exchange_params":{
         "datatoken_address": "",
-        "datatoken_amt": 50,
+        "datatoken_amt": 10,
         "ocean_amt": 1,
         "rate": 1,
         "has_pricing_schema": true
     },
     "algo_exchange_params":{
         "datatoken_address": "",
-        "datatoken_amt": 50,
+        "datatoken_amt": 10,
         "ocean_amt": 1,
         "rate": 1,
         "has_pricing_schema": true
