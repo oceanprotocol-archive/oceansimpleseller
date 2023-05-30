@@ -352,7 +352,7 @@ class OceanConnection(BaseSyncConnection):
                 algorithm_data=ALGO_compute_input,
                 compute_environment=free_c2d_env["id"],
                 valid_until=int(
-                    (datetime.now(timezone.utc) + timedelta(days=1)).timestamp() * 1000
+                    (datetime.now(timezone.utc) + timedelta(days=1)).timestamp()
                 ),
                 consume_market_order_fee_address=compute_service.datatoken,
                 tx_dict=tx_dict,
